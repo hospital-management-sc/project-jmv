@@ -104,43 +104,350 @@ npm run dev
 ## 📁 Estructura del Proyecto
 
 ```
-hospital-management-system/
-├── backend/                    # API REST (Express + TypeScript)
-│   ├── src/
-│   │   ├── config/            # Configuraciones
-│   │   ├── models/            # Esquemas Mongoose
-│   │   ├── controllers/       # Controllers
-│   │   ├── services/          # Lógica de negocio
-│   │   ├── middleware/        # Middlewares
-│   │   ├── routes/            # Rutas
-│   │   ├── utils/             # Utilidades
-│   │   └── index.ts           # Punto de entrada
-│   ├── tests/
+pwa-hospital-militar/
+│
+├── 📁 client/                          # Frontend PWA (React.js)
+│   ├── 📁 public/
+│   │   ├── index.html
+│   │   ├── manifest.json
+│   │   ├── sw.js
+│   │   └── icons/
+│   │
+│   ├── 📁 src/
+│   │   ├── 📁 components/
+│   │   │   ├── 📁 common/
+│   │   │   │   ├── Header.jsx
+│   │   │   │   ├── Sidebar.jsx
+│   │   │   │   ├── LoadingSpinner.jsx
+│   │   │   │   ├── ErrorBoundary.jsx
+│   │   │   │   ├── DataTable.jsx        # Tabla reusable con paginación
+│   │   │   │   ├── SearchFilter.jsx     # Búsqueda y filtros
+│   │   │   │   └── Modal.jsx            # Modal reusable
+│   │   │   │
+│   │   │   ├── 📁 auth/
+│   │   │   │   ├── LoginForm.jsx
+│   │   │   │   ├── ProtectedRoute.jsx
+│   │   │   │   └── RoleBasedAccess.jsx  # Control de acceso por roles
+│   │   │   │
+│   │   │   ├── 📁 admin/                # NUEVO: Componentes de administración
+│   │   │   │   ├── 📁 dashboard/
+│   │   │   │   │   ├── StatsCards.jsx   # Tarjetas de estadísticas
+│   │   │   │   │   ├── Charts.jsx       # Gráficos y reportes
+│   │   │   │   │   └── ActivityFeed.jsx # Feed de actividad
+│   │   │   │   │
+│   │   │   │   ├── 📁 users/
+│   │   │   │   │   ├── UserForm.jsx     # Formulario crear/editar usuario
+│   │   │   │   │   ├── UserList.jsx     # Lista de usuarios
+│   │   │   │   │   ├── UserRoles.jsx    # Gestión de roles
+│   │   │   │   │   └── BulkActions.jsx  # Acciones masivas
+│   │   │   │   │
+│   │   │   │   ├── 📁 system/
+│   │   │   │   │   ├── SystemConfig.jsx # Configuración del sistema
+│   │   │   │   │   ├── BackupRestore.jsx # Backup y restauración
+│   │   │   │   │   ├── AuditLog.jsx     # Logs de auditoría
+│   │   │   │   │   └── ApiKeys.jsx      # Gestión de API keys
+│   │   │   │   │
+│   │   │   │   ├── 📁 reports/
+│   │   │   │   │   ├── ReportBuilder.jsx # Constructor de reportes
+│   │   │   │   │   ├── Analytics.jsx    # Analytics avanzados
+│   │   │   │   │   └── ExportTools.jsx  # Herramientas de exportación
+│   │   │   │   │
+│   │   │   │   └── AdminSidebar.jsx     # Sidebar específico para admin
+│   │   │   │
+│   │   │   ├── 📁 pacientes/
+│   │   │   │   ├── PatientForm.jsx
+│   │   │   │   ├── PatientList.jsx
+│   │   │   │   ├── PatientCard.jsx
+│   │   │   │   └── PatientSearch.jsx    # Búsqueda avanzada
+│   │   │   │
+│   │   │   ├── 📁 medical/
+│   │   │   │   ├── MedicalHistory.jsx
+│   │   │   │   ├── AppointmentScheduler.jsx
+│   │   │   │   ├── ReportGenerator.jsx
+│   │   │   │   ├── InterconsultaForm.jsx
+│   │   │   │   └── MedicalCharts.jsx    # Gráficos médicos
+│   │   │   │
+│   │   │   └── 📁 dashboard/            # Componentes de dashboard general
+│   │   │       ├── QuickActions.jsx     # Acciones rápidas
+│   │   │       ├── Notifications.jsx    # Panel de notificaciones
+│   │   │       └── UpcomingAppointments.jsx
+│   │   │
+│   │   ├── 📁 pages/
+│   │   │   ├── Dashboard.jsx            # Dashboard principal
+│   │   │   │
+│   │   │   ├── 📁 admin/                # NUEVO: Páginas de administración
+│   │   │   │   ├── AdminDashboard.jsx   # Dashboard administrativo
+│   │   │   │   ├── 📁 user-management/
+│   │   │   │   │   ├── UsersListPage.jsx
+│   │   │   │   │   ├── UserCreatePage.jsx
+│   │   │   │   │   └── UserEditPage.jsx
+│   │   │   │   │
+│   │   │   │   ├── 📁 system-management/
+│   │   │   │   │   ├── SystemConfigPage.jsx
+│   │   │   │   │   ├── BackupPage.jsx
+│   │   │   │   │   ├── AuditLogsPage.jsx
+│   │   │   │   │   └── ApiManagementPage.jsx
+│   │   │   │   │
+│   │   │   │   ├── 📁 reports/
+│   │   │   │   │   ├── ReportsPage.jsx
+│   │   │   │   │   ├── AnalyticsPage.jsx
+│   │   │   │   │   └── CustomReportsPage.jsx
+│   │   │   │   │
+│   │   │   │   ├── 📁 hospital-config/
+│   │   │   │   │   ├── DepartmentsPage.jsx  # Gestión de departamentos
+│   │   │   │   │   ├── SpecialtiesPage.jsx  # Especialidades médicas
+│   │   │   │   │   └── SchedulesPage.jsx    # Horarios del hospital
+│   │   │   │   │
+│   │   │   │   └── AdminLayout.jsx      # Layout específico para admin
+│   │   │   │
+│   │   │   ├── 📁 pacientes/
+│   │   │   │   ├── PatientsPage.jsx
+│   │   │   │   └── PatientDetail.jsx
+│   │   │   │
+│   │   │   ├── 📁 medical/
+│   │   │   │   ├── MedicalHistoryPage.jsx
+│   │   │   │   ├── AppointmentsPage.jsx
+│   │   │   │   ├── InterconsultasPage.jsx
+│   │   │   │   └── ReportsPage.jsx
+│   │   │   │
+│   │   │   └── AuthPage.jsx
+│   │   │
+│   │   ├── 📁 hooks/
+│   │   │   ├── useAuth.js
+│   │   │   ├── usePatients.js
+│   │   │   ├── useAppointments.js
+│   │   │   ├── useLocalStorage.js
+│   │   │   ├── useAdmin.js              # NUEVO: Hook para funcionalidades admin
+│   │   │   ├── useUsers.js              # NUEVO: Gestión de usuarios
+│   │   │   ├── useReports.js            # NUEVO: Reportes y analytics
+│   │   │   └── useSystem.js             # NUEVO: Configuración del sistema
+│   │   │
+│   │   ├── 📁 services/
+│   │   │   ├── api.js
+│   │   │   ├── authService.js
+│   │   │   ├── patientService.js
+│   │   │   ├── appointmentService.js
+│   │   │   ├── storageService.js
+│   │   │   ├── adminService.js          # NUEVO: Servicios de administración
+│   │   │   ├── userService.js           # NUEVO: Servicios de usuarios
+│   │   │   ├── reportService.js         # NUEVO: Servicios de reportes
+│   │   │   └── systemService.js         # NUEVO: Servicios del sistema
+│   │   │
+│   │   ├── 📁 utils/
+│   │   │   ├── constants.js
+│   │   │   ├── validators.js
+│   │   │   ├── formatters.js
+│   │   │   ├── offlineManager.js
+│   │   │   ├── adminHelpers.js          # NUEVO: Utilidades para admin
+│   │   │   ├── exportUtils.js           # NUEVO: Exportación de datos
+│   │   │   └── chartUtils.js            # NUEVO: Utilidades para gráficos
+│   │   │
+│   │   ├── 📁 contexts/
+│   │   │   ├── AuthContext.js
+│   │   │   ├── AppContext.js
+│   │   │   ├── OfflineContext.js
+│   │   │   └── AdminContext.js          # NUEVO: Context para admin
+│   │   │
+│   │   ├── 📁 styles/
+│   │   │   ├── index.css
+│   │   │   ├── components/
+│   │   │   ├── admin/                   # NUEVO: Estilos específicos admin
+│   │   │   └── responsive.css
+│   │   │
+│   │   ├── 📁 assets/
+│   │   │   ├── images/
+│   │   │   ├── icons/
+│   │   │   └── fonts/
+│   │   │
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   └── index.jsx
+│   │
 │   ├── package.json
-│   └── tsconfig.json
+│   ├── vite.config.js
+│   └── sw-development.js
 │
-├── frontend/                   # React + Vite
-│   ├── src/
-│   │   ├── components/        # Componentes React
-│   │   ├── pages/             # Páginas
-│   │   ├── hooks/             # Custom hooks
-│   │   ├── services/          # Servicios API
-│   │   ├── context/           # Context API
-│   │   ├── styles/            # CSS Modules
-│   │   └── App.tsx
-│   ├── public/                # Assets estáticos
-│   ├── index.html
+├── 📁 server/                         # Backend (Node.js/Express)
+│   ├── 📁 src/
+│   │   ├── 📁 controllers/
+│   │   │   ├── authController.js
+│   │   │   ├── patientController.js
+│   │   │   ├── medicalHistoryController.js
+│   │   │   ├── appointmentController.js
+│   │   │   ├── interconsultaController.js
+│   │   │   ├── reportController.js
+│   │   │   ├── userController.js
+│   │   │   ├── adminController.js       # NUEVO: Controlador de admin
+│   │   │   ├── systemController.js      # NUEVO: Controlador del sistema
+│   │   │   └── analyticsController.js   # NUEVO: Controlador de analytics
+│   │   │
+│   │   ├── 📁 routes/
+│   │   │   ├── index.js
+│   │   │   ├── authRoutes.js
+│   │   │   ├── patientRoutes.js
+│   │   │   ├── medicalRoutes.js
+│   │   │   ├── appointmentRoutes.js
+│   │   │   ├── adminRoutes.js           # NUEVO: Rutas de administración
+│   │   │   ├── userRoutes.js            # NUEVO: Rutas de usuarios
+│   │   │   ├── systemRoutes.js          # NUEVO: Rutas del sistema
+│   │   │   └── analyticsRoutes.js       # NUEVO: Rutas de analytics
+│   │   │
+│   │   ├── 📁 models/
+│   │   │   ├── User.js
+│   │   │   ├── Patient.js
+│   │   │   ├── MedicalHistory.js
+│   │   │   ├── Appointment.js
+│   │   │   ├── Interconsulta.js
+│   │   │   ├── Report.js
+│   │   │   ├── Department.js            # NUEVO: Modelo de departamentos
+│   │   │   ├── Specialty.js             # NUEVO: Modelo de especialidades
+│   │   │   ├── AuditLog.js              # NUEVO: Modelo de logs de auditoría
+│   │   │   ├── SystemConfig.js          # NUEVO: Modelo de configuración
+│   │   │   └── Backup.js                # NUEVO: Modelo de backups
+│   │   │
+│   │   ├── 📁 middleware/
+│   │   │   ├── authMiddleware.js
+│   │   │   ├── validationMiddleware.js
+│   │   │   ├── roleMiddleware.js
+│   │   │   ├── errorHandler.js
+│   │   │   ├── logger.js
+│   │   │   ├── adminMiddleware.js       # NUEVO: Middleware para admin
+│   │   │   └── auditMiddleware.js       # NUEVO: Middleware de auditoría
+│   │   │
+│   │   ├── 📁 services/
+│   │   │   ├── authService.js
+│   │   │   ├── patientService.js
+│   │   │   ├── emailService.js
+│   │   │   ├── reportService.js
+│   │   │   ├── adminService.js          # NUEVO: Servicios de administración
+│   │   │   ├── userManagementService.js # NUEVO: Gestión de usuarios
+│   │   │   ├── analyticsService.js      # NUEVO: Servicios de analytics
+│   │   │   ├── backupService.js         # NUEVO: Servicios de backup
+│   │   │   └── systemService.js         # NUEVO: Servicios del sistema
+│   │   │
+│   │   ├── 📁 utils/
+│   │   │   ├── 📁 database/
+│   │   │   │   ├── connection.js
+│   │   │   │   └── seed.js
+│   │   │   │
+│   │   │   ├── 📁 security/
+│   │   │   │   ├── encryption.js
+│   │   │   │   ├── validators.js
+│   │   │   │   └── auditLogger.js       # NUEVO: Logger de auditoría
+│   │   │   │
+│   │   │   ├── 📁 admin/                # NUEVO: Utilidades de admin
+│   │   │   │   ├── dataExport.js        # Exportación de datos
+│   │   │   │   ├── reportGenerator.js   # Generador de reportes
+│   │   │   │   └── systemMonitor.js     # Monitor del sistema
+│   │   │   │
+│   │   │   ├── helpers.js
+│   │   │   └── constants.js
+│   │   │
+│   │   ├── 📁 config/
+│   │   │   ├── database.js
+│   │   │   ├── environment.js
+│   │   │   ├── security.js
+│   │   │   ├── pwa.js
+│   │   │   └── admin.js                 # NUEVO: Configuración admin
+│   │   │
+│   │   ├── 📁 docs/
+│   │   │   └── swagger.json
+│   │   │
+│   │   └── app.js
+│   │   └── server.js
+│   │
 │   ├── package.json
-│   └── tsconfig.json
+│   ├── .env.example
+│   └── dockerfile
 │
-├── docs/                       # Documentación
-│   ├── ARQUITECTURA.md
-│   ├── API.md
-│   ├── DATABASE.md
-│   ├── SEGURIDAD.md
-│   └── SETUP.md
+├── 📁 shared/
+│   ├── 📁 types/
+│   ├── 📁 constants/
+│   │   ├── roles.js                    # Actualizado con roles admin
+│   │   ├── permissions.js              # NUEVO: Permisos detallados
+│   │   └── system.js                   # NUEVO: Constantes del sistema
+│   └── 📁 utils/
 │
-└── docker-compose.yml         # Orquestación Docker
+├── 📁 docs/
+│   ├── 📁 technical/
+│   │   ├── architecture.md
+│   │   ├── api-reference.md
+│   │   ├── database-schema.md
+│   │   ├── deployment-guide.md
+│   │   └── admin-guide.md              # NUEVO: Guía de administración
+│   │
+│   ├── 📁 user-manuals/
+│   │   ├── manual-medicos.md
+│   │   ├── manual-administrativos.md
+│   │   ├── manual-admin.md             # NUEVO: Manual de administrador
+│   │   └── quick-start.md
+│   │
+│   ├── 📁 requirements/
+│   │   ├── functional-requirements.md
+│   │   ├── non-functional-requirements.md
+│   │   ├── user-stories.md
+│   │   └── admin-requirements.md       # NUEVO: Requisitos de admin
+│   │
+│   └── project-presentation.pdf
+│
+├── 📁 tests/
+│   ├── 📁 client/
+│   │   ├── unit/
+│   │   │   └── admin/                  # NUEVO: Tests de componentes admin
+│   │   ├── integration/
+│   │   └── e2e/
+│   │       └── admin/                  # NUEVO: Tests E2E de admin
+│   │
+│   ├── 📁 server/
+│   │   ├── unit/
+│   │   │   └── admin/                  # NUEVO: Tests de servicios admin
+│   │   ├── integration/
+│   │   └── api/
+│   │       └── admin/                  # NUEVO: Tests de API admin
+│   │
+│   └── jest.config.js
+│
+├── 📁 scripts/
+│   ├── setup-dev.js
+│   ├── seed-database.js
+│   ├── backup-data.js
+│   ├── create-admin-user.js            # NUEVO: Script crear usuario admin
+│   ├── system-maintenance.js           # NUEVO: Mantenimiento del sistema
+│   ├── generate-reports.js             # NUEVO: Generar reportes automáticos
+│   └── deployment/
+│
+├── 📁 deployment/
+│   ├── 📁 docker/
+│   │   ├── docker-compose.yml
+│   │   ├── nginx/
+│   │   └── mongo/
+│   │
+│   ├── 📁 production/
+│   │   ├── environment.prod.js
+│   │   └── build-script.js
+│   │
+│   └── 📁 staging/
+│
+├── 📁 database/
+│   ├── 📁 migrations/
+│   │   ├── 001-initial-schema.js
+│   │   ├── 002-add-admin-features.js   # NUEVO: Migración para features admin
+│   │   └── 003-audit-logging.js        # NUEVO: Migración para auditoría
+│   ├── 📁 seeds/
+│   │   ├── admin-users.js              # NUEVO: Semilla de usuarios admin
+│   │   ├── departments.js              # NUEVO: Semilla de departamentos
+│   │   └── specialties.js              # NUEVO: Semilla de especialidades
+│   └── schema-design.mongodb
+│
+├── 📁 backups/
+│   ├── 📁 sample-data/
+│   └── 📁 database-dumps/
+│
+├── .gitignore
+├── README.md
+├── package.json
+├── docker-compose.yml
+└── LICENSE
 
 Ver GUIA_PROYECTO.md para estructura detallada.
 ```
