@@ -9,6 +9,7 @@ Bienvenido a la Wiki del Sistema de Gestión Hospitalaria. Esta documentación c
 ### 🚀 Inicio Rápido
 - **[Resumen del Proyecto](Resumen-del-Proyecto.md)** - Descripción general y objetivos
 - **[Guía del Proyecto](Guia-del-Proyecto.md)** - Contexto completo, arquitectura y fases
+- **[Guía de Organización](ORGANIZACION.md)** - Cómo está organizado este repositorio
 
 ### 👥 Organización y Equipo
 - **[Liderazgo del Equipo](Liderazgo-Equipo.md)** - Manual de liderazgo y gestión del equipo
