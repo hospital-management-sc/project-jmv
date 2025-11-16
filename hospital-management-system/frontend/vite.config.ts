@@ -18,10 +18,4 @@ export default defineConfig({
       '@hooks': path.resolve(__dirname, './src/hooks'),
     },
   },
-  preview: {
-    middlewareMode: false,
-  },
-  server: {
-    middlewareMode: false,
-  },
 })
