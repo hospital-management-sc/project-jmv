@@ -6,7 +6,7 @@
  */
 
 import express, { Express, Request, Response, NextFunction } from 'express';
-import cors from 'cors';
+import cors, { CorsOptions } from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
@@ -33,8 +33,8 @@ const NODE_ENV = config.nodeEnv;
 app.use(helmet());
 
 // CORS configuration
-const corsOptions = {
-  origin: (origin, callback) => {
+const corsOptions: CorsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     // Allow requests from the configured origin (with or without trailing slash)
     const allowedOrigin = config.corsOrigin.replace(/\/$/, ''); // Remove trailing slash
     
