@@ -35,7 +35,6 @@ export interface User {
  * Login credentials
  */
 export interface LoginCredentials {
-  ci: string
   email: string
   password: string
 }
@@ -44,21 +43,26 @@ export interface LoginCredentials {
  * Registration data
  */
 export interface RegisterData {
-  ci: string
-  firstName: string
-  lastName: string
+  nombre: string
   email: string
   password: string
-  confirmPassword: string
-  type: UserType
-  role?: UserRole // Optional - puede ser asignado por admin después
+  ci?: string
+  role?: string
 }
 
 /**
  * Authentication response
  */
 export interface AuthResponse {
-  user: User
-  token: string
-  refreshToken?: string
+  success: boolean
+  data?: {
+    id: number
+    nombre: string
+    email: string
+    role: string
+    token: string
+    refreshToken?: string
+  }
+  error?: string
+  message?: string
 }

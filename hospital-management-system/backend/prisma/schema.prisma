@@ -59,16 +59,21 @@ model PersonalMilitar {
 model Usuario {
   id        BigInt   @id @default(autoincrement())
   nombre    String   @db.VarChar(200)
-  ci        String?  @db.VarChar(50)
+  email     String   @unique @db.VarChar(200)
+  password  String   @db.VarChar(255)
+  ci        String?  @unique @db.VarChar(50)
   cargo     String?  @db.VarChar(100)
-  email     String?  @db.VarChar(200)
-  role      String?  @db.VarChar(50) // MEDICO, ENFERMERO, ADMIN, etc
+  role      String?  @db.VarChar(50) // MEDICO, ENFERMERO, ADMIN, USUARIO, etc
   createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
 
   // Relaciones
   admisiones        Admision[]
   encuentros        Encuentro[]
   auditorias        AuditLog[]
+
+  @@index([email])
+  @@index([ci])
 }
 
 // ============================================

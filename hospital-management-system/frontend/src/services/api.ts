@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '@/utils/constants'
+import { API_BASE_URL, STORAGE_KEYS } from '@/utils/constants'
 
 interface RequestOptions extends RequestInit {
   headers?: Record<string, string>
@@ -10,19 +10,44 @@ async function request<T>(
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
 
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  })
+  // Get token from localStorage
+  const token = localStorage.getItem(STORAGE_KEYS.TOKEN)
 
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`)
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers,
   }
 
-  return response.json()
+  // Add authorization header if token exists
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
+  console.log('API Request:', { url, method: options.method || 'GET', headers })
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      mode: 'cors',
+      credentials: 'include',
+    })
+
+    console.log('API Response status:', response.status)
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      console.error('API Error:', errorData)
+      throw new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    console.log('API Response data:', data)
+    return data
+  } catch (error) {
+    console.error('Fetch error:', error)
+    throw error
+  }
 }
 
 export const apiService = {

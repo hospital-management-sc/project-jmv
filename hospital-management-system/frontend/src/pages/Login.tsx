@@ -7,10 +7,6 @@ import { authService } from '@services/auth'
 import styles from './Login.module.css'
 
 const loginSchema = z.object({
-  ci: z
-    .string()
-    .min(1, 'C.I. es requerido')
-    .regex(/^[0-9]+$/, 'C.I. debe contener solo números'),
   email: z
     .string()
     .min(1, 'Email es requerido')
@@ -35,13 +31,24 @@ export default function Login() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      const response = await authService.login(data)
-      authService.setToken(response.token)
-      // Redirect to dashboard or home
-      navigate('/')
-    } catch (error) {
+      console.log('Attempting login with:', data.email)
+      const response = await authService.login({
+        email: data.email,
+        password: data.password,
+      })
+      console.log('Login response:', response)
+      
+      if (response.success && response.data?.token) {
+        authService.setToken(response.data.token)
+        console.log('Token saved, redirecting...')
+        navigate('/')
+      } else {
+        alert('Error: ' + (response.error || 'Respuesta inválida del servidor'))
+      }
+    } catch (error: any) {
       console.error('Login error:', error)
-      alert('Error al iniciar sesión. Verifica tus credenciales.')
+      const message = error.response?.data?.message || error.message || 'Error desconocido'
+      alert('Error al iniciar sesión: ' + message)
     }
   }
 
@@ -51,14 +58,6 @@ export default function Login() {
       <p className={styles.subtitle}>Inicia sesión en tu cuenta</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-        <FormInput
-          id="ci"
-          label="C.I. (Cédula de Identidad)"
-          placeholder="Ej: 12345678"
-          error={errors.ci?.message}
-          {...register('ci')}
-        />
-
         <FormInput
           id="email"
           type="email"
