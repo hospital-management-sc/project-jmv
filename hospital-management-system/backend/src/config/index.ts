@@ -26,6 +26,15 @@ function getCorsOrigin(): string {
     return envCors;
   }
 
+  // Auto-detect production environments
+  const nodeEnv = process.env.NODE_ENV;
+  if (nodeEnv === 'production') {
+    // For production on Render backend with Vercel frontend
+    const corsUrl = 'https://project-jmv.vercel.app';
+    console.log(`[CONFIG] Production detected: ${corsUrl}`);
+    return corsUrl;
+  }
+
   // Default to localhost for local development
   const defaultCors = 'http://localhost:5173';
   console.log(`[CONFIG] Using default localhost: ${defaultCors}`);

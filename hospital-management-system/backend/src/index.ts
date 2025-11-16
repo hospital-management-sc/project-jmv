@@ -34,9 +34,25 @@ app.use(helmet());
 
 // CORS configuration
 const corsOptions = {
-  origin: config.corsOrigin,
+  origin: (origin, callback) => {
+    // Allow requests from the configured origin (with or without trailing slash)
+    const allowedOrigin = config.corsOrigin.replace(/\/$/, ''); // Remove trailing slash
+    
+    // For development, allow all origins
+    if (config.isDevelopment) {
+      callback(null, true);
+      return;
+    }
+    
+    // For production, check exact match (without trailing slash comparison)
+    if (!origin || origin.replace(/\/$/, '') === allowedOrigin) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS policy violation'));
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200,
 };
