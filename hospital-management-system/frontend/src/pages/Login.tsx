@@ -31,24 +31,36 @@ export default function Login() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      console.log('Attempting login with:', data.email)
+      console.log('[Login] Form submitted with email:', data.email)
+      console.log('[Login] API_BASE_URL:', import.meta.env.VITE_API_URL || 'using constants')
+      
       const response = await authService.login({
         email: data.email,
         password: data.password,
       })
-      console.log('Login response:', response)
+      
+      console.log('[Login] Response received:', response)
       
       if (response.success && response.data?.token) {
+        console.log('[Login] Token validated, saving to localStorage')
         authService.setToken(response.data.token)
-        console.log('Token saved, redirecting...')
+        console.log('[Login] Token saved successfully, redirecting to home')
         navigate('/')
       } else {
-        alert('Error: ' + (response.error || 'Respuesta inválida del servidor'))
+        const errorMsg = response.error || 'Respuesta inválida del servidor'
+        console.error('[Login] Invalid response structure:', { response, errorMsg })
+        alert('Error: ' + errorMsg)
       }
     } catch (error: any) {
-      console.error('Login error:', error)
-      const message = error.response?.data?.message || error.message || 'Error desconocido'
-      alert('Error al iniciar sesión: ' + message)
+      const errorType = error?.name || 'Unknown'
+      const errorMessage = error?.message || 'Error desconocido'
+      console.error('[Login] Exception caught:', {
+        type: errorType,
+        message: errorMessage,
+        stack: error?.stack,
+        fullError: error,
+      })
+      alert('Error al iniciar sesión: ' + errorMessage)
     }
   }
 

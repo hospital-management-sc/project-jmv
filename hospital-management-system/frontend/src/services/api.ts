@@ -4,6 +4,9 @@ interface RequestOptions extends RequestInit {
   headers?: Record<string, string>
 }
 
+// Log API configuration on module load
+console.log('[API] Service initialized with BASE_URL:', API_BASE_URL)
+
 async function request<T>(
   endpoint: string,
   options: RequestOptions = {}
@@ -23,9 +26,17 @@ async function request<T>(
     headers.Authorization = `Bearer ${token}`
   }
 
-  console.log('API Request:', { url, method: options.method || 'GET', headers })
+  const requestInfo = {
+    url,
+    method: options.method || 'GET',
+    headers,
+    timestamp: new Date().toISOString(),
+  }
+
+  console.log('[API] Starting request:', requestInfo)
 
   try {
+    console.log('[API] Sending fetch to:', url)
     const response = await fetch(url, {
       ...options,
       headers,
@@ -33,19 +44,34 @@ async function request<T>(
       credentials: 'include',
     })
 
-    console.log('API Response status:', response.status)
+    console.log('[API] Response received', {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get('content-type'),
+    })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      console.error('API Error:', errorData)
+      let errorData
+      try {
+        errorData = await response.json()
+      } catch {
+        errorData = { message: response.statusText }
+      }
+      console.error('[API] Error response:', { status: response.status, errorData })
       throw new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`)
     }
 
     const data = await response.json()
-    console.log('API Response data:', data)
+    console.log('[API] Response parsed successfully:', data)
     return data
-  } catch (error) {
-    console.error('Fetch error:', error)
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('[API] Fetch failed:', {
+      error: errorMessage,
+      url,
+      method: options.method || 'GET',
+      timestamp: new Date().toISOString(),
+    })
     throw error
   }
 }

@@ -49,7 +49,9 @@ export default function Register() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      console.log('Attempting register with:', data.email)
+      console.log('[Register] Form submitted with email:', data.email)
+      console.log('[Register] Form data:', { nombre: data.nombre, email: data.email, role: data.role })
+      
       const response = await authService.register({
         nombre: data.nombre,
         email: data.email,
@@ -57,18 +59,28 @@ export default function Register() {
         ci: data.ci || undefined,
         role: data.role || 'USUARIO',
       })
-      console.log('Register response:', response)
+      
+      console.log('[Register] Response received:', response)
       
       if (response.success) {
+        console.log('[Register] Registration successful, redirecting to login')
         alert('¡Registro exitoso! Ahora inicia sesión.')
         navigate('/login')
       } else {
-        alert('Error: ' + (response.error || 'Respuesta inválida del servidor'))
+        const errorMsg = response.error || 'Respuesta inválida del servidor'
+        console.error('[Register] Invalid response:', { response, errorMsg })
+        alert('Error: ' + errorMsg)
       }
     } catch (error: any) {
-      console.error('Register error:', error)
-      const message = error.response?.data?.message || error.message || 'Error desconocido'
-      alert('Error al registrarse: ' + message)
+      const errorType = error?.name || 'Unknown'
+      const errorMessage = error?.message || 'Error desconocido'
+      console.error('[Register] Exception caught:', {
+        type: errorType,
+        message: errorMessage,
+        stack: error?.stack,
+        fullError: error,
+      })
+      alert('Error al registrarse: ' + errorMessage)
     }
   }
 

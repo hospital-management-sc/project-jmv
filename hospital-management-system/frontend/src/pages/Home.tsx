@@ -17,9 +17,9 @@ export default function Home() {
       }
 
       try {
-        const response = await apiService.get('/auth/me')
+        const response = await apiService.get<any>('/auth/me')
         console.log('User data:', response)
-        setUser(response.data)
+        setUser((response as any).data)
       } catch (error) {
         console.error('Error fetching user:', error)
         authService.logout()

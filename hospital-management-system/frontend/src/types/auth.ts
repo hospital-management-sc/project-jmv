@@ -1,20 +1,24 @@
 /**
  * User roles in the hospital management system
  */
-export enum UserRole {
-  ADMIN = 'admin',
-  DOCTOR = 'doctor',
-  COORDINATOR = 'coordinator',
-  STAFF = 'staff',
-}
+export const UserRole = {
+  ADMIN: 'admin',
+  DOCTOR: 'doctor',
+  COORDINATOR: 'coordinator',
+  STAFF: 'staff',
+} as const
+
+export type UserRoleType = (typeof UserRole)[keyof typeof UserRole]
 
 /**
  * User types that can register
  */
-export enum UserType {
-  MEDICAL = 'medical', // Médicos y coordinadores
-  ADMINISTRATIVE = 'administrative', // Personal administrativo
-}
+export const UserType = {
+  MEDICAL: 'medical', // Médicos y coordinadores
+  ADMINISTRATIVE: 'administrative', // Personal administrativo
+} as const
+
+export type UserTypeType = (typeof UserType)[keyof typeof UserType]
 
 /**
  * User interface
@@ -25,8 +29,8 @@ export interface User {
   firstName: string
   lastName: string
   email: string
-  role: UserRole
-  type: UserType
+  role: UserRoleType
+  type: UserTypeType
   createdAt: string
   updatedAt: string
 }
