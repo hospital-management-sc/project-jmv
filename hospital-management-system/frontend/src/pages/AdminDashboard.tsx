@@ -5,31 +5,40 @@
 
 import { useState, useEffect } from 'react'
 import styles from './AdminDashboard.module.css'
+import { useDashboardStats } from '../hooks/useDashboardStats'
 
 type ViewMode = 'main' | 'register-patient' | 'create-appointment' | 'search-patient'
 
 export default function AdminDashboard() {
   const [viewMode, setViewMode] = useState<ViewMode>('main')
+  const { stats, loading, error } = useDashboardStats(30000) // Actualizar cada 30 segundos
 
   const renderMainView = () => (
     <>
       {/* Sección de Estadísticas */}
       <section className={styles['dashboard-stats']}>
+        {error && (
+          <div style={{ gridColumn: '1 / -1', color: '#ef4444', padding: '1rem', backgroundColor: '#fee2e2', borderRadius: '0.375rem', marginBottom: '1rem' }}>
+            ⚠️ Error al cargar estadísticas: {error}
+          </div>
+        )}
         <div className={styles.card}>
           <h2>Total de Pacientes</h2>
-          <div className={styles['stat-value']}>0</div>
-        </div>
-        <div className={styles.card}>
-          <h2>Usuarios Activos</h2>
-          <div className={styles['stat-value']}>0</div>
+          <div className={styles['stat-value']}>
+            {loading ? '...' : stats?.totalPacientes ?? 0}
+          </div>
         </div>
         <div className={styles.card}>
           <h2>Citas Programadas Hoy</h2>
-          <div className={styles['stat-value']}>0</div>
+          <div className={styles['stat-value']}>
+            {loading ? '...' : stats?.citasProgramadasHoy ?? 0}
+          </div>
         </div>
         <div className={styles.card}>
           <h2>Registros de Auditoría</h2>
-          <div className={styles['stat-value']}>0</div>
+          <div className={styles['stat-value']}>
+            {loading ? '...' : stats?.registrosAuditoria ?? 0}
+          </div>
         </div>
       </section>
 
