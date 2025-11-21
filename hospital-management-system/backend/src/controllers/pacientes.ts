@@ -10,6 +10,33 @@ import logger from '../utils/logger';
 const prisma = new PrismaClient();
 
 /**
+ * Función helper para convertir BigInt a string en objetos
+ */
+function convertBigIntToString(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  
+  if (typeof obj === 'bigint') {
+    return obj.toString();
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => convertBigIntToString(item));
+  }
+  
+  if (typeof obj === 'object') {
+    const converted: any = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        converted[key] = convertBigIntToString(obj[key]);
+      }
+    }
+    return converted;
+  }
+  
+  return obj;
+}
+
+/**
  * Crear un nuevo paciente con su información de admisión
  * POST /api/pacientes
  */
@@ -282,7 +309,7 @@ export const buscarPaciente = async (
 
     res.status(200).json({
       success: true,
-      data: paciente,
+      data: convertBigIntToString(paciente),
     });
   } catch (error: any) {
     logger.error('Error al buscar paciente:', error);
@@ -322,7 +349,7 @@ export const listarPacientes = async (
 
     res.status(200).json({
       success: true,
-      data: pacientes,
+      data: convertBigIntToString(pacientes),
       pagination: {
         page: pageNum,
         limit: limitNum,

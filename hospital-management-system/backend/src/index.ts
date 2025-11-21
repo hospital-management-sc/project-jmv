@@ -15,6 +15,7 @@ import logger from './utils/logger';
 import config from './config';
 import authRoutes from './routes/auth';
 import pacientesRoutes from './routes/pacientes';
+import citasRoutes from './routes/citas';
 
 // Load environment variables
 dotenv.config();
@@ -105,6 +106,9 @@ app.use('/api/auth', authRoutes);
 
 // Pacientes routes
 app.use('/api/pacientes', pacientesRoutes);
+
+// Citas routes
+app.use('/api/citas', citasRoutes);
 
 // ============================================
 // ERROR HANDLING MIDDLEWARE

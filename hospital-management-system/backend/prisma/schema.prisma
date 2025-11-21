@@ -34,6 +34,7 @@ model Paciente {
   admisiones            Admision[]
   encuentros            Encuentro[]
   antecedentes          Antecedente[]
+  citas                 Cita[] @relation("CitasPaciente")
 
   @@index([ci])
   @@index([nroHistoria])
@@ -71,6 +72,7 @@ model Usuario {
   admisiones        Admision[]
   encuentros        Encuentro[]
   auditorias        AuditLog[]
+  citas             Cita[] @relation("CitasMedico")
 
   @@index([email])
   @@index([ci])
@@ -258,5 +260,31 @@ model AuditLog {
 
   @@index([tabla])
   @@index([usuarioId])
+}
+
+// ============================================
+// CITA - Cita médica programada
+// ============================================
+model Cita {
+  id              BigInt   @id @default(autoincrement())
+  pacienteId      BigInt
+  medicoId        BigInt?
+  fechaCita       DateTime @db.Date
+  horaCita        DateTime? @db.Time
+  especialidad    String   @db.VarChar(100)
+  motivo          String?  @db.VarChar(500)
+  estado          String   @default("PROGRAMADA") @db.VarChar(50) // CHECK: PROGRAMADA, REALIZADA, CANCELADA, NO_ASISTIO
+  notas           String?  @db.Text
+  recordatorioEnviado Boolean @default(false)
+  createdAt       DateTime @default(now()) @db.Timestamptz()
+  updatedAt       DateTime @updatedAt @db.Timestamptz()
+
+  // Relaciones
+  paciente        Paciente @relation("CitasPaciente", fields: [pacienteId], references: [id], onDelete: Cascade)
+  medico          Usuario? @relation("CitasMedico", fields: [medicoId], references: [id])
+
+  @@index([pacienteId])
+  @@index([fechaCita])
+  @@index([estado])
 }
 

@@ -3,7 +3,7 @@
  * Vista especializada para gestión administrativa y control de usuarios
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './AdminDashboard.module.css'
 
 type ViewMode = 'main' | 'register-patient' | 'create-appointment' | 'search-patient'
@@ -722,6 +722,20 @@ function RegisterPatientForm() {
 function CreateAppointmentForm() {
   const [searchCI, setSearchCI] = useState('')
   const [selectedPatient, setSelectedPatient] = useState<any>(null)
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchError, setSearchError] = useState('')
+  const [especialidades, setEspecialidades] = useState<string[]>([
+    'Medicina General',
+    'Cardiología',
+    'Traumatología',
+    'Pediatría',
+    'Ginecología',
+    'Cirugía',
+    'Neurología',
+    'Oftalmología',
+  ])
+  const [citasExistentes, setCitasExistentes] = useState<any[]>([])
+
   const [appointmentData, setAppointmentData] = useState({
     fecha: '',
     hora: '',
@@ -730,22 +744,174 @@ function CreateAppointmentForm() {
     motivo: '',
   })
 
-  const handleSearchPatient = () => {
-    // TODO: Buscar paciente por CI
-    console.log('Buscando paciente:', searchCI)
-    // Simulación
-    setSelectedPatient({
-      ci: searchCI,
-      nombre: 'Paciente de Prueba',
-      nroHistoria: 'HC-2025-001',
-    })
+  const [errors, setErrors] = useState<{[key: string]: string}>({})
+  const [submitLoading, setSubmitLoading] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState('')
+
+  // Cargar especialidades al montar el componente
+  useEffect(() => {
+    console.log('CreateAppointmentForm montado, cargando especialidades')
+    cargarEspecialidades()
+  }, [])
+
+  // Cargar especialidades al montar
+  const cargarEspecialidades = async () => {
+    const especialidadesDefecto = [
+      'Medicina General',
+      'Cardiología',
+      'Traumatología',
+      'Pediatría',
+      'Ginecología',
+      'Cirugía',
+      'Neurología',
+      'Oftalmología',
+    ]
+
+    try {
+      const apiBaseUrl = window.location.hostname.includes('app.github.dev')
+        ? window.location.origin.replace('-5173.', '-3001.')
+        : 'http://localhost:3001'
+
+      const response = await fetch(`${apiBaseUrl}/api/citas/info/especialidades`)
+      const result = await response.json()
+
+      console.log('Respuesta de especialidades:', result)
+
+      if (result.success && result.data && result.data.length > 0) {
+        console.log('Usando especialidades de API:', result.data)
+        setEspecialidades(result.data)
+      } else {
+        console.log('Usando especialidades por defecto')
+        setEspecialidades(especialidadesDefecto)
+      }
+    } catch (error) {
+      console.error('Error cargando especialidades:', error)
+      setEspecialidades(especialidadesDefecto)
+    }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSearchPatient = async () => {
+    if (!searchCI.trim()) {
+      setSearchError('Por favor ingrese un CI')
+      return
+    }
+
+    setSearchLoading(true)
+    setSearchError('')
+    setSelectedPatient(null)
+    setCitasExistentes([])
+
+    try {
+      const apiBaseUrl = window.location.hostname.includes('app.github.dev')
+        ? window.location.origin.replace('-5173.', '-3001.')
+        : 'http://localhost:3001'
+
+      const response = await fetch(`${apiBaseUrl}/api/pacientes/search?ci=${encodeURIComponent(searchCI)}`)
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Paciente no encontrado')
+      }
+
+      setSelectedPatient(result.data)
+
+      // Cargar citas existentes del paciente
+      const citasResponse = await fetch(`${apiBaseUrl}/api/citas/paciente/${result.data.id}?estado=PROGRAMADA`)
+      const citasResult = await citasResponse.json()
+
+      if (citasResult.success) {
+        setCitasExistentes(citasResult.data || [])
+      }
+
+      // Limpiar formulario de cita
+      setAppointmentData({
+        fecha: '',
+        hora: '',
+        especialidad: '',
+        medico: '',
+        motivo: '',
+      })
+      setErrors({})
+      setSubmitMessage('')
+    } catch (err: any) {
+      setSearchError(err.message || 'Error al buscar paciente')
+      setSelectedPatient(null)
+    } finally {
+      setSearchLoading(false)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Creando cita:', { selectedPatient, appointmentData })
-    // TODO: Implementar llamada al API
-    alert('Funcionalidad de citas en desarrollo')
+
+    const newErrors: {[key: string]: string} = {}
+    if (!appointmentData.fecha) newErrors.fecha = 'Requerido'
+    if (!appointmentData.hora) newErrors.hora = 'Requerido'
+    if (!appointmentData.especialidad) newErrors.especialidad = 'Requerido'
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+
+    setSubmitLoading(true)
+    setSubmitMessage('')
+
+    try {
+      const apiBaseUrl = window.location.hostname.includes('app.github.dev')
+        ? window.location.origin.replace('-5173.', '-3001.')
+        : 'http://localhost:3001'
+
+      const citaData = {
+        pacienteId: selectedPatient.id,
+        medicoId: null,
+        fechaCita: appointmentData.fecha,
+        horaCita: appointmentData.hora,
+        especialidad: appointmentData.especialidad,
+        motivo: appointmentData.motivo || null,
+        notas: null,
+      }
+
+      const response = await fetch(`${apiBaseUrl}/api/citas`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(citaData),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al crear la cita')
+      }
+
+      setSubmitMessage(`✅ Cita programada exitosamente para ${appointmentData.fecha} a las ${appointmentData.hora}`)
+      
+      // Limpiar formulario
+      setAppointmentData({
+        fecha: '',
+        hora: '',
+        especialidad: '',
+        medico: '',
+        motivo: '',
+      })
+      setErrors({})
+
+      // Recargar citas
+      const citasResponse = await fetch(`${apiBaseUrl}/api/citas/paciente/${selectedPatient.id}?estado=PROGRAMADA`)
+      const citasResult = await citasResponse.json()
+      if (citasResult.success) {
+        setCitasExistentes(citasResult.data || [])
+      }
+
+      setTimeout(() => setSubmitMessage(''), 5000)
+    } catch (error: any) {
+      console.error('Error:', error)
+      alert(`❌ Error: ${error.message}`)
+    } finally {
+      setSubmitLoading(false)
+    }
   }
 
   return (
@@ -754,35 +920,125 @@ function CreateAppointmentForm() {
       <p className={styles["form-description"]}>Busque el paciente y programe una cita médica</p>
 
       {/* Búsqueda de Paciente */}
-      <div className="search-patient-box">
-        <h3>1. Buscar Paciente</h3>
-        <div className="search-input-group">
+      <div className="search-patient-box" style={{ marginBottom: '2rem' }}>
+        <h3 style={{ marginBottom: '1rem' }}>1. Buscar Paciente</h3>
+        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
           <input
             type="text"
             value={searchCI}
-            onChange={(e) => setSearchCI(e.target.value)}
+            onChange={(e) => {
+              setSearchCI(e.target.value)
+              setSearchError('')
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSearchPatient()
+              }
+            }}
             placeholder="Ingrese CI del paciente (Ej: V-12345678)"
-            className="search-input"
+            style={{
+              flex: 1,
+              padding: '0.75rem',
+              backgroundColor: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '0.375rem',
+              color: 'var(--text-primary)',
+              fontSize: '0.95rem',
+            }}
+            disabled={selectedPatient ? true : false}
           />
-          <button onClick={handleSearchPatient} className="btn-search">
-            Buscar
+          <button
+            onClick={handleSearchPatient}
+            disabled={searchLoading || selectedPatient ? true : false}
+            style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: '#7c3aed',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.375rem',
+              cursor: selectedPatient ? 'not-allowed' : 'pointer',
+              opacity: selectedPatient ? 0.5 : 1,
+              fontSize: '0.95rem',
+              fontWeight: 500,
+            }}
+          >
+            {searchLoading ? 'Buscando...' : 'Buscar'}
           </button>
+          {selectedPatient && (
+            <button
+              onClick={() => {
+                setSelectedPatient(null)
+                setSearchCI('')
+                setCitasExistentes([])
+                setAppointmentData({
+                  fecha: '',
+                  hora: '',
+                  especialidad: '',
+                  medico: '',
+                  motivo: '',
+                })
+              }}
+              style={{
+                padding: '0.75rem 1.5rem',
+                backgroundColor: 'var(--bg-tertiary)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '0.375rem',
+                cursor: 'pointer',
+                fontSize: '0.95rem',
+              }}
+            >
+              Buscar Otro
+            </button>
+          )}
         </div>
 
+        {searchError && (
+          <div style={{ color: '#ef4444', marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#fee2e2', borderRadius: '0.375rem' }}>
+            {searchError}
+          </div>
+        )}
+
         {selectedPatient && (
-          <div className="patient-info-card">
-            <h4>Paciente Seleccionado</h4>
-            <p><strong>CI:</strong> {selectedPatient.ci}</p>
-            <p><strong>Nombre:</strong> {selectedPatient.nombre}</p>
-            <p><strong>Historia:</strong> {selectedPatient.nroHistoria}</p>
+          <div style={{ padding: '1rem', backgroundColor: 'var(--bg-tertiary)', borderRadius: '0.5rem', marginBottom: '1rem', border: '1px solid var(--border-color)' }}>
+            <h4 style={{ margin: '0 0 1rem 0', color: 'var(--text-primary)' }}>Paciente Seleccionado</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+              <div>
+                <strong>CI:</strong> {selectedPatient.ci}
+              </div>
+              <div>
+                <strong>Nombre:</strong> {selectedPatient.apellidosNombres}
+              </div>
+              <div>
+                <strong>Historia:</strong> {selectedPatient.nroHistoria}
+              </div>
+              <div>
+                <strong>Teléfono:</strong> {selectedPatient.telefono || 'N/A'}
+              </div>
+            </div>
           </div>
         )}
       </div>
 
+      {/* Citas Existentes */}
+      {citasExistentes.length > 0 && (
+        <div style={{ marginBottom: '2rem', padding: '1rem', backgroundColor: 'rgba(124, 58, 237, 0.1)', borderRadius: '0.5rem', borderLeft: '3px solid #7c3aed' }}>
+          <h4 style={{ marginTop: 0, marginBottom: '1rem' }}>Citas Programadas</h4>
+          <div style={{ display: 'grid', gap: '0.75rem' }}>
+            {citasExistentes.map((cita: any) => (
+              <div key={cita.id} style={{ padding: '0.75rem', backgroundColor: 'var(--bg-secondary)', borderRadius: '0.375rem', fontSize: '0.9rem' }}>
+                <strong>{new Date(cita.fechaCita).toLocaleDateString('es-VE')} a las {cita.horaCita ? new Date(`1970-01-01T${cita.horaCita}`).toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</strong> - {cita.especialidad}
+                <span style={{ float: 'right', color: '#7c3aed', fontSize: '0.8rem' }}>Estado: {cita.estado}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Formulario de Cita */}
       {selectedPatient && (
-        <form onSubmit={handleSubmit} className="appointment-form">
-          <h3>2. Datos de la Cita</h3>
+        <form onSubmit={handleSubmit}>
+          <h3 style={{ marginBottom: '1.5rem' }}>2. Datos de la Cita</h3>
           <div className={styles["form-grid"]}>
             <div className={styles["form-group"]}>
               <label>Fecha *</label>
@@ -790,8 +1046,13 @@ function CreateAppointmentForm() {
                 type="date"
                 required
                 value={appointmentData.fecha}
-                onChange={(e) => setAppointmentData({...appointmentData, fecha: e.target.value})}
+                onChange={(e) => {
+                  setAppointmentData({...appointmentData, fecha: e.target.value})
+                  setErrors({...errors, fecha: ''})
+                }}
+                min={new Date().toISOString().split('T')[0]}
               />
+              {errors.fecha && <span className={styles["error-message"]}>{errors.fecha}</span>}
             </div>
 
             <div className={styles["form-group"]}>
@@ -800,33 +1061,44 @@ function CreateAppointmentForm() {
                 type="time"
                 required
                 value={appointmentData.hora}
-                onChange={(e) => setAppointmentData({...appointmentData, hora: e.target.value})}
+                onChange={(e) => {
+                  setAppointmentData({...appointmentData, hora: e.target.value})
+                  setErrors({...errors, hora: ''})
+                }}
               />
+              {errors.hora && <span className={styles["error-message"]}>{errors.hora}</span>}
             </div>
 
             <div className={styles["form-group"]}>
-              <label>Especialidad *</label>
+              <label>Especialidad * (Total: {especialidades.length})</label>
               <select
                 required
                 value={appointmentData.especialidad}
-                onChange={(e) => setAppointmentData({...appointmentData, especialidad: e.target.value})}
+                onChange={(e) => {
+                  console.log('Especialidad seleccionada:', e.target.value)
+                  setAppointmentData({...appointmentData, especialidad: e.target.value})
+                  setErrors({...errors, especialidad: ''})
+                }}
               >
                 <option value="">Seleccione especialidad...</option>
-                <option value="Medicina General">Medicina General</option>
-                <option value="Cardiología">Cardiología</option>
-                <option value="Traumatología">Traumatología</option>
-                <option value="Pediatría">Pediatría</option>
-                <option value="Ginecología">Ginecología</option>
+                {especialidades && especialidades.length > 0 ? (
+                  especialidades.map(esp => (
+                    <option key={esp} value={esp}>{esp}</option>
+                  ))
+                ) : (
+                  <option disabled>No hay especialidades disponibles</option>
+                )}
               </select>
+              {errors.especialidad && <span className={styles["error-message"]}>{errors.especialidad}</span>}
             </div>
 
             <div className={styles["form-group"]}>
-              <label>Médico</label>
+              <label>Médico (Opcional)</label>
               <input
                 type="text"
                 value={appointmentData.medico}
                 onChange={(e) => setAppointmentData({...appointmentData, medico: e.target.value})}
-                placeholder="Nombre del médico"
+                placeholder="Nombre del médico o especialista"
               />
             </div>
 
@@ -837,16 +1109,56 @@ function CreateAppointmentForm() {
                 onChange={(e) => setAppointmentData({...appointmentData, motivo: e.target.value})}
                 placeholder="Describa brevemente el motivo de la consulta"
                 rows={3}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  backgroundColor: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '0.375rem',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'inherit',
+                  fontSize: '0.95rem',
+                  resize: 'vertical',
+                }}
               />
             </div>
           </div>
 
-          <div className="form-actions">
-            <button type="submit" className="btn-primary">
-              Programar Cita
+          {submitMessage && (
+            <div style={{ color: '#059669', marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#d1fae5', borderRadius: '0.375rem' }}>
+              {submitMessage}
+            </div>
+          )}
+
+          <div className="form-actions" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+            <button type="submit" disabled={submitLoading} style={{ opacity: submitLoading ? 0.6 : 1, cursor: submitLoading ? 'not-allowed' : 'pointer' }} className="btn-primary">
+              {submitLoading ? 'Programando...' : 'Programar Cita'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAppointmentData({
+                  fecha: '',
+                  hora: '',
+                  especialidad: '',
+                  medico: '',
+                  motivo: '',
+                })
+                setErrors({})
+                setSubmitMessage('')
+              }}
+              className="btn-secondary"
+            >
+              Limpiar Formulario
             </button>
           </div>
         </form>
+      )}
+
+      {!selectedPatient && !selectedPatient && (
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+          <p>Busque un paciente para comenzar a programar una cita médica</p>
+        </div>
       )}
     </section>
   )
@@ -857,23 +1169,74 @@ function SearchPatientView() {
   const [searchType, setSearchType] = useState<'ci' | 'historia'>('ci')
   const [searchValue, setSearchValue] = useState('')
   const [patientData, setPatientData] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSearch = () => {
-    console.log('Buscando paciente:', { searchType, searchValue })
-    // TODO: Implementar búsqueda real
-    // Simulación
-    setPatientData({
-      nroHistoria: 'HC-2025-001',
-      apellidosNombres: 'Pérez Gómez Juan Carlos',
-      ci: 'V-12345678',
-      fechaNacimiento: '1980-05-15',
-      sexo: 'M',
-      telefono: '0412-1234567',
-      direccion: 'Caracas, Venezuela',
-      ultimaVisita: '2025-11-10',
-      admisiones: 3,
-      encuentros: 12,
-    })
+  const handleSearch = async () => {
+    if (!searchValue.trim()) {
+      setError('Por favor ingrese un criterio de búsqueda')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+    setPatientData(null)
+
+    try {
+      // Detectar URL del API según el entorno
+      const apiBaseUrl = window.location.hostname.includes('app.github.dev')
+        ? window.location.origin.replace('-5173.', '-3001.')
+        : 'http://localhost:3001'
+
+      // Construir URL de búsqueda
+      const param = searchType === 'ci' ? `ci=${encodeURIComponent(searchValue)}` : `historia=${encodeURIComponent(searchValue)}`
+      const url = `${apiBaseUrl}/api/pacientes/search?${param}`
+
+      const response = await fetch(url)
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Paciente no encontrado')
+      }
+
+      // Formatear datos para mostrar
+      const paciente = result.data
+      setPatientData({
+        id: paciente.id,
+        nroHistoria: paciente.nroHistoria,
+        apellidosNombres: paciente.apellidosNombres,
+        ci: paciente.ci,
+        fechaNacimiento: paciente.fechaNacimiento,
+        sexo: paciente.sexo,
+        telefono: paciente.telefono,
+        direccion: paciente.direccion,
+        nacionalidad: paciente.nacionalidad,
+        estado: paciente.estado,
+        lugarNacimiento: paciente.lugarNacimiento,
+        religion: paciente.religion,
+        createdAt: paciente.createdAt,
+        admisiones: paciente.admisiones || [],
+        encuentros: paciente.encuentros || [],
+        personalMilitar: paciente.personalMilitar,
+      })
+    } catch (err: any) {
+      setError(err.message || 'Error al buscar paciente')
+      setPatientData(null)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const calcularEdad = (fechaNac: string): number => {
+    if (!fechaNac) return 0
+    const hoy = new Date()
+    const nac = new Date(fechaNac)
+    let edad = hoy.getFullYear() - nac.getFullYear()
+    const diferenciaMeses = hoy.getMonth() - nac.getMonth()
+    if (diferenciaMeses < 0 || (diferenciaMeses === 0 && hoy.getDate() < nac.getDate())) {
+      edad--
+    }
+    return edad
   }
 
   return (
@@ -887,7 +1250,12 @@ function SearchPatientView() {
             <input
               type="radio"
               checked={searchType === 'ci'}
-              onChange={() => setSearchType('ci')}
+              onChange={() => {
+                setSearchType('ci')
+                setSearchValue('')
+                setError('')
+                setPatientData(null)
+              }}
             />
             Buscar por CI
           </label>
@@ -895,7 +1263,12 @@ function SearchPatientView() {
             <input
               type="radio"
               checked={searchType === 'historia'}
-              onChange={() => setSearchType('historia')}
+              onChange={() => {
+                setSearchType('historia')
+                setSearchValue('')
+                setError('')
+                setPatientData(null)
+              }}
             />
             Buscar por Nro. Historia
           </label>
@@ -905,69 +1278,112 @@ function SearchPatientView() {
           <input
             type="text"
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder={searchType === 'ci' ? 'Ej: V-12345678' : 'Ej: HC-2025-001'}
+            onChange={(e) => {
+              setSearchValue(e.target.value)
+              setError('')
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch()
+              }
+            }}
+            placeholder={searchType === 'ci' ? 'Ej: V-12345678' : 'Ej: 00-00-00'}
             className="search-input"
           />
-          <button onClick={handleSearch} className="btn-search">
-            Buscar Paciente
+          <button onClick={handleSearch} disabled={loading} className="btn-search">
+            {loading ? 'Buscando...' : 'Buscar Paciente'}
           </button>
         </div>
+
+        {error && (
+          <div style={{ color: '#ef4444', marginTop: '0.75rem', padding: '0.75rem', backgroundColor: '#fee2e2', borderRadius: '0.375rem' }}>
+            {error}
+          </div>
+        )}
       </div>
 
       {patientData && (
-        <div className="patient-details">
+        <div className="patient-details" style={{ marginTop: '2rem' }}>
           <h3>Información del Paciente</h3>
-          <div className="details-grid">
-            <div className="detail-item">
+          <div className="details-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <strong>Nro. Historia:</strong>
               <span>{patientData.nroHistoria}</span>
             </div>
-            <div className="detail-item">
+            <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <strong>Nombre Completo:</strong>
               <span>{patientData.apellidosNombres}</span>
             </div>
-            <div className="detail-item">
+            <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <strong>CI:</strong>
               <span>{patientData.ci}</span>
             </div>
-            <div className="detail-item">
-              <strong>Fecha de Nacimiento:</strong>
-              <span>{patientData.fechaNacimiento}</span>
+            <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <strong>Edad:</strong>
+              <span>{calcularEdad(patientData.fechaNacimiento)} años</span>
             </div>
-            <div className="detail-item">
+            <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <strong>Fecha de Nacimiento:</strong>
+              <span>{new Date(patientData.fechaNacimiento).toLocaleDateString('es-VE')}</span>
+            </div>
+            <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <strong>Sexo:</strong>
               <span>{patientData.sexo === 'M' ? 'Masculino' : 'Femenino'}</span>
             </div>
-            <div className="detail-item">
+            <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <strong>Nacionalidad:</strong>
+              <span>{patientData.nacionalidad || 'N/A'}</span>
+            </div>
+            <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <strong>Teléfono:</strong>
-              <span>{patientData.telefono}</span>
+              <span>{patientData.telefono || 'N/A'}</span>
             </div>
-            <div className="detail-item">
+            <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <strong>Estado:</strong>
+              <span>{patientData.estado || 'N/A'}</span>
+            </div>
+            <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <strong>Lugar de Nacimiento:</strong>
+              <span>{patientData.lugarNacimiento || 'N/A'}</span>
+            </div>
+            <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: '1 / -1' }}>
               <strong>Dirección:</strong>
-              <span>{patientData.direccion}</span>
-            </div>
-            <div className="detail-item">
-              <strong>Última Visita:</strong>
-              <span>{patientData.ultimaVisita}</span>
+              <span>{patientData.direccion || 'N/A'}</span>
             </div>
           </div>
 
-          <div className="patient-stats">
-            <div className="stat-card">
-              <h4>Admisiones</h4>
-              <p className="stat-number">{patientData.admisiones}</p>
+          {patientData.personalMilitar && (
+            <div style={{ marginBottom: '2rem', padding: '1rem', backgroundColor: 'rgba(124, 58, 237, 0.1)', borderRadius: '0.5rem', borderLeft: '3px solid #7c3aed' }}>
+              <h4 style={{ marginTop: 0, marginBottom: '1rem' }}>Datos Militares</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                <div><strong>Grado:</strong> {patientData.personalMilitar.grado || 'N/A'}</div>
+                <div><strong>Componente:</strong> {patientData.personalMilitar.componente || 'N/A'}</div>
+                <div><strong>Unidad:</strong> {patientData.personalMilitar.unidad || 'N/A'}</div>
+              </div>
             </div>
-            <div className="stat-card">
-              <h4>Encuentros</h4>
-              <p className="stat-number">{patientData.encuentros}</p>
+          )}
+
+          <div className="patient-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+            <div className="stat-card" style={{ padding: '1.5rem', backgroundColor: 'var(--bg-tertiary)', borderRadius: '0.5rem', textAlign: 'center' }}>
+              <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Admisiones</h4>
+              <p style={{ margin: 0, fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>{patientData.admisiones.length}</p>
+            </div>
+            <div className="stat-card" style={{ padding: '1.5rem', backgroundColor: 'var(--bg-tertiary)', borderRadius: '0.5rem', textAlign: 'center' }}>
+              <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Encuentros</h4>
+              <p style={{ margin: 0, fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>{patientData.encuentros.length}</p>
             </div>
           </div>
 
-          <div className="action-buttons">
-            <button className="btn-primary">Ver Historia Completa</button>
-            <button className="btn-secondary">Imprimir Resumen</button>
-            <button className="btn-secondary">Programar Cita</button>
+          <div className="action-buttons" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <button className="btn-primary" style={{ padding: '0.75rem 1.5rem', cursor: 'pointer' }}>
+              Ver Historia Completa
+            </button>
+            <button className="btn-secondary" style={{ padding: '0.75rem 1.5rem', cursor: 'pointer' }}>
+              Imprimir Resumen
+            </button>
+            <button className="btn-secondary" style={{ padding: '0.75rem 1.5rem', cursor: 'pointer' }}>
+              Programar Cita
+            </button>
           </div>
         </div>
       )}
