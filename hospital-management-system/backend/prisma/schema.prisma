@@ -14,45 +14,48 @@ datasource db {
 // PACIENTES - Información básica del paciente
 // ============================================
 model Paciente {
-  id                    BigInt   @id @default(autoincrement())
-  nroHistoria           String   @unique @db.VarChar(50)
-  apellidosNombres      String   @db.VarChar(200)
-  ci                    String   @unique @db.VarChar(50)
-  fechaNacimiento       DateTime? @db.Date
-  sexo                  String?  @db.VarChar(3) // CHECK: M, F
-  nacionalidad          String?  @db.VarChar(100)
-  direccion             String?  @db.VarChar(300)
-  telefono              String?  @db.VarChar(50)
-  lugarNacimiento       String?  @db.VarChar(200)
-  estado                String?  @db.VarChar(100)
-  region                String?  @db.VarChar(100)
-  createdAt             DateTime  @default(now()) @db.Timestamptz()
-  updatedAt             DateTime  @updatedAt @db.Timestamptz()
+  id               BigInt    @id @default(autoincrement())
+  nroHistoria      String    @unique @db.VarChar(50)
+  apellidosNombres String    @db.VarChar(200)
+  ci               String    @unique @db.VarChar(50)
+  fechaNacimiento  DateTime? @db.Date
+  sexo             String?   @db.VarChar(3) // CHECK: M, F
+  nacionalidad     String?   @db.VarChar(100)
+  direccion        String?   @db.VarChar(300)
+  telefono         String?   @db.VarChar(50)
+  lugarNacimiento  String?   @db.VarChar(200)
+  estado           String?   @db.VarChar(100)
+  region           String?   @db.VarChar(100)
+  estadoRegistro   String    @default("PERMANENTE") @db.VarChar(50) // TEMPORAL | PERMANENTE | NN
+  createdAt        DateTime  @default(now()) @db.Timestamptz()
+  updatedAt        DateTime  @updatedAt @db.Timestamptz()
 
   // Relaciones
-  personalMilitar       PersonalMilitar?
-  admisiones            Admision[]
-  encuentros            Encuentro[]
-  antecedentes          Antecedente[]
-  citas                 Cita[] @relation("CitasPaciente")
+  personalMilitar         PersonalMilitar?
+  admisiones              Admision[]
+  encuentros              Encuentro[]
+  antecedentes            Antecedente[]
+  citas                   Cita[]                   @relation("CitasPaciente")
+  formatosHospitalizacion FormatoHospitalizacion[]
 
   @@index([ci])
   @@index([nroHistoria])
+  @@index([estadoRegistro])
 }
 
 // ============================================
 // PERSONAL MILITAR - Info militar del paciente
 // ============================================
 model PersonalMilitar {
-  id              BigInt  @id @default(autoincrement())
-  pacienteId      BigInt  @unique
-  grado           String? @db.VarChar(50)
-  componente      String? @db.VarChar(100)
-  unidad          String? @db.VarChar(200)
-  estadoMilitar   String? @db.VarChar(50) // activo, disponible, resActiva
+  id            BigInt  @id @default(autoincrement())
+  pacienteId    BigInt  @unique
+  grado         String? @db.VarChar(50)
+  componente    String? @db.VarChar(100)
+  unidad        String? @db.VarChar(200)
+  estadoMilitar String? @db.VarChar(50) // activo, disponible, resActiva
 
   // Relaciones
-  paciente        Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  paciente Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
 }
 
 // ============================================
@@ -70,10 +73,16 @@ model Usuario {
   updatedAt DateTime @updatedAt @db.Timestamptz()
 
   // Relaciones
-  admisiones        Admision[]
-  encuentros        Encuentro[]
-  auditorias        AuditLog[]
-  citas             Cita[] @relation("CitasMedico")
+  admisionesCreadas    Admision[]           @relation("AdmisionesCreadas")
+  encuentros           Encuentro[]
+  auditorias           AuditLog[]
+  citas                Cita[]               @relation("CitasMedico")
+  laboratorios         Laboratorio[]
+  estudiosEspeciales   EstudioEspecial[]
+  electrocardiogramas  Electrocardiograma[]
+  ordenesMedicasOrdena OrdenMedica[]        @relation("OrdenesMedicasOrdena")
+  ordenesMedicasCumple OrdenMedica[]        @relation("OrdenesMedicasCumple")
+  evolucionesMedicas   EvolucionMedica[]
 
   @@index([email])
   @@index([ci])
@@ -83,60 +92,83 @@ model Usuario {
 // ADMISION - Registro de admisión inicial
 // ============================================
 model Admision {
-  id              BigInt   @id @default(autoincrement())
-  pacienteId      BigInt
-  fechaAdmision   DateTime @db.Date
-  horaAdmision    DateTime? @db.Time
-  formaIngreso    String?  @db.VarChar(20) // CHECK: AMBULANTE, AMBULANCIA
-  habitacion      String?  @db.VarChar(50)
+  id         BigInt @id @default(autoincrement())
+  pacienteId BigInt
+
+  // Tipo y servicio
+  tipo            String   @default("HOSPITALIZACION") @db.VarChar(50) // EMERGENCIA | HOSPITALIZACION | CONSULTA_EXTERNA | UCI | CIRUGIA
+  servicio        String?  @db.VarChar(100) // EMERGENCIA | MEDICINA_INTERNA | CIRUGIA_GENERAL | UCI | PEDIATRIA | etc.
+
+  // Fechas y horas
+  fechaAdmision DateTime  @db.Date
+  horaAdmision  DateTime? @db.Time
+  fechaAlta     DateTime? @db.Date
+  horaAlta      DateTime? @db.Time
+
+  // Datos de ingreso
+  formaIngreso String? @db.VarChar(20) // AMBULANTE | AMBULANCIA | TRANSFERENCIA
+  habitacion   String? @db.VarChar(50)
+  cama         String? @db.VarChar(50)
+
+  // Estado de la admisión
+  estado   String  @default("ACTIVA") @db.VarChar(50) // ACTIVA | ALTA | TRANSFERIDO | FALLECIDO | CANCELADA | EN_ESPERA
+  tipoAlta String? @db.VarChar(50) // MEJORIA | VOLUNTARIA | TRANSFERENCIA | FALLECIMIENTO | FUGA | ADMINISTRATIVA
+
+  // Otros
   firmaFacultativo String? @db.VarChar(200)
-  estadoAdmision  String?  @db.VarChar(50)
-  createdById     BigInt?
-  createdAt       DateTime @default(now()) @db.Timestamptz()
-  updatedAt       DateTime @updatedAt @db.Timestamptz()
+  observaciones    String? @db.Text
+
+  createdById BigInt?
+  createdAt   DateTime @default(now()) @db.Timestamptz()
+  updatedAt   DateTime @updatedAt @db.Timestamptz()
 
   // Relaciones
-  paciente              Paciente @relation(fields: [pacienteId], references: [id])
-  createdBy             Usuario? @relation(fields: [createdById], references: [id])
-  estanciaHospitalaria  EstanciaHospitalaria?
-  encuentros            Encuentro[]
+  paciente               Paciente                @relation(fields: [pacienteId], references: [id])
+  createdBy              Usuario?                @relation("AdmisionesCreadas", fields: [createdById], references: [id])
+  estanciaHospitalaria   EstanciaHospitalaria?
+  encuentros             Encuentro[]
+  formatoEmergencia      FormatoEmergencia?
+  formatoHospitalizacion FormatoHospitalizacion?
 
   @@index([pacienteId])
   @@index([fechaAdmision])
+  @@index([tipo])
+  @@index([estado])
+  @@index([servicio])
 }
 
 // ============================================
 // ESTANCIA HOSPITALARIA - Alta y cálculo días
 // ============================================
 model EstanciaHospitalaria {
-  id                    BigInt   @id @default(autoincrement())
-  admisionId            BigInt   @unique
-  fechaAlta             DateTime? @db.Date
-  diasHosp              Int?
-  diagnosticoIngresoId  BigInt?
-  diagnosticoEgresoId   BigInt?
-  notas                 String?  @db.Text
-  updatedAt             DateTime @updatedAt @db.Timestamptz()
+  id                   BigInt    @id @default(autoincrement())
+  admisionId           BigInt    @unique
+  fechaAlta            DateTime? @db.Date
+  diasHosp             Int?
+  diagnosticoIngresoId BigInt?
+  diagnosticoEgresoId  BigInt?
+  notas                String?   @db.Text
+  updatedAt            DateTime  @updatedAt @db.Timestamptz()
 
   // Relaciones
-  admision              Admision @relation(fields: [admisionId], references: [id], onDelete: Cascade)
-  diagnosticoIngreso    Diagnostico? @relation("ingreso", fields: [diagnosticoIngresoId], references: [id])
-  diagnosticoEgreso     Diagnostico? @relation("egreso", fields: [diagnosticoEgresoId], references: [id])
+  admision           Admision     @relation(fields: [admisionId], references: [id], onDelete: Cascade)
+  diagnosticoIngreso Diagnostico? @relation("ingreso", fields: [diagnosticoIngresoId], references: [id])
+  diagnosticoEgreso  Diagnostico? @relation("egreso", fields: [diagnosticoEgresoId], references: [id])
 }
 
 // ============================================
 // DIAGNOSTICOS - Catálogo de diagnósticos CIE
 // ============================================
 model Diagnostico {
-  id           BigInt   @id @default(autoincrement())
-  codigoCie    String?  @db.VarChar(20)
-  descripcion  String   @db.VarChar(500)
-  tipo         String?  @db.VarChar(20)
-  createdAt    DateTime @default(now()) @db.Timestamptz()
+  id          BigInt   @id @default(autoincrement())
+  codigoCie   String?  @db.VarChar(20)
+  descripcion String   @db.VarChar(500)
+  tipo        String?  @db.VarChar(20)
+  createdAt   DateTime @default(now()) @db.Timestamptz()
 
   // Relaciones
-  estanciaIngresos      EstanciaHospitalaria[] @relation("ingreso")
-  estanciaEgresos       EstanciaHospitalaria[] @relation("egreso")
+  estanciaIngresos EstanciaHospitalaria[] @relation("ingreso")
+  estanciaEgresos  EstanciaHospitalaria[] @relation("egreso")
 
   @@index([codigoCie])
 }
@@ -145,27 +177,27 @@ model Diagnostico {
 // ENCUENTROS - Visitas/atenciones (emergencia, hospitalización, consulta)
 // ============================================
 model Encuentro {
-  id              BigInt   @id @default(autoincrement())
-  pacienteId      BigInt
-  admisionId      BigInt?
-  tipo            String   @db.VarChar(30) // CHECK: EMERGENCIA, HOSPITALIZACION, CONSULTA, OTRO
-  fecha           DateTime @db.Date
-  hora            DateTime? @db.Time
-  motivoConsulta  String?  @db.VarChar(1000)
-  enfermedadActual String? @db.Text
-  procedencia     String?  @db.VarChar(200)
-  nroCama         String?  @db.VarChar(50)
-  createdById     BigInt?
-  createdAt       DateTime @default(now()) @db.Timestamptz()
-  updatedAt       DateTime @updatedAt @db.Timestamptz()
+  id               BigInt    @id @default(autoincrement())
+  pacienteId       BigInt
+  admisionId       BigInt?
+  tipo             String    @db.VarChar(30) // CHECK: EMERGENCIA, HOSPITALIZACION, CONSULTA, OTRO
+  fecha            DateTime  @db.Date
+  hora             DateTime? @db.Time
+  motivoConsulta   String?   @db.VarChar(1000)
+  enfermedadActual String?   @db.Text
+  procedencia      String?   @db.VarChar(200)
+  nroCama          String?   @db.VarChar(50)
+  createdById      BigInt?
+  createdAt        DateTime  @default(now()) @db.Timestamptz()
+  updatedAt        DateTime  @updatedAt @db.Timestamptz()
 
   // Relaciones
-  paciente              Paciente @relation(fields: [pacienteId], references: [id])
-  admision              Admision? @relation(fields: [admisionId], references: [id])
-  createdBy             Usuario? @relation(fields: [createdById], references: [id])
-  signosVitales         SignosVitales[]
-  examenRegional        ExamenRegional?
-  impresiones           ImpresionDiagnostica[]
+  paciente       Paciente               @relation(fields: [pacienteId], references: [id])
+  admision       Admision?              @relation(fields: [admisionId], references: [id])
+  createdBy      Usuario?               @relation(fields: [createdById], references: [id])
+  signosVitales  SignosVitales[]
+  examenRegional ExamenRegional?
+  impresiones    ImpresionDiagnostica[]
 
   @@index([pacienteId, fecha])
 }
@@ -174,18 +206,18 @@ model Encuentro {
 // SIGNOS VITALES - Presión, pulso, temperatura, etc
 // ============================================
 model SignosVitales {
-  id              BigInt   @id @default(autoincrement())
-  encuentroId     BigInt
-  taSistolica     Int?
-  taDiastolica    Int?
-  pulso           Int?
-  temperatura     Decimal? @db.Decimal(4, 2)
-  fr              Int?     // Frecuencia respiratoria
-  observaciones   String?  @db.VarChar(500)
-  registradoEn    DateTime @default(now()) @db.Timestamptz()
+  id            BigInt   @id @default(autoincrement())
+  encuentroId   BigInt
+  taSistolica   Int?
+  taDiastolica  Int?
+  pulso         Int?
+  temperatura   Decimal? @db.Decimal(4, 2)
+  fr            Int? // Frecuencia respiratoria
+  observaciones String?  @db.VarChar(500)
+  registradoEn  DateTime @default(now()) @db.Timestamptz()
 
   // Relaciones
-  encuentro       Encuentro @relation(fields: [encuentroId], references: [id], onDelete: Cascade)
+  encuentro Encuentro @relation(fields: [encuentroId], references: [id], onDelete: Cascade)
 
   @@index([encuentroId])
 }
@@ -194,20 +226,20 @@ model SignosVitales {
 // EXAMEN REGIONAL - Examen físico por regiones
 // ============================================
 model ExamenRegional {
-  id          BigInt   @id @default(autoincrement())
-  encuentroId BigInt   @unique
-  piel        String?  @db.Text
-  cabeza      String?  @db.Text
-  cuello      String?  @db.Text
-  torax       String?  @db.Text
-  pulmones    String?  @db.Text
-  corazon     String?  @db.Text
-  abdomen     String?  @db.Text
-  anoRecto    String?  @db.Text
-  genitales   String?  @db.Text
+  id          BigInt  @id @default(autoincrement())
+  encuentroId BigInt  @unique
+  piel        String? @db.Text
+  cabeza      String? @db.Text
+  cuello      String? @db.Text
+  torax       String? @db.Text
+  pulmones    String? @db.Text
+  corazon     String? @db.Text
+  abdomen     String? @db.Text
+  anoRecto    String? @db.Text
+  genitales   String? @db.Text
 
   // Relaciones
-  encuentro   Encuentro @relation(fields: [encuentroId], references: [id], onDelete: Cascade)
+  encuentro Encuentro @relation(fields: [encuentroId], references: [id], onDelete: Cascade)
 }
 
 // ============================================
@@ -221,7 +253,7 @@ model Antecedente {
   registradoEn DateTime @default(now()) @db.Timestamptz()
 
   // Relaciones
-  paciente     Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  paciente Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
 
   @@index([pacienteId])
 }
@@ -230,15 +262,15 @@ model Antecedente {
 // IMPRESIONES DIAGNOSTICAS - Diagnósticos del encuentro
 // ============================================
 model ImpresionDiagnostica {
-  id           BigInt   @id @default(autoincrement())
-  encuentroId  BigInt
-  codigoCie    String?  @db.VarChar(20)
-  descripcion  String?  @db.Text
-  clase        String   @default("PRESUNTIVO") @db.VarChar(20) // CHECK: PRESUNTIVO, CONFIRMADO
-  createdAt    DateTime @default(now()) @db.Timestamptz()
+  id          BigInt   @id @default(autoincrement())
+  encuentroId BigInt
+  codigoCie   String?  @db.VarChar(20)
+  descripcion String?  @db.Text
+  clase       String   @default("PRESUNTIVO") @db.VarChar(20) // CHECK: PRESUNTIVO, CONFIRMADO
+  createdAt   DateTime @default(now()) @db.Timestamptz()
 
   // Relaciones
-  encuentro    Encuentro @relation(fields: [encuentroId], references: [id], onDelete: Cascade)
+  encuentro Encuentro @relation(fields: [encuentroId], references: [id], onDelete: Cascade)
 
   @@index([codigoCie])
   @@index([encuentroId])
@@ -248,16 +280,16 @@ model ImpresionDiagnostica {
 // AUDIT LOG - Cambios críticos y auditoría
 // ============================================
 model AuditLog {
-  id          BigInt   @id @default(autoincrement())
-  tabla       String   @db.VarChar(100)
-  registroId  BigInt?
-  usuarioId   BigInt?
-  accion      String   @db.VarChar(50) // CREATE, UPDATE, DELETE
-  detalle     Json?    // Campo JSONB para detalles
-  creadoEn    DateTime @default(now()) @db.Timestamptz()
+  id         BigInt   @id @default(autoincrement())
+  tabla      String   @db.VarChar(100)
+  registroId BigInt?
+  usuarioId  BigInt?
+  accion     String   @db.VarChar(50) // CREATE, UPDATE, DELETE
+  detalle    Json? // Campo JSONB para detalles
+  creadoEn   DateTime @default(now()) @db.Timestamptz()
 
   // Relaciones
-  usuario     Usuario? @relation(fields: [usuarioId], references: [id])
+  usuario Usuario? @relation(fields: [usuarioId], references: [id])
 
   @@index([tabla])
   @@index([usuarioId])
@@ -267,25 +299,493 @@ model AuditLog {
 // CITA - Cita médica programada
 // ============================================
 model Cita {
-  id              BigInt   @id @default(autoincrement())
-  pacienteId      BigInt
-  medicoId        BigInt?
-  fechaCita       DateTime @db.Date
-  horaCita        DateTime? @db.Time
-  especialidad    String   @db.VarChar(100)
-  motivo          String?  @db.VarChar(500)
-  estado          String   @default("PROGRAMADA") @db.VarChar(50) // CHECK: PROGRAMADA, REALIZADA, CANCELADA, NO_ASISTIO
-  notas           String?  @db.Text
-  recordatorioEnviado Boolean @default(false)
-  createdAt       DateTime @default(now()) @db.Timestamptz()
-  updatedAt       DateTime @updatedAt @db.Timestamptz()
+  id                  BigInt    @id @default(autoincrement())
+  pacienteId          BigInt
+  medicoId            BigInt?
+  fechaCita           DateTime  @db.Date
+  horaCita            DateTime? @db.Time
+  especialidad        String    @db.VarChar(100)
+  motivo              String?   @db.VarChar(500)
+  estado              String    @default("PROGRAMADA") @db.VarChar(50) // CHECK: PROGRAMADA, REALIZADA, CANCELADA, NO_ASISTIO
+  notas               String?   @db.Text
+  recordatorioEnviado Boolean   @default(false)
+  createdAt           DateTime  @default(now()) @db.Timestamptz()
+  updatedAt           DateTime  @updatedAt @db.Timestamptz()
 
   // Relaciones
-  paciente        Paciente @relation("CitasPaciente", fields: [pacienteId], references: [id], onDelete: Cascade)
-  medico          Usuario? @relation("CitasMedico", fields: [medicoId], references: [id])
+  paciente Paciente @relation("CitasPaciente", fields: [pacienteId], references: [id], onDelete: Cascade)
+  medico   Usuario? @relation("CitasMedico", fields: [medicoId], references: [id])
 
   @@index([pacienteId])
   @@index([fechaCita])
   @@index([estado])
 }
 
+// ============================================
+// FORMATO EMERGENCIA - Datos clínicos de emergencia
+// ============================================
+model FormatoEmergencia {
+  id         BigInt @id @default(autoincrement())
+  admisionId BigInt @unique
+
+  // Datos clínicos
+  motivoConsulta   String? @db.Text
+  enfermedadActual String? @db.Text
+  procedencia      String? @db.VarChar(200)
+
+  // Signos vitales al ingreso
+  taSistolica  Int?
+  taDiastolica Int?
+  fc           Int? // Frecuencia Cardíaca
+  fr           Int? // Frecuencia Respiratoria
+  temperatura  Decimal? @db.Decimal(4, 2)
+  spo2         Int? // Saturación de Oxígeno
+
+  // Evaluación
+  impresionDx             String? @db.Text
+  indicaciones            String? @db.Text
+  requiereHospitalizacion Boolean @default(false)
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  // Relaciones
+  admision Admision @relation(fields: [admisionId], references: [id], onDelete: Cascade)
+
+  @@index([admisionId])
+}
+
+// ============================================
+// FORMATO HOSPITALIZACION - Formato completo de hospitalización (11 secciones)
+// ============================================
+model FormatoHospitalizacion {
+  id         BigInt @id @default(autoincrement())
+  admisionId BigInt @unique
+  pacienteId BigInt
+
+  // Metadatos
+  fechaCreacion       DateTime @default(now()) @db.Timestamptz()
+  ultimaActualizacion DateTime @updatedAt @db.Timestamptz()
+
+  // Relaciones
+  admision Admision @relation(fields: [admisionId], references: [id], onDelete: Cascade)
+  paciente Paciente @relation(fields: [pacienteId], references: [id])
+
+  // Sub-documentos relacionados (11 secciones del formato)
+  signosVitales          SignosVitalesHosp[]
+  laboratorios           Laboratorio[]
+  estudiosEspeciales     EstudioEspecial[]
+  electrocardiogramas    Electrocardiograma[]
+  antecedentesDetallados AntecedentesDetallados?
+  examenFuncional        ExamenFuncional?
+  examenFisicoCompleto   ExamenFisicoCompleto?
+  resumenIngreso         ResumenIngreso?
+  ordenesMedicas         OrdenMedica[]
+  evolucionesMedicas     EvolucionMedica[]
+
+  @@index([admisionId])
+  @@index([pacienteId])
+}
+
+// ============================================
+// SIGNOS VITALES HOSPITALIZACION - Registro múltiple de signos vitales
+// ============================================
+model SignosVitalesHosp {
+  id            BigInt   @id @default(autoincrement())
+  formatoHospId BigInt
+  fecha         DateTime @db.Date
+  hora          DateTime @db.Time
+
+  // Signos vitales completos
+  taSistolica  Int?
+  taDiastolica Int?
+  tam          Decimal? @db.Decimal(5, 2) // Tensión Arterial Media
+  fc           Int? // Frecuencia Cardíaca
+  fr           Int? // Frecuencia Respiratoria
+  temperatura  Decimal? @db.Decimal(4, 2)
+  spo2         Int? // Saturación de Oxígeno
+
+  observacion   String?  @db.Text
+  registradoPor BigInt?
+  createdAt     DateTime @default(now()) @db.Timestamptz()
+
+  // Relaciones
+  formatoHosp FormatoHospitalizacion @relation(fields: [formatoHospId], references: [id], onDelete: Cascade)
+
+  @@index([formatoHospId])
+  @@index([fecha])
+}
+
+// ============================================
+// LABORATORIO - Resultados de laboratorio (44 parámetros)
+// ============================================
+model Laboratorio {
+  id            BigInt    @id @default(autoincrement())
+  formatoHospId BigInt
+  fecha         DateTime  @db.Date
+  hora          DateTime? @db.Time
+
+  // Hematología
+  hgb         Decimal? @db.Decimal(5, 2) // Hemoglobina
+  hct         Decimal? @db.Decimal(5, 2) // Hematocrito
+  vcm         Decimal? @db.Decimal(5, 2) // Volumen Corpuscular Medio
+  chcm        Decimal? @db.Decimal(5, 2) // Concentración Hemoglobina Corpuscular Media
+  leucocitos  Decimal? @db.Decimal(10, 2)
+  neutrofilos Decimal? @db.Decimal(5, 2)
+  linfocitos  Decimal? @db.Decimal(5, 2)
+  eosinofilos Decimal? @db.Decimal(5, 2)
+  plaquetas   Decimal? @db.Decimal(10, 2)
+
+  // Coagulación
+  pt          Decimal? @db.Decimal(5, 2) // Tiempo de Protrombina
+  ptt         Decimal? @db.Decimal(5, 2) // Tiempo de Tromboplastina Parcial
+  inr         Decimal? @db.Decimal(4, 2)
+  fibrinogeno Decimal? @db.Decimal(7, 2)
+
+  // Reactantes de Fase Aguda
+  vsg Decimal? @db.Decimal(5, 2) // Velocidad de Sedimentación Globular
+  pcr Decimal? @db.Decimal(7, 2) // Proteína C Reactiva
+
+  // Química Sanguínea
+  glicemia              Decimal? @db.Decimal(7, 2)
+  urea                  Decimal? @db.Decimal(7, 2)
+  creatinina            Decimal? @db.Decimal(5, 2)
+  amilasa               Decimal? @db.Decimal(7, 2)
+  lipasa                Decimal? @db.Decimal(7, 2)
+  tgo                   Decimal? @db.Decimal(7, 2) // Transaminasa Glutámico Oxalacética
+  tgp                   Decimal? @db.Decimal(7, 2) // Transaminasa Glutámico Pirúvica
+  troponina             Decimal? @db.Decimal(7, 4)
+  fosfatasa_alcalina    Decimal? @db.Decimal(7, 2)
+  bilirrubina_total     Decimal? @db.Decimal(5, 2)
+  bilirrubina_directa   Decimal? @db.Decimal(5, 2)
+  bilirrubina_indirecta Decimal? @db.Decimal(5, 2)
+  acido_urico           Decimal? @db.Decimal(5, 2)
+  proteinas_totales     Decimal? @db.Decimal(5, 2)
+  albumina              Decimal? @db.Decimal(5, 2)
+  globulina             Decimal? @db.Decimal(5, 2)
+  ldh                   Decimal? @db.Decimal(7, 2) // Lactato Deshidrogenasa
+  colesterol            Decimal? @db.Decimal(7, 2)
+  trigliceridos         Decimal? @db.Decimal(7, 2)
+
+  // Electrolitos
+  sodio   Decimal? @db.Decimal(5, 2)
+  potasio Decimal? @db.Decimal(4, 2)
+  cloro   Decimal? @db.Decimal(5, 2)
+
+  // Marcadores Especiales
+  ferritina Decimal? @db.Decimal(7, 2)
+  dimero_d  Decimal? @db.Decimal(7, 2)
+  ck        Decimal? @db.Decimal(7, 2) // Creatinquinasa
+  ckmb      Decimal? @db.Decimal(7, 2) // Creatinquinasa MB
+
+  observaciones String?  @db.Text
+  registradoPor BigInt?
+  createdAt     DateTime @default(now()) @db.Timestamptz()
+
+  // Relaciones
+  formatoHosp FormatoHospitalizacion @relation(fields: [formatoHospId], references: [id], onDelete: Cascade)
+  usuario     Usuario?               @relation(fields: [registradoPor], references: [id])
+
+  @@index([formatoHospId])
+  @@index([fecha])
+}
+
+// ============================================
+// ESTUDIO ESPECIAL - Estudios de imágenes y otros
+// ============================================
+model EstudioEspecial {
+  id            BigInt    @id @default(autoincrement())
+  formatoHospId BigInt
+  fecha         DateTime  @db.Date
+  hora          DateTime? @db.Time
+
+  tipoEstudio String  @db.VarChar(100) // Rx, TAC, RMN, Eco, Endoscopia, etc.
+  descripcion String  @db.Text
+  resultado   String? @db.Text
+  archivoUrl  String? @db.VarChar(500) // URL del archivo adjunto
+
+  registradoPor BigInt?
+  createdAt     DateTime @default(now()) @db.Timestamptz()
+
+  // Relaciones
+  formatoHosp FormatoHospitalizacion @relation(fields: [formatoHospId], references: [id], onDelete: Cascade)
+  usuario     Usuario?               @relation(fields: [registradoPor], references: [id])
+
+  @@index([formatoHospId])
+  @@index([fecha])
+  @@index([tipoEstudio])
+}
+
+// ============================================
+// ELECTROCARDIOGRAMA - Interpretación de EKG
+// ============================================
+model Electrocardiograma {
+  id            BigInt    @id @default(autoincrement())
+  formatoHospId BigInt
+  fecha         DateTime  @db.Date
+  hora          DateTime? @db.Time
+
+  interpretacion String? @db.Text
+  ritmo          String? @db.VarChar(100)
+  frecuencia     Int?
+  hallazgos      String? @db.Text
+  archivoUrl     String? @db.VarChar(500) // URL de la imagen del EKG
+
+  registradoPor BigInt?
+  createdAt     DateTime @default(now()) @db.Timestamptz()
+
+  // Relaciones
+  formatoHosp FormatoHospitalizacion @relation(fields: [formatoHospId], references: [id], onDelete: Cascade)
+  usuario     Usuario?               @relation(fields: [registradoPor], references: [id])
+
+  @@index([formatoHospId])
+  @@index([fecha])
+}
+
+// ============================================
+// ANTECEDENTES DETALLADOS - Antecedentes completos del paciente (CLINICA II)
+// ============================================
+model AntecedentesDetallados {
+  id            BigInt @id @default(autoincrement())
+  formatoHospId BigInt @unique
+
+  // Antecedentes Personales
+  patologiaBase              String? @db.Text
+  alergiaMedicamentos        String? @db.Text
+  antecedentesQx             String? @db.Text
+  transfusionesSanguineas    String? @db.Text
+  traumatismos               String? @db.Text
+  hospitalizacionesRecientes String? @db.Text
+
+  // Antecedentes Familiares
+  madre            String? @db.Text
+  padre            String? @db.Text
+  hermanos         String? @db.Text
+  hermanasCantidad Int?
+  hermanosCantidad Int?
+  hijasCantidad    Int?
+  hijosCantidad    Int?
+
+  // Hábitos Psicobiológicos
+  cafeinicos           String?  @db.Text
+  tabaquicos           String?  @db.Text
+  ipa                  Decimal? @db.Decimal(5, 2) // Índice Paquetes/Año
+  alcoholicos          String?  @db.Text
+  drogas               String?  @db.Text
+  adiccionMedicamentos String?  @db.Text
+
+  // Antecedentes Epidemiológicos
+  viajesRecientes         String?  @db.Text
+  residenciaZona          String?  @db.VarChar(200)
+  viviendaTipo            String?  @db.VarChar(100)
+  viviendaSalas           Int?
+  viviendaCocina          Boolean?
+  viviendaComedor         Boolean?
+  viviendaBanos           Int?
+  viviendaCuartos         Int?
+  viviendaPersonasCant    Int?
+  servicioElectricidad    Boolean?
+  servicioAguasBlancas    Boolean?
+  servicioAguasResiduales Boolean?
+  servicioGasDomestico    Boolean?
+  servicioAseoUrbano      Boolean?
+  contactoAnimales        String?  @db.Text
+  vectores                String?  @db.Text
+  contactoTB              Boolean?
+  privadosLibertad        Boolean?
+  pacienteCovid           Boolean?
+  tosedoresCronicos       Boolean?
+  parejasSexuales         String?  @db.VarChar(100)
+  otrosEpidemiologicos    String?  @db.Text
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  // Relaciones
+  formatoHosp FormatoHospitalizacion @relation(fields: [formatoHospId], references: [id], onDelete: Cascade)
+
+  @@index([formatoHospId])
+}
+
+// ============================================
+// EXAMEN FUNCIONAL - Revisión por sistemas (CLINICA II)
+// ============================================
+model ExamenFuncional {
+  id            BigInt @id @default(autoincrement())
+  formatoHospId BigInt @unique
+
+  general          String? @db.Text
+  piel             String? @db.Text
+  cabeza           String? @db.Text
+  ojos             String? @db.Text
+  oidos            String? @db.Text
+  nariz            String? @db.Text
+  boca             String? @db.Text
+  garganta         String? @db.Text
+  respiratorio     String? @db.Text
+  cardiovascular   String? @db.Text
+  genitourinario   String? @db.Text
+  gastrointestinal String? @db.Text
+  nervioso         String? @db.Text
+  oma              String? @db.Text // Órganos, Músculos, Articulaciones
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  // Relaciones
+  formatoHosp FormatoHospitalizacion @relation(fields: [formatoHospId], references: [id], onDelete: Cascade)
+
+  @@index([formatoHospId])
+}
+
+// ============================================
+// EXAMEN FISICO COMPLETO - Examen físico detallado (CLINICA III)
+// ============================================
+model ExamenFisicoCompleto {
+  id            BigInt    @id @default(autoincrement())
+  formatoHospId BigInt    @unique
+  fecha         DateTime  @default(now()) @db.Date
+  hora          DateTime? @db.Time
+
+  // Signos vitales al momento del examen
+  taSistolica  Int?
+  taDiastolica Int?
+  fc           Int?
+  fr           Int?
+  temperatura  Decimal? @db.Decimal(4, 2)
+  spo2         Int?
+  peso         Decimal? @db.Decimal(5, 2)
+  talla        Decimal? @db.Decimal(5, 2)
+
+  // Examen físico por regiones
+  piel         String? @db.Text
+  cabeza       String? @db.Text
+  ojos         String? @db.Text
+  oidos        String? @db.Text
+  boca         String? @db.Text
+  cuello       String? @db.Text
+  cp           String? @db.Text // Cardiopulmonar
+  abdomen      String? @db.Text
+  genitales    String? @db.Text
+  extremidades String? @db.Text
+  neurologico  String? @db.Text
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  // Relaciones
+  formatoHosp FormatoHospitalizacion @relation(fields: [formatoHospId], references: [id], onDelete: Cascade)
+
+  @@index([formatoHospId])
+}
+
+// ============================================
+// RESUMEN DE INGRESO - Documento consolidado (CLINICA I + resumen)
+// ============================================
+model ResumenIngreso {
+  id            BigInt    @id @default(autoincrement())
+  formatoHospId BigInt    @unique
+  fecha         DateTime  @db.Date
+  hora          DateTime? @db.Time
+
+  // Clínica I
+  motivoConsulta   String? @db.Text
+  enfermedadActual String? @db.Text
+
+  // Resumen de antecedentes
+  antecedentesResumen String? @db.Text
+
+  // Examen físico resumido
+  examenFisicoResumen String? @db.Text
+
+  // Impresión diagnóstica inicial
+  impresionDxInicial String? @db.Text
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  // Relaciones
+  formatoHosp FormatoHospitalizacion @relation(fields: [formatoHospId], references: [id], onDelete: Cascade)
+
+  @@index([formatoHospId])
+}
+
+// ============================================
+// ORDEN MEDICA - Órdenes médicas durante hospitalización
+// ============================================
+model OrdenMedica {
+  id            BigInt   @id @default(autoincrement())
+  formatoHospId BigInt
+  fecha         DateTime @db.Date
+  hora          DateTime @db.Time
+
+  tipoOrden    String  @db.VarChar(50) // MEDICAMENTO | ESTUDIO | DIETA | PROCEDIMIENTO | INTERCONSULTA
+  descripcion  String  @db.Text
+  indicaciones String? @db.Text
+
+  estado            String    @default("PENDIENTE") @db.VarChar(50) // PENDIENTE | CUMPLIDA | CANCELADA
+  fechaCumplimiento DateTime?
+
+  archivoUrl String? @db.VarChar(500) // Recipe o documento adjunto
+
+  ordenadoPor BigInt?
+  cumplidaPor BigInt?
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  // Relaciones
+  formatoHosp  FormatoHospitalizacion @relation(fields: [formatoHospId], references: [id], onDelete: Cascade)
+  medicoOrdena Usuario?               @relation("OrdenesMedicasOrdena", fields: [ordenadoPor], references: [id])
+  medicoCumple Usuario?               @relation("OrdenesMedicasCumple", fields: [cumplidaPor], references: [id])
+
+  @@index([formatoHospId])
+  @@index([fecha])
+  @@index([estado])
+  @@index([tipoOrden])
+}
+
+// ============================================
+// EVOLUCION MEDICA - Notas de evolución diarias
+// ============================================
+model EvolucionMedica {
+  id            BigInt   @id @default(autoincrement())
+  formatoHospId BigInt
+  fecha         DateTime @db.Date
+  hora          DateTime @db.Time
+  cama          String?  @db.VarChar(50)
+
+  diasHospitalizacion Int? // D.H. (días)
+  impresionDx         String? @db.Text
+
+  // SOAP (Subjetivo, Objetivo, Análisis, Plan)
+  subjetivo String? @db.Text
+  objetivo  String? @db.Text
+
+  // Signos vitales del momento
+  taSistolica  Int?
+  taDiastolica Int?
+  fc           Int?
+  fr           Int?
+  spo2         Int?
+  temperatura  Decimal? @db.Decimal(4, 2)
+
+  // Examen físico dirigido
+  piel         String? @db.Text
+  cp           String? @db.Text // Cardiopulmonar
+  abdomen      String? @db.Text
+  extremidades String? @db.Text
+  neurologico  String? @db.Text
+
+  notas String? @db.Text
+
+  evolucionadoPor BigInt?
+  createdAt       DateTime @default(now()) @db.Timestamptz()
+
+  // Relaciones
+  formatoHosp FormatoHospitalizacion @relation(fields: [formatoHospId], references: [id], onDelete: Cascade)
+  medico      Usuario?               @relation(fields: [evolucionadoPor], references: [id])
+
+  @@index([formatoHospId])
+  @@index([fecha])
+}
