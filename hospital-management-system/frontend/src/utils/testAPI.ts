@@ -9,11 +9,13 @@
  * O simplemente copiar el contenido en window._testAPI
  */
 
+import { API_BASE_URL } from './constants'
+
 export const testAPI = {
   async testHealth() {
     console.log('🧪 Testing /api/health...')
     try {
-      const response = await fetch('http://localhost:3001/api/health')
+      const response = await fetch(`${API_BASE_URL.replace('/api', '')}/health`)
       const data = await response.json()
       console.log('✅ Health check:', data)
       return data
@@ -25,7 +27,7 @@ export const testAPI = {
   async testLogin() {
     console.log('🧪 Testing login...')
     try {
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -54,7 +56,7 @@ export const testAPI = {
         return
       }
 
-      const response = await fetch('http://localhost:3001/api/auth/me', {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await response.json()

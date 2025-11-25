@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import styles from './AdminDashboard.module.css'
 import { useDashboardStats } from '../hooks/useDashboardStats'
 import RegistrarAdmision from '../components/RegistrarAdmision'
+import { API_BASE_URL } from '../utils/constants'
 
 type ViewMode = 'main' | 'register-patient' | 'create-appointment' | 'search-patient' | 'register-admission' | 'patient-history'
 
@@ -320,12 +321,7 @@ function RegisterPatientForm() {
     }
 
     try {
-      // Detectar URL del API según el entorno
-      const apiUrl = window.location.hostname.includes('app.github.dev')
-        ? window.location.origin.replace('-5173.', '-3001.') + '/api/pacientes'
-        : 'http://localhost:3001/api/pacientes'
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`${API_BASE_URL}/pacientes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -802,11 +798,7 @@ function CreateAppointmentForm({ preSelectedPatient }: { preSelectedPatient?: an
     if (preSelectedPatient) {
       const cargarCitasPaciente = async () => {
         try {
-          const apiBaseUrl = window.location.hostname.includes('app.github.dev')
-            ? window.location.origin.replace('-5173.', '-3001.')
-            : 'http://localhost:3001'
-          
-          const citasResponse = await fetch(`${apiBaseUrl}/api/citas/paciente/${preSelectedPatient.id}?estado=PROGRAMADA`)
+          const citasResponse = await fetch(`${API_BASE_URL}/citas/paciente/${preSelectedPatient.id}?estado=PROGRAMADA`)
           const citasResult = await citasResponse.json()
           
           if (citasResult.success) {
@@ -848,12 +840,8 @@ function CreateAppointmentForm({ preSelectedPatient }: { preSelectedPatient?: an
     setCitasExistentes([])
 
     try {
-      const apiBaseUrl = window.location.hostname.includes('app.github.dev')
-        ? window.location.origin.replace('-5173.', '-3001.')
-        : 'http://localhost:3001'
-
       const ciCompleta = `${searchCITipo}-${searchCINumeros}`
-      const response = await fetch(`${apiBaseUrl}/api/pacientes/search?ci=${encodeURIComponent(ciCompleta)}`)
+      const response = await fetch(`${API_BASE_URL}/pacientes/search?ci=${encodeURIComponent(ciCompleta)}`)
       const result = await response.json()
 
       if (!response.ok) {
@@ -905,10 +893,6 @@ function CreateAppointmentForm({ preSelectedPatient }: { preSelectedPatient?: an
     setSubmitMessage('')
 
     try {
-      const apiBaseUrl = window.location.hostname.includes('app.github.dev')
-        ? window.location.origin.replace('-5173.', '-3001.')
-        : 'http://localhost:3001'
-
       const citaData = {
         pacienteId: selectedPatient.id,
         medicoId: null,
@@ -919,7 +903,7 @@ function CreateAppointmentForm({ preSelectedPatient }: { preSelectedPatient?: an
         notas: null,
       }
 
-      const response = await fetch(`${apiBaseUrl}/api/citas`, {
+      const response = await fetch(`${API_BASE_URL}/citas`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1310,14 +1294,9 @@ function SearchPatientView({ onViewHistory, onScheduleAppointment }: { onViewHis
     setPatientData(null)
 
     try {
-      // Detectar URL del API según el entorno
-      const apiBaseUrl = window.location.hostname.includes('app.github.dev')
-        ? window.location.origin.replace('-5173.', '-3001.')
-        : 'http://localhost:3001'
-
       // Construir URL de búsqueda
       const param = searchType === 'ci' ? `ci=${encodeURIComponent(searchParam)}` : `historia=${encodeURIComponent(searchParam)}`
-      const url = `${apiBaseUrl}/api/pacientes/search?${param}`
+      const url = `${API_BASE_URL}/pacientes/search?${param}`
 
       const response = await fetch(url)
       const result = await response.json()
@@ -1592,12 +1571,8 @@ function PatientHistoryView({ patient, onBack }: { patient: any; onBack: () => v
   const cargarHistoriaCompleta = async () => {
     setLoading(true)
     try {
-      const apiBaseUrl = window.location.hostname.includes('app.github.dev')
-        ? window.location.origin.replace('-5173.', '-3001.')
-        : 'http://localhost:3001'
-
       // Cargar datos completos del paciente con admisiones y encuentros
-      const response = await fetch(`${apiBaseUrl}/api/pacientes/${patient.id}`)
+      const response = await fetch(`${API_BASE_URL}/pacientes/${patient.id}`)
       const result = await response.json()
 
       if (result.success) {
