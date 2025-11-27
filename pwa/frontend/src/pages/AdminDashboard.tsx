@@ -1583,7 +1583,6 @@ function PatientHistoryView({ patient, onBack }: { patient: any; onBack: () => v
   const [encuentros, setEncuentros] = useState<Encuentro[]>([])
   const [encuentroSeleccionado, setEncuentroSeleccionado] = useState<Encuentro | null>(null)
   const [loading, setLoading] = useState(true)
-  const [loadingEncuentros, setLoadingEncuentros] = useState(true)
 
   useEffect(() => {
     cargarHistoriaCompleta()
@@ -1615,7 +1614,6 @@ function PatientHistoryView({ patient, onBack }: { patient: any; onBack: () => v
   }
 
   const cargarEncuentros = async () => {
-    setLoadingEncuentros(true)
     try {
       const data = await encuentrosService.obtenerPorPaciente(patient.id)
       setEncuentros(data)
@@ -1623,8 +1621,6 @@ function PatientHistoryView({ patient, onBack }: { patient: any; onBack: () => v
     } catch (err) {
       console.error('Error al cargar encuentros:', err)
       setEncuentros([])
-    } finally {
-      setLoadingEncuentros(false)
     }
   }
 
