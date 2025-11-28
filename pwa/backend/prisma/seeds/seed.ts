@@ -79,15 +79,6 @@ async function main() {
     // ============================================
     console.log('\n📋 Paso 2: Creando Personal Autorizado de prueba (whitelist)...');
     
-    // Limpiar registros de prueba existentes (excepto SUPER_ADMIN)
-    await prisma.personalAutorizado.deleteMany({
-      where: {
-        ci: {
-          not: 'V00000001',
-        },
-      },
-    });
-
     // Personal autorizado de prueba que AÚN NO se ha registrado
     const personalAutorizadoPrueba = [
       {
@@ -143,14 +134,23 @@ async function main() {
     ];
 
     for (const personal of personalAutorizadoPrueba) {
-      await prisma.personalAutorizado.create({
-        data: {
-          ...personal,
-          estado: 'ACTIVO',
-          registrado: false, // AÚN NO se han registrado en la app
-        },
+      // Verificar si ya existe antes de crear (idempotente)
+      const existing = await prisma.personalAutorizado.findUnique({
+        where: { ci: personal.ci },
       });
-      console.log(`   ✅ Autorizado: ${personal.nombreCompleto} (${personal.ci}) - ${personal.rolAutorizado}`);
+      
+      if (!existing) {
+        await prisma.personalAutorizado.create({
+          data: {
+            ...personal,
+            estado: 'ACTIVO',
+            registrado: false, // AÚN NO se han registrado en la app
+          },
+        });
+        console.log(`   ✅ Autorizado: ${personal.nombreCompleto} (${personal.ci}) - ${personal.rolAutorizado}`);
+      } else {
+        console.log(`   ℹ️  Ya existe: ${personal.nombreCompleto} (${personal.ci})`);
+      }
     }
 
     // ============================================
