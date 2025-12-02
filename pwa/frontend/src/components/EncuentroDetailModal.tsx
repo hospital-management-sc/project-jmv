@@ -147,7 +147,7 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
                     {signos.temperatura && (
                       <div className={styles.signoItem}>
                         <span className={styles.signoLabel}>Temperatura</span>
-                        <span className={styles.signoValue}>{signos.temperatura}°C</span>
+                        {/* <span className={styles.signoValue}>{signos.temperatura}°C</span> */}
                       </div>
                     )}
                     {signos.fr && (

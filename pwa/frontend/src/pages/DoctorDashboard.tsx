@@ -280,11 +280,14 @@ export default function DoctorDashboard() {
       <main className={styles['dashboard-main']}>
         {viewMode === 'main' && renderMainView()}
         {viewMode === 'hospitalized-patients' && <HospitalizedPatientsView />}
-        {viewMode === 'register-encounter' && <RegisterEncounterView />}
+        {viewMode === 'register-encounter' && <RegisterEncounterView patient={selectedPatient} />}
         {viewMode === 'search-patient' && <SearchPatientView onViewHistory={(patient) => {
           setSelectedPatient(patient)
           setViewMode('patient-history')
-        }} />}
+        }}  onRegisterEncounter={(patient) => {
+          setSelectedPatient(patient)
+          setViewMode('register-encounter')
+        }}/>}
         {viewMode === 'patient-history' && selectedPatient && (
           <PatientHistoryView 
             patient={selectedPatient}
@@ -476,10 +479,10 @@ function HospitalizedPatientsView() {
 // ==========================================
 // COMPONENTE: Registrar Encuentro
 // ==========================================
-function RegisterEncounterView() {
-  const [step, setStep] = useState(1)
-  const [searchCI, setSearchCI] = useState('')
-  const [paciente, setPaciente] = useState<PatientBasic | null>(null)
+function RegisterEncounterView({ patient = null }: { patient: PatientBasic | null}) {
+  const [step, setStep] = useState(patient ? 2 : 1)
+  const [searchCI, setSearchCI] = useState(patient? patient?.ci  : '')
+  const [paciente, setPaciente] = useState<PatientBasic | null>(patient)
   const [searching, setSearching] = useState(false)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState('')
@@ -885,7 +888,7 @@ function RegisterEncounterView() {
 // ==========================================
 // COMPONENTE: Buscar Paciente
 // ==========================================
-function SearchPatientView({ onViewHistory }: { onViewHistory: (patient: PatientBasic) => void }) {
+function SearchPatientView({ onViewHistory, onRegisterEncounter }: { onViewHistory: (patient: PatientBasic) => void, onRegisterEncounter: (patient: PatientBasic) => void }) {
   const [searchType, setSearchType] = useState<'ci' | 'historia'>('ci')
   const [searchValue, setSearchValue] = useState('')
   const [searching, setSearching] = useState(false)
@@ -907,6 +910,7 @@ function SearchPatientView({ onViewHistory }: { onViewHistory: (patient: Patient
       const result = await response.json()
 
       if (result.success && result.data) {
+        console.log('El paciente:', result?.data);
         setPaciente(result.data)
       } else {
         setError('Paciente no encontrado')
@@ -1015,7 +1019,7 @@ function SearchPatientView({ onViewHistory }: { onViewHistory: (patient: Patient
               <button className={styles['btn-primary']} onClick={() => onViewHistory(paciente)}>
                 📋 Ver Historia Completa
               </button>
-              <button className={styles['btn-secondary']} onClick={() => alert('Próximamente: Registrar Encuentro')}>
+              <button className={styles['btn-secondary']} onClick={() => onRegisterEncounter(paciente)}>
                 📝 Nuevo Encuentro
               </button>
             </div>

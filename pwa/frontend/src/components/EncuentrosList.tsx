@@ -3,10 +3,10 @@
  * Solo lectura - Vista administrativa
  */
 
-import { useState } from 'react';
-import type { Encuentro } from '@/services/encuentros.service';
-import styles from './EncuentrosList.module.css';
-import { VENEZUELA_TIMEZONE, VENEZUELA_LOCALE } from '@/utils/dateUtils';
+import { useState } from "react";
+import type { Encuentro } from "@/services/encuentros.service";
+import styles from "./EncuentrosList.module.css";
+import { VENEZUELA_TIMEZONE, VENEZUELA_LOCALE } from "@/utils/dateUtils";
 
 interface EncuentrosListProps {
   encuentros: Encuentro[];
@@ -14,14 +14,14 @@ interface EncuentrosListProps {
 }
 
 const EncuentrosList = ({ encuentros, onVerDetalle }: EncuentrosListProps) => {
-  const [filtroTipo, setFiltroTipo] = useState<string>('TODOS');
+  const [filtroTipo, setFiltroTipo] = useState<string>("TODOS");
 
   const getTipoLabel = (tipo: string) => {
     const labels: Record<string, string> = {
-      EMERGENCIA: '🚨 Emergencia',
-      HOSPITALIZACION: '🛏️ Hospitalización',
-      CONSULTA: '🩺 Consulta',
-      OTRO: '📋 Otro',
+      EMERGENCIA: "🚨 Emergencia",
+      HOSPITALIZACION: "🛏️ Hospitalización",
+      CONSULTA: "🩺 Consulta",
+      OTRO: "📋 Otro",
     };
     return labels[tipo] || tipo;
   };
@@ -40,29 +40,30 @@ const EncuentrosList = ({ encuentros, onVerDetalle }: EncuentrosListProps) => {
     const date = new Date(fecha);
     return date.toLocaleDateString(VENEZUELA_LOCALE, {
       timeZone: VENEZUELA_TIMEZONE,
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
     });
   };
 
   const formatHora = (hora?: string) => {
-    if (!hora) return '--:--';
+    if (!hora) return "--:--";
     // La hora viene en formato HH:mm:ss, tomamos solo HH:mm
     return hora.substring(0, 5);
   };
 
-  const encuentrosFiltrados = filtroTipo === 'TODOS'
-    ? encuentros
-    : encuentros.filter(e => e.tipo === filtroTipo);
+  const encuentrosFiltrados =
+    filtroTipo === "TODOS"
+      ? encuentros
+      : encuentros.filter((e) => e.tipo === filtroTipo);
 
   if (encuentros.length === 0) {
     return (
       <div className={styles.emptyState}>
         <p>📋 No se encontraron encuentros médicos para este paciente</p>
         <span className={styles.emptySubtext}>
-          Los encuentros son registrados por el personal médico durante las consultas,
-          emergencias u hospitalizaciones.
+          Los encuentros son registrados por el personal médico durante las
+          consultas, emergencias u hospitalizaciones.
         </span>
       </div>
     );
@@ -92,19 +93,28 @@ const EncuentrosList = ({ encuentros, onVerDetalle }: EncuentrosListProps) => {
       </div>
 
       <div className={styles.timeline}>
-        {encuentrosFiltrados.map((encuentro) => (
+        {encuentrosFiltrados?.map((encuentro) => (
           <div key={encuentro.id} className={styles.timelineItem}>
             <div className={styles.timelineMarker}>
-              <div className={`${styles.markerDot} ${getTipoBadgeClass(encuentro.tipo)}`} />
+              <div
+                className={`${styles.markerDot} ${getTipoBadgeClass(
+                  encuentro.tipo
+                )}`}
+              />
             </div>
             <div className={styles.encounterCard}>
               <div className={styles.cardHeader}>
                 <div className={styles.headerLeft}>
-                  <span className={`${styles.tipoBadge} ${getTipoBadgeClass(encuentro.tipo)}`}>
+                  <span
+                    className={`${styles.tipoBadge} ${getTipoBadgeClass(
+                      encuentro.tipo
+                    )}`}
+                  >
                     {getTipoLabel(encuentro.tipo)}
                   </span>
                   <span className={styles.fecha}>
-                    {formatFecha(encuentro.fecha)} - {formatHora(encuentro.hora)}
+                    {formatFecha(encuentro.fecha)} -{" "}
+                    {formatHora(encuentro.hora)}
                   </span>
                 </div>
                 <button
@@ -122,7 +132,9 @@ const EncuentrosList = ({ encuentros, onVerDetalle }: EncuentrosListProps) => {
                     <strong>👨‍⚕️ Médico:</strong>
                     <span>{encuentro.createdBy.nombre}</span>
                     {encuentro.createdBy.cargo && (
-                      <span className={styles.cargo}>({encuentro.createdBy.cargo})</span>
+                      <span className={styles.cargo}>
+                        ({encuentro.createdBy.cargo})
+                      </span>
                     )}
                   </div>
                 )}
@@ -137,28 +149,35 @@ const EncuentrosList = ({ encuentros, onVerDetalle }: EncuentrosListProps) => {
                 {encuentro.impresiones && encuentro.impresiones.length > 0 && (
                   <div className={styles.diagnostico}>
                     <strong>Diagnóstico:</strong>
-                    <span>{encuentro.impresiones[0].descripcion || 'Sin descripción'}</span>
+                    <span>
+                      {encuentro.impresiones[0].descripcion ||
+                        "Sin descripción"}
+                    </span>
                   </div>
                 )}
 
-                {encuentro.signosVitales && encuentro.signosVitales.length > 0 && (
-                  <div className={styles.signos}>
-                    <strong>Signos vitales:</strong>
-                    <div className={styles.signosGrid}>
-                      {encuentro.signosVitales[0].taSistolica && encuentro.signosVitales[0].taDiastolica && (
-                        <span>
-                          PA: {encuentro.signosVitales[0].taSistolica}/{encuentro.signosVitales[0].taDiastolica}
-                        </span>
-                      )}
-                      {encuentro.signosVitales[0].pulso && (
-                        <span>FC: {encuentro.signosVitales[0].pulso}</span>
-                      )}
-                      {encuentro.signosVitales[0].temperatura && (
+                {encuentro.signosVitales &&
+                  encuentro.signosVitales.length > 0 && (
+                    <div className={styles.signos}>
+                      <strong>Signos vitales:</strong>
+                      <div className={styles.signosGrid}>
+                        {encuentro.signosVitales[0].taSistolica &&
+                          encuentro.signosVitales[0].taDiastolica && (
+                            <span>
+                              PA: {encuentro.signosVitales[0].taSistolica}/
+                              {encuentro.signosVitales[0].taDiastolica}
+                            </span>
+                          )}
+                        {encuentro.signosVitales[0].pulso && (
+                          <span>FC: {encuentro.signosVitales[0].pulso}</span>
+                        )}
+                        {/* TODO: corregir respuesta del back referente a la propiedad temperatura */}
+                        {/* {encuentro.signosVitales[0].temperatura && (
                         <span>Temp: {encuentro.signosVitales[0].temperatura}°C</span>
-                      )}
+                      )} */}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {encuentro.nroCama && (
                   <div className={styles.cama}>
@@ -172,7 +191,7 @@ const EncuentrosList = ({ encuentros, onVerDetalle }: EncuentrosListProps) => {
         ))}
       </div>
 
-      {encuentrosFiltrados.length === 0 && filtroTipo !== 'TODOS' && (
+      {encuentrosFiltrados.length === 0 && filtroTipo !== "TODOS" && (
         <div className={styles.noResults}>
           <p>No hay encuentros de tipo {getTipoLabel(filtroTipo)}</p>
         </div>
