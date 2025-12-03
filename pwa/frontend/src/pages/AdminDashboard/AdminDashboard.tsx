@@ -5,14 +5,14 @@
 
 import { useState, useEffect } from 'react'
 import styles from './AdminDashboard.module.css'
-import { useDashboardStats } from '../hooks/useDashboardStats'
-import RegistrarAdmision from '../components/RegistrarAdmision'
-import PacientesHospitalizados from '../components/PacientesHospitalizados'
-import EncuentroDetailModal from '../components/EncuentroDetailModal'
-import { encuentrosService } from '../services/encuentros.service'
-import type { Encuentro } from '../services/encuentros.service'
-import { API_BASE_URL } from '../utils/constants'
-import { VENEZUELA_TIMEZONE, VENEZUELA_LOCALE } from '../utils/dateUtils'
+import { useDashboardStats } from '@/hooks/useDashboardStats'
+import RegistrarAdmision from '@/components/RegistrarAdmision'
+import PacientesHospitalizados from '@/components/PacientesHospitalizados'
+import EncuentroDetailModal from '@/components/EncuentroDetailModal'
+import { encuentrosService } from '@/services/encuentros.service'
+import type { Encuentro } from '@/services/encuentros.service'
+import { API_BASE_URL } from '@/utils/constants'
+import { VENEZUELA_TIMEZONE, VENEZUELA_LOCALE } from '@/utils/dateUtils'
 
 type ViewMode = 'main' | 'register-patient' | 'create-appointment' | 'search-patient' | 'register-admission' | 'patient-history' | 'hospitalized-patients'
 
