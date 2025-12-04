@@ -204,6 +204,60 @@
   margin-top: -var(--spacing-xs);
 }
 
+.dual-input-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.dual-input-group select {
+  min-width: 85px;
+  flex-shrink: 0;
+  font-weight: 500;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.dual-input-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.dual-input-group select.inputError,
+.dual-input-group input.inputError {
+  border-color: var(--color-error);
+}
+
+.dual-input-group select.inputError:focus,
+.dual-input-group input.inputError:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.dual-input-group input {
+  flex: 1;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.dual-input-group input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
 .twoColumn {
   display: grid;
   grid-template-columns: 1fr 1fr;

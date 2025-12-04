@@ -53,11 +53,14 @@ const registerSchema = z
     nombre: z
       .string()
       .min(2, 'Nombre completo debe tener al menos 2 caracteres'),
-    ci: z
+    ciTipo: z
+      .string()
+      .min(1, 'Tipo de cédula es requerido'),
+    ciNumeros: z
       .string()
       .regex(
-        /^[VEP]\d{7,9}$/,
-        'C.I. debe comenzar con V, E o P seguido de 7-9 dígitos (Ej: V12345678)'
+        /^\d{7,9}$/,
+        'C.I. debe tener 7-9 dígitos (Ej: 12345678)'
       ),
     email: z
       .string()
@@ -124,11 +127,12 @@ export default function Register() {
     try {
       console.log('[Register] Form submitted with email:', data.email)
       
+      const ciCompleta = `${data.ciTipo}${data.ciNumeros}`
       const response = await authService.register({
         nombre: data.nombre,
         email: data.email,
         password: data.password,
-        ci: data.ci.toUpperCase(),
+        ci: ciCompleta.toUpperCase(),
         role: data.role,
       })
       
@@ -162,9 +166,9 @@ export default function Register() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Registrarse</h1>
+      <h1 className={styles.title}>Hospital JMV</h1>
       <p className={styles.subtitle}>
-        Sistema exclusivo para personal autorizado del hospital
+        Registro en el sistema
       </p>
 
       {/* Mensaje de advertencia sobre sistema cerrado */}
@@ -231,24 +235,41 @@ export default function Register() {
         <FormInput
           id="nombre"
           label="Nombre Completo (como aparece en su cédula)"
-          placeholder="Ej: Juan Carlos Pérez García"
+          placeholder="Ej: Leslie Sofía Acevedo Martínez"
           error={errors.nombre?.message}
           {...register('nombre')}
         />
 
-        <FormInput
-          id="ci"
-          label="C.I. (Cédula de Identidad)"
-          placeholder="Ej: V12345678"
-          error={errors.ci?.message}
-          {...register('ci')}
-        />
+        <div className={styles.formGroup}>
+          <label htmlFor="ciTipo">C.I. (Cédula de Identidad)</label>
+          <div className={styles["dual-input-group"]}>
+            <select
+              id="ciTipo"
+              {...register('ciTipo')}
+              className={errors.ciTipo ? styles.inputError : ''}
+            >
+              <option value="V">V</option>
+              <option value="E">E</option>
+              <option value="P">P</option>
+            </select>
+            <input
+              type="text"
+              id="ciNumeros"
+              placeholder="10200300"
+              maxLength={9}
+              {...register('ciNumeros')}
+              className={errors.ciNumeros ? styles.inputError : ''}
+            />
+          </div>
+          {errors.ciTipo?.message && <span className={styles.error}>{errors.ciTipo.message}</span>}
+          {errors.ciNumeros?.message && <span className={styles.error}>{errors.ciNumeros.message}</span>}
+        </div>
 
         <FormInput
           id="email"
           type="email"
-          label="Email Institucional"
-          placeholder="tu.nombre@hospital.com"
+          label="Email"
+          placeholder="tu.correo@email.com"
           error={errors.email?.message}
           {...register('email')}
         />
@@ -258,7 +279,7 @@ export default function Register() {
             id="password"
             type={showPassword ? 'text' : 'password'}
             label="Contraseña"
-            placeholder="Mín. 6 caracteres"
+            placeholder="Mínimo 6 caracteres"
             error={errors.password?.message}
             {...register('password')}
           />
@@ -279,13 +300,6 @@ export default function Register() {
         <Link to="/login" className={styles.link}>
           Inicia sesión
         </Link>
-      </p>
-
-      <p className={styles.helpText}>
-        ¿Problemas para registrarte? Contacta a{' '}
-        <a href="mailto:soporte@hospital.com" className={styles.link}>
-          soporte@hospital.com
-        </a>
       </p>
     </div>
   )
