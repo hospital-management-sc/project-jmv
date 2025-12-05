@@ -67,13 +67,14 @@ model Paciente {
   lugarNacimiento     String?   @db.VarChar(200)
   religion            String?   @db.VarChar(100)
   estado              String?   @db.VarChar(100)
-  region           String?   @db.VarChar(100)
+  tipoPaciente        String    @default("PNA") @db.VarChar(50) // MILITAR | AFILIADO | PNA
   estadoRegistro   String    @default("PERMANENTE") @db.VarChar(50) // TEMPORAL | PERMANENTE | NN
   createdAt        DateTime  @default(now()) @db.Timestamptz()
   updatedAt        DateTime  @updatedAt @db.Timestamptz()
 
   // Relaciones
   personalMilitar         PersonalMilitar?
+  afiliado                Afiliado?
   admisiones              Admision[]
   encuentros              Encuentro[]
   antecedentes            Antecedente[]
@@ -84,6 +85,7 @@ model Paciente {
   @@index([ci])
   @@index([nroHistoria])
   @@index([estadoRegistro])
+  @@index([tipoPaciente])
 }
 
 // ============================================
@@ -99,6 +101,31 @@ model PersonalMilitar {
 
   // Relaciones
   paciente Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// AFILIADO - Info de afiliación del paciente
+// ============================================
+model Afiliado {
+  id                Int     @id @default(autoincrement())
+  pacienteId        Int     @unique
+  nroCarnet         String? @db.VarChar(100) // Número de carnet del afiliado
+  parentesco        String? @db.VarChar(100) // Relación con el militar (esposo/a, hijo/a, padre/madre, etc.)
+  titularNombre     String? @db.VarChar(200) // Nombre del militar titular
+  titularCi         String? @db.VarChar(50)  // CI del militar titular
+  titularGrado      String? @db.VarChar(50)  // Grado del militar titular
+  titularComponente String? @db.VarChar(100) // Componente del militar titular
+  fechaAfiliacion   DateTime? @db.Date       // Fecha de afiliación al servicio
+  vigente           Boolean @default(true)   // Si la afiliación está vigente
+  
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  // Relaciones
+  paciente Paciente @relation(fields: [pacienteId], references: [id], onDelete: Cascade)
+  
+  @@index([titularCi])
+  @@index([nroCarnet])
 }
 
 // ============================================

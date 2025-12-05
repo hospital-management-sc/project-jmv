@@ -28,6 +28,7 @@ export const ESTADOS_VENEZUELA = [
   'Vargas',
   'Yaracuy',
   'Zulia',
+  'Extranjero'
 ];
 
 /**
@@ -78,7 +79,6 @@ export const RELIGIONES = [
   'Budismo',
   'Ateísmo/Agnosticismo',
   'Otra',
-  'Sin especificar',
 ];
 
 /**

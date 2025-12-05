@@ -67,9 +67,13 @@ export const crearPaciente = async (
       lugarNacimiento,
       nacionalidad,
       estado,
+      religion,
       direccion,
       telefono,
       telefonoEmergencia,
+      
+      // Tipo de paciente
+      tipoPaciente,
       
       // Datos militares (opcional)
       grado,
@@ -77,18 +81,53 @@ export const crearPaciente = async (
       componente,
       unidad,
       
+      // Datos de afiliado (opcional)
+      afiliadoData,
+      
       // Diagnóstico de ingreso (opcional)
       diagnosticoIngreso,
     } = req.body;
 
     // Validar campos requeridos
-    if (!nroHistoria || !apellidosNombres || !ci || !fechaAdmision || !horaAdmision || !sexo || !fechaNacimiento) {
+    if (!nroHistoria || !apellidosNombres || !ci || !fechaAdmision || !horaAdmision || !sexo || !fechaNacimiento || !estado || !religion) {
       res.status(400).json({
         error: 'Validation Error',
         message: 'Faltan campos requeridos',
-        requiredFields: ['nroHistoria', 'apellidosNombres', 'ci', 'fechaAdmision', 'horaAdmision', 'sexo', 'fechaNacimiento'],
+        requiredFields: ['nroHistoria', 'apellidosNombres', 'ci', 'fechaAdmision', 'horaAdmision', 'sexo', 'fechaNacimiento', 'estado', 'religion'],
       });
       return;
+    }
+
+    // Validar tipoPaciente
+    const tiposPacienteValidos = ['MILITAR', 'AFILIADO', 'PNA'];
+    const tipoPacienteNormalizado = tipoPaciente || 'PNA';
+    if (!tiposPacienteValidos.includes(tipoPacienteNormalizado)) {
+      res.status(400).json({
+        error: 'Validation Error',
+        message: 'Tipo de paciente inválido. Debe ser: MILITAR, AFILIADO o PNA',
+      });
+      return;
+    }
+
+    // Validaciones específicas por tipo
+    if (tipoPacienteNormalizado === 'MILITAR') {
+      if (!grado || !componente || !estadoMilitar) {
+        res.status(400).json({
+          error: 'Validation Error',
+          message: 'Grado, Componente y Estado Militar son requeridos para personal militar',
+        });
+        return;
+      }
+    }
+
+    if (tipoPacienteNormalizado === 'AFILIADO') {
+      if (!afiliadoData || !afiliadoData.nroCarnet || !afiliadoData.parentesco || !afiliadoData.titularNombre || !afiliadoData.titularCi) {
+        res.status(400).json({
+          error: 'Validation Error',
+          message: 'Datos de afiliación incompletos. Se requiere: nroCarnet, parentesco, titularNombre y titularCi',
+        });
+        return;
+      }
     }
 
     // Validar formato de historia clínica
@@ -132,9 +171,11 @@ export const crearPaciente = async (
           lugarNacimiento: lugarNacimiento || null,
           nacionalidad: nacionalidad || null,
           estado: estado || null,
+          religion: religion || null,
           direccion: direccion || null,
           telefono: telefono || null,
           telefonoEmergencia: telefonoEmergencia || null,
+          tipoPaciente: tipoPacienteNormalizado,
         },
       });
 
@@ -166,6 +207,23 @@ export const crearPaciente = async (
             estadoMilitar: estadoMilitar || null,
             componente: componente || null,
             unidad: unidad || null,
+          },
+        });
+      }
+
+      // Crear datos de afiliado si es tipo AFILIADO
+      if (tipoPacienteNormalizado === 'AFILIADO' && afiliadoData) {
+        await tx.afiliado.create({
+          data: {
+            pacienteId: paciente.id,
+            nroCarnet: afiliadoData.nroCarnet || null,
+            parentesco: afiliadoData.parentesco || null,
+            titularNombre: afiliadoData.titularNombre || null,
+            titularCi: afiliadoData.titularCi || null,
+            titularGrado: afiliadoData.titularGrado || null,
+            titularComponente: afiliadoData.titularComponente || null,
+            fechaAfiliacion: afiliadoData.fechaAfiliacion ? new Date(afiliadoData.fechaAfiliacion) : null,
+            vigente: afiliadoData.vigente !== undefined ? afiliadoData.vigente : true,
           },
         });
       }
@@ -232,6 +290,7 @@ export const obtenerPaciente = async (
       where: { id: Number(id) },
       include: {
         personalMilitar: true,
+        afiliado: true,
         admisiones: true,
         encuentros: true,
         citas: {
@@ -290,6 +349,7 @@ export const buscarPaciente = async (
         where: { ci: ci as string },
         include: {
           personalMilitar: true,
+          afiliado: true,
           admisiones: true,
           encuentros: true,
           citas: {
@@ -304,6 +364,7 @@ export const buscarPaciente = async (
         where: { nroHistoria: historia as string },
         include: {
           personalMilitar: true,
+          afiliado: true,
           admisiones: true,
           encuentros: true,
           citas: {
@@ -391,6 +452,7 @@ export const listarPacientes = async (
         orderBy: { createdAt: 'desc' },
         include: {
           personalMilitar: true,
+          afiliado: true,
         },
       }),
       prisma.paciente.count(),

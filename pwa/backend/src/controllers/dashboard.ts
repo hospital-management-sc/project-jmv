@@ -14,11 +14,33 @@ export const getDashboardStats = async (_req: Request, res: Response): Promise<v
     hoy.setHours(0, 0, 0, 0)
 
     // Ejecutar todas las queries en paralelo para mejor performance
-    const [totalPacientes, citasProgramadasHoy, registrosAuditoria] = await Promise.all([
+    const [
+      totalPacientes,
+      pacientesMilitares,
+      pacientesAfiliados,
+      pacientesPNA,
+      citasProgramadasHoy,
+      registrosAuditoria
+    ] = await Promise.all([
       // 1. Total de pacientes registrados
       prisma.paciente.count(),
 
-      // 2. Citas programadas para hoy
+      // 2. Pacientes militares
+      prisma.paciente.count({
+        where: { tipoPaciente: 'MILITAR' }
+      }),
+
+      // 3. Pacientes afiliados
+      prisma.paciente.count({
+        where: { tipoPaciente: 'AFILIADO' }
+      }),
+
+      // 4. Pacientes PNA (No Afiliados)
+      prisma.paciente.count({
+        where: { tipoPaciente: 'PNA' }
+      }),
+
+      // 5. Citas programadas para hoy
       prisma.cita.count({
         where: {
           fechaCita: {
@@ -29,7 +51,7 @@ export const getDashboardStats = async (_req: Request, res: Response): Promise<v
         },
       }),
 
-      // 3. Registros de auditoría de hoy
+      // 6. Registros de auditoría de hoy
       prisma.auditLog.count({
         where: {
           creadoEn: {
@@ -44,6 +66,9 @@ export const getDashboardStats = async (_req: Request, res: Response): Promise<v
       success: true,
       data: {
         totalPacientes,
+        pacientesMilitares,
+        pacientesAfiliados,
+        pacientesPNA,
         citasProgramadasHoy,
         registrosAuditoria,
       },

@@ -1,0 +1,117 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  min-height: 400px;
+  background: #1a1f2e;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.buttonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.typeButton {
+  background: #2d3548;
+  border: 3px solid #3d4558;
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  min-height: 220px;
+}
+
+.typeButton:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.typeButton.militar {
+  border-color: #4a5d3f;
+}
+
+.typeButton.militar:hover {
+  border-color: #5a7d4f;
+  background: #3a4d3f;
+}
+
+.typeButton.afiliado {
+  border-color: #3b82f6;
+}
+
+.typeButton.afiliado:hover {
+  border-color: #60a5fa;
+  background: #1e3a5f;
+}
+
+.typeButton.pna {
+  border-color: #6b7280;
+}
+
+.typeButton.pna:hover {
+  border-color: #9ca3af;
+  background: #3d4451;
+}
+
+.icon {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.typeButton h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #f8fafc;
+}
+
+.typeButton p {
+  font-size: 1rem;
+  color: #94a3b8;
+  margin: 0;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .buttonGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .typeButton {
+    min-height: 180px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+}

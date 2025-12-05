@@ -3,6 +3,9 @@ import { API_BASE_URL } from '../utils/constants'
 
 interface DashboardStats {
   totalPacientes: number
+  pacientesMilitares: number
+  pacientesAfiliados: number
+  pacientesPNA: number
   citasProgramadasHoy: number
   registrosAuditoria: number
 }
