@@ -4,6 +4,16 @@
 
 ---
 
+## 🌍 ¿Zona Horaria?
+
+Se implementó una **solución completa para manejo de zona horaria Venezuela (GMT-4)**. 
+
+👉 **Lee primero:** [TIMEZONE_START_HERE.md](./TIMEZONE_START_HERE.md)
+
+Para resumen ejecutivo: [RESUMEN_EJECUTIVO_TIMEZONE.md](./RESUMEN_EJECUTIVO_TIMEZONE.md)
+
+---
+
 ## 📌 Resumen
 
 Solución digital para optimizar procesos administrativos y clínicos del **Hospital Militar Tipo I "Dr. José María Vargas"**.

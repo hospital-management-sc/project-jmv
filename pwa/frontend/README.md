@@ -206,6 +206,41 @@ Ejecutar linter:
 npm run lint
 ```
 
+## 🌍 Manejo de Zona Horaria
+
+### Configuración para Venezuela (GMT-4)
+
+El sistema está configurado para usar la zona horaria de Venezuela (America/Caracas, GMT-4) en todas las operaciones de fecha y hora.
+
+**Funciones de utilidad en `src/utils/dateUtils.ts`:**
+
+```typescript
+// Obtiene la fecha actual en Venezuela en formato ISO (YYYY-MM-DD)
+getTodayVenezuelaISO(): string
+// Ejemplo: "2025-12-04"
+
+// Obtiene la hora actual en Venezuela (HH:MM)
+getCurrentTimeVenezuela(): string
+// Ejemplo: "20:30"
+
+// Convierte un Date a formato legible en Venezuela
+formatDateVenezuela(date: Date): string
+// Ejemplo: "jueves, 4 de diciembre de 2025"
+
+// Convierte un Date a formato completo (fecha + hora) en Venezuela
+formatFullDateVenezuela(date: Date): string
+// Ejemplo: "jueves, 4 de diciembre de 2025, 8:17 p.m."
+```
+
+**Implementación con Intl.DateTimeFormat:**
+Las funciones utilizan `Intl.DateTimeFormat` con la opción `timeZone: 'America/Caracas'` para asegurar que todas las operaciones de fecha/hora respeten la zona horaria local, independientemente de la zona horaria del servidor o navegador del usuario.
+
+**Validar timezone:**
+```bash
+# En la carpeta frontend
+ts-node test-timezone.ts
+```
+
 ## 📚 Recursos
 
 - [React Documentation](https://react.dev)

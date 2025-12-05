@@ -15,7 +15,7 @@ import { AfiliadoDataSection, type AfiliadoData } from '@/components/AfiliadoDat
 import { encuentrosService } from '@/services/encuentros.service'
 import type { Encuentro } from '@/services/encuentros.service'
 import { API_BASE_URL } from '@/utils/constants'
-import { VENEZUELA_TIMEZONE, VENEZUELA_LOCALE } from '@/utils/dateUtils'
+import { VENEZUELA_TIMEZONE, VENEZUELA_LOCALE, getTodayVenezuelaISO, getCurrentTimeVenezuela } from '@/utils/dateUtils'
 import { ESTADOS_VENEZUELA, NACIONALIDADES, RELIGIONES, GRADOS_MILITARES, COMPONENTES_MILITARES } from '@/constants/venezuela'
 
 type ViewMode = 'main' | 'register-patient' | 'create-appointment' | 'search-patient' | 'register-admission' | 'patient-history' | 'hospitalized-patients'
@@ -219,8 +219,8 @@ function RegisterPatientForm() {
     // ADMISION
     nroHistoria: '',
     formaIngreso: 'AMBULANTE',
-    fechaAdmision: new Date().toISOString().split('T')[0],
-    horaAdmision: new Date().toTimeString().slice(0, 5),
+    fechaAdmision: getTodayVenezuelaISO(),
+    horaAdmision: getCurrentTimeVenezuela(),
     firmaFacultativo: '',
     habitacion: '',
     
@@ -285,7 +285,7 @@ function RegisterPatientForm() {
     return value.length >= 7 && value.length <= 9
   }
 
-  // Validar números de teléfono (7 dígitos)
+  // Validar números de teléfono (hasta 7 dígitos para entrada, exactamente 7 para validación final)
   const validateTelefonoNumeros = (value: string): boolean => {
     const pattern = /^\d{0,7}$/
     return pattern.test(value)
@@ -368,6 +368,9 @@ function RegisterPatientForm() {
     if (!formData.religion) newErrors.religion = 'Requerido'
     if (!formData.direccion) newErrors.direccion = 'Requerido'
     if (!formData.telefonoNumeros) newErrors.telefonoNumeros = 'Requerido'
+    if (formData.telefonoNumeros && formData.telefonoNumeros.length !== 7) newErrors.telefonoNumeros = 'Debe tener exactamente 7 dígitos'
+    if (formData.telefonoEmergenciaNumeros && formData.telefonoEmergenciaNumeros.length !== 7) newErrors.telefonoEmergenciaNumeros = 'Debe tener exactamente 7 dígitos'
+    if (formData.telefonoNumeros && formData.telefonoNumeros.length !== 7) newErrors.telefonoNumeros = 'Debe tener exactamente 7 dígitos'
 
     // Validaciones específicas por tipo de paciente
     if (selectedPatientType === 'MILITAR') {
@@ -467,8 +470,8 @@ function RegisterPatientForm() {
       setFormData({
         nroHistoria: '',
         formaIngreso: 'AMBULANTE',
-        fechaAdmision: new Date().toISOString().split('T')[0],
-        horaAdmision: new Date().toTimeString().slice(0, 5),
+        fechaAdmision: getTodayVenezuelaISO(),
+        horaAdmision: getCurrentTimeVenezuela(),
         firmaFacultativo: '',
         habitacion: '',
         apellidosNombres: '',
@@ -915,8 +918,8 @@ function RegisterPatientForm() {
               setFormData({
                 nroHistoria: '',
                 formaIngreso: 'AMBULANTE',
-                fechaAdmision: new Date().toISOString().split('T')[0],
-                horaAdmision: new Date().toTimeString().slice(0, 5),
+                fechaAdmision: getTodayVenezuelaISO(),
+                horaAdmision: getCurrentTimeVenezuela(),
                 firmaFacultativo: '',
                 habitacion: '',
                 apellidosNombres: '',

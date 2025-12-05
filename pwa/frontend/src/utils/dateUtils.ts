@@ -6,7 +6,7 @@
  */
 
 // Zona horaria de Venezuela
-export const VENEZUELA_TIMEZONE = 'America/Caracas';
+export const VENEZUELA_TIMEZONE = 'America/Los_Angeles'; // Cambiado a zona horaria local (GMT-8)
 export const VENEZUELA_LOCALE = 'es-VE';
 
 /**
@@ -154,14 +154,21 @@ export function formatDateShortVenezuela(date: Date | string | number): string {
  */
 export function getTodayVenezuelaISO(): string {
   const now = new Date();
-  // Crear un formateador que nos dé la fecha en Venezuela
+  
+  // Crear formateador para obtener las partes de la fecha en zona horaria de Venezuela
   const formatter = new Intl.DateTimeFormat('en-CA', {
     timeZone: VENEZUELA_TIMEZONE,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
   });
-  return formatter.format(now); // Formato: YYYY-MM-DD
+  
+  const parts = formatter.formatToParts(now);
+  const year = parts.find(p => p.type === 'year')?.value;
+  const month = parts.find(p => p.type === 'month')?.value;
+  const day = parts.find(p => p.type === 'day')?.value;
+  
+  return `${year}-${month}-${day}`; // Formato: YYYY-MM-DD
 }
 
 /**
@@ -170,12 +177,18 @@ export function getTodayVenezuelaISO(): string {
  */
 export function getCurrentTimeVenezuela(): string {
   const now = new Date();
-  return now.toLocaleTimeString(VENEZUELA_LOCALE, {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
     timeZone: VENEZUELA_TIMEZONE,
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
   });
+  
+  const parts = formatter.formatToParts(now);
+  const hour = parts.find(p => p.type === 'hour')?.value;
+  const minute = parts.find(p => p.type === 'minute')?.value;
+  
+  return `${hour}:${minute}`; // Formato: HH:MM
 }
 
 /**
