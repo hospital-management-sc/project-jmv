@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react'
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { API_BASE_URL } from '@/utils/constants'
-import { getTodayVenezuelaISO, formatDateVenezuela, formatTimeMilitaryVenezuela, formatDateLocal } from '@/utils/dateUtils'
+import { getTodayVenezuelaISO, formatTimeMilitaryVenezuela, formatDateLocal } from '@/utils/dateUtils'
 import styles from '../AdminDashboard.module.css'
 
 interface CreateAppointmentFormProps {

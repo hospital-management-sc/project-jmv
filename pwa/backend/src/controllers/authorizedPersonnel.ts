@@ -2,7 +2,8 @@
  * Authorized Personnel Controller
  * 
  * Controlador para gestionar la whitelist de personal autorizado.
- * SOLO SUPER_ADMIN puede acceder a estos endpoints.
+ * La validación de SUPER_ADMIN está garantizada por middleware,
+ * por lo que no es necesario verificar nuevamente aquí.
  */
 
 import { Response } from 'express';
@@ -15,21 +16,8 @@ import {
   deactivateAuthorizedPersonnel,
   getWhitelistStats,
 } from '../services/authorizedPersonnel';
-import { ValidationError, AppError, UnauthorizedError } from '../types/responses';
+import { ValidationError, AppError } from '../types/responses';
 import logger from '../utils/logger';
-
-/**
- * Middleware helper to verify SUPER_ADMIN role
- */
-const verifySuperAdmin = (req: AuthRequest): void => {
-  if (!req.user) {
-    throw new UnauthorizedError('Usuario no autenticado');
-  }
-  if (req.user.role !== 'SUPER_ADMIN') {
-    logger.security(`[WHITELIST] Acceso no autorizado intentado por usuario ${req.user.id} (rol: ${req.user.role})`);
-    throw new UnauthorizedError('Solo SUPER_ADMIN puede gestionar el personal autorizado');
-  }
-};
 
 /**
  * GET /api/authorized-personnel
@@ -37,8 +25,6 @@ const verifySuperAdmin = (req: AuthRequest): void => {
  */
 export const getAll = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    verifySuperAdmin(req);
-
     const { estado, rol, registrado, departamento } = req.query;
 
     const filters = {
@@ -88,10 +74,8 @@ export const getAll = async (req: AuthRequest, res: Response): Promise<void> => 
  * GET /api/authorized-personnel/stats
  * Obtiene estadísticas de la whitelist
  */
-export const getStats = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getStats = async (_req: AuthRequest, res: Response): Promise<void> => {
   try {
-    verifySuperAdmin(req);
-
     const stats = await getWhitelistStats();
 
     res.status(200).json({
@@ -122,8 +106,6 @@ export const getStats = async (req: AuthRequest, res: Response): Promise<void> =
  */
 export const getByCI = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    verifySuperAdmin(req);
-
     const { ci } = req.params;
 
     if (!ci) {
@@ -180,8 +162,6 @@ export const getByCI = async (req: AuthRequest, res: Response): Promise<void> =>
  */
 export const create = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    verifySuperAdmin(req);
-
     const {
       ci,
       nombreCompleto,
@@ -249,8 +229,6 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
  */
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    verifySuperAdmin(req);
-
     const { ci } = req.params;
     const updateData = req.body;
 
@@ -305,8 +283,6 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
  */
 export const deactivate = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    verifySuperAdmin(req);
-
     const { ci } = req.params;
     const { motivoBaja } = req.body;
 
@@ -360,8 +336,6 @@ export const deactivate = async (req: AuthRequest, res: Response): Promise<void>
  */
 export const bulkCreate = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    verifySuperAdmin(req);
-
     const { personnel } = req.body;
 
     if (!Array.isArray(personnel) || personnel.length === 0) {

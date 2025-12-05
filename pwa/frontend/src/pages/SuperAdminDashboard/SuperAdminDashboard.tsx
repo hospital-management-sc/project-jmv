@@ -78,21 +78,33 @@ const ESTADOS_PERSONAL = [
 ]
 
 const DEPARTAMENTOS = [
-  'Admisiones',
-  'Emergencia',
+  // Especialidades Médicas Clínicas (15)
   'Medicina Interna',
+  'Medicina Paliativa',
   'Cirugía General',
   'Pediatría',
-  'Ginecología',
+  'Neumo Pediatría',
   'Traumatología',
-  'Cardiología',
+  'Cirugía de Manos',
+  'Odontología',
+  'Otorrinolaringología',
+  'Dermatología',
+  'Fisiatría',
+  'Ginecología',
+  'Gastroenterología',
+  'Hematología',
+  'Psicología',
+  // Servicios de Apoyo
+  'Emergencia',
   'UCI',
   'Laboratorio',
   'Radiología',
   'Farmacia',
+  'Admisiones',
+  // Administrativos
   'Administración',
-  'Sistemas',
   'Recursos Humanos',
+  'Sistemas',
   'Otro',
 ]
 
