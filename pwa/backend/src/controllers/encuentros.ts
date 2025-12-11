@@ -100,7 +100,7 @@ export const crearEncuentro = async (
           admisionId: admisionId ? Number(admisionId) : null,
           tipo,
           fecha: fecha ? new Date(fecha) : new Date(),
-          hora: hora ? new Date(`1970-01-01T${hora}:00`) : new Date(),
+          hora: hora || null,
           motivoConsulta,
           enfermedadActual,
           procedencia,
@@ -238,7 +238,7 @@ export const crearEncuentroDesdeCita = async (
           pacienteId: cita.pacienteId,
           tipo: 'CONSULTA',
           fecha: new Date(),
-          hora: new Date(),
+          hora: new Date().toTimeString().slice(0, 5), // HH:MM
           motivoConsulta: motivoConsulta || cita.motivo,
           enfermedadActual,
           procedencia: 'CITA_PROGRAMADA',

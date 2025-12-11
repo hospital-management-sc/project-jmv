@@ -242,6 +242,12 @@ export default function Login() {
         </button>
       </form>
 
+      <p className={styles.forgotPasswordLink}>
+        <Link to="/forgot-password" className={styles.link}>
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </p>
+
       <div className={styles.divider}>o</div>
 
       <p className={styles.registerLink}>

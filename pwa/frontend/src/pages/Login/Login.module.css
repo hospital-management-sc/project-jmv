@@ -227,6 +227,24 @@
   color: var(--text-primary);
 }
 
+.forgotPasswordLink {
+  text-align: center;
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.forgotPasswordLink .link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.forgotPasswordLink .link:hover {
+  text-decoration: underline;
+  color: var(--color-primary-dark);
+}
+
 @media (max-width: 600px) {
   .errorAlert {
     flex-direction: column;

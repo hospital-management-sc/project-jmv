@@ -122,3 +122,46 @@ export const getCurrentUser = async (req: AuthRequest, res: Response): Promise<v
     });
   }
 };
+
+/**
+ * POST /api/auth/forgot-password
+ * Verify user identity (email + CI) and allow password reset
+ */
+export const forgotPassword = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { email, ci, newPassword } = req.body;
+
+    // Validation
+    if (!email || !ci || !newPassword) {
+      throw new ValidationError('Email, C.I., and new password are required');
+    }
+
+    if (newPassword.length < 6) {
+      throw new ValidationError('Password must be at least 6 characters long');
+    }
+
+    // Call service
+    const { resetPasswordUser } = await import('../services/auth');
+    await resetPasswordUser({ email, ci, newPassword });
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully. You can now login with your new password.',
+    });
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({
+        success: false,
+        error: error.name,
+        message: error.message,
+      });
+    } else {
+      logger.error('Forgot password error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'An error occurred during password reset',
+      });
+    }
+  }
+};

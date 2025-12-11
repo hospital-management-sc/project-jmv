@@ -5,6 +5,7 @@ import { useState } from "react";
 import styles from "../DoctorDashboard.module.css";
 import type { PatientBasic } from "../interfaces";
 import { API_BASE_URL } from "@/utils/constants";
+import { getTodayVenezuelaISO, getCurrentTimeVenezuela } from "@/utils/dateUtils";
 import { encuentrosService } from "@/services";
 import { toast } from "sonner";
 
@@ -14,16 +15,19 @@ interface Props {
 }
 export default function RegisterEncounter({ patient = null, doctorId }: Props) {
   const [step, setStep] = useState(patient ? 2 : 1);
-  const [searchCI, setSearchCI] = useState(patient ? patient?.ci : "");
+  // Dual input para CI
+  const [searchCITipo, setSearchCITipo] = useState<'V' | 'E' | 'P'>('V');
+  const [searchCINumeros, setSearchCINumeros] = useState(patient ? patient?.ci.split('-')[1] : "");
   const [paciente, setPaciente] = useState<PatientBasic | null>(patient);
   const [searching, setSearching] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [ciErrors, setCIErrors] = useState<{[key: string]: string}>({});
   const [formData, setFormData] = useState({
     tipo: "CONSULTA" as "EMERGENCIA" | "HOSPITALIZACION" | "CONSULTA" | "OTRO",
-    fecha: new Date().toISOString().split("T")[0],
-    hora: new Date().toTimeString().slice(0, 5),
+    fecha: getTodayVenezuelaISO(),
+    hora: getCurrentTimeVenezuela(),
     motivoConsulta: "",
     enfermedadActual: "",
     procedencia: "",
@@ -44,16 +48,45 @@ export default function RegisterEncounter({ patient = null, doctorId }: Props) {
   // TODO: Obtener ID del médico del contexto de autenticación
   // const medicoId = 1;
 
+  // Validar números de cédula (7-9 dígitos)
+  const validateCINumeros = (value: string): boolean => {
+    const pattern = /^\d{0,9}$/
+    return pattern.test(value)
+  }
+
+  // Validar que la cédula tenga mínimo 7 dígitos
+  const validateCINumerosLength = (value: string): boolean => {
+    return value.length >= 7 && value.length <= 9
+  }
+
+  const handleCINumerosChange = (value: string) => {
+    if (validateCINumeros(value)) {
+      setSearchCINumeros(value)
+      setCIErrors({...ciErrors, searchCINumeros: ''})
+    }
+  }
+
   const buscarPaciente = async () => {
-    if (!searchCI.trim()) {
-      setError("Ingrese un número de cédula");
+    const newErrors: {[key: string]: string} = {}
+    
+    if (!searchCINumeros.trim()) {
+      newErrors.searchCINumeros = "Ingrese un número de cédula";
+    }
+    if (searchCINumeros && !validateCINumerosLength(searchCINumeros)) {
+      newErrors.searchCINumeros = "Debe tener entre 7 y 9 dígitos";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setCIErrors(newErrors)
       return;
     }
+
+    const fullCI = `${searchCITipo}-${searchCINumeros}`;
     setSearching(true);
     setError("");
     try {
       const response = await fetch(
-        `${API_BASE_URL}/pacientes/search?ci=${searchCI}`
+        `${API_BASE_URL}/pacientes/search?ci=${fullCI}`
       );
       const result = await response.json();
       if (result.success && result.data) {
@@ -143,11 +176,12 @@ export default function RegisterEncounter({ patient = null, doctorId }: Props) {
       setTimeout(() => {
         setStep(1);
         setPaciente(null);
-        setSearchCI("");
+        setSearchCITipo('V');
+        setSearchCINumeros("");
         setFormData({
           tipo: "CONSULTA",
-          fecha: new Date().toISOString().split("T")[0],
-          hora: new Date().toTimeString().slice(0, 5),
+          fecha: getTodayVenezuelaISO(),
+          hora: getCurrentTimeVenezuela(),
           motivoConsulta: "",
           enfermedadActual: "",
           procedencia: "",
@@ -163,6 +197,7 @@ export default function RegisterEncounter({ patient = null, doctorId }: Props) {
           observaciones: "",
         });
         setSuccessMessage("");
+        setCIErrors({});
       }, 2000);
     } catch (err: unknown) {
       const errorMessage =
@@ -207,17 +242,29 @@ export default function RegisterEncounter({ patient = null, doctorId }: Props) {
         <div className={styles["form-card"]}>
           <h3>Buscar Paciente por Cédula</h3>
           <div className={styles["search-box"]}>
-            <input
-              type="text"
-              placeholder="Ej: V-12345678"
-              value={searchCI}
-              onChange={(e) => setSearchCI(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && buscarPaciente()}
-            />
+            <div className={styles["dual-input-group"]}>
+              <select
+                value={searchCITipo}
+                onChange={(e) => setSearchCITipo(e.target.value as 'V' | 'E' | 'P')}
+              >
+                <option value="V">V</option>
+                <option value="E">E</option>
+                <option value="P">P</option>
+              </select>
+              <input
+                type="text"
+                placeholder="12345678"
+                value={searchCINumeros}
+                onChange={(e) => handleCINumerosChange(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && buscarPaciente()}
+                maxLength={9}
+              />
+            </div>
             <button onClick={buscarPaciente} disabled={searching}>
               {searching ? "🔄 Buscando..." : "🔍 Buscar"}
             </button>
           </div>
+          {ciErrors.searchCINumeros && <p className={styles["error-text"]}>{ciErrors.searchCINumeros}</p>}
           {error && <p className={styles["error-text"]}>{error}</p>}
         </div>
       )}

@@ -51,7 +51,7 @@ export const crearAdmision = async (req: Request, res: Response) => {
         tipo,
         servicio: servicio || null,
         fechaAdmision: new Date(fechaAdmision),
-        horaAdmision: horaAdmision ? new Date(`1970-01-01T${horaAdmision}`) : null,
+        horaAdmision: horaAdmision || null,
         formaIngreso: formaIngreso || null,
         habitacion: habitacion || null,
         cama: cama || null,
@@ -351,7 +351,7 @@ export const registrarAlta = async (req: Request, res: Response) => {
       data: {
         estado: 'ALTA',
         fechaAlta: new Date(fechaAlta),
-        horaAlta: horaAlta ? new Date(`1970-01-01T${horaAlta}`) : null,
+        horaAlta: horaAlta || null,
         tipoAlta,
         estanciaHospitalaria: {
           upsert: {

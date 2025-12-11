@@ -187,7 +187,7 @@ export const crearPaciente = async (
           pacienteId: paciente.id,
           formaIngreso: formaIngreso || 'AMBULANTE',
           fechaAdmision: new Date(fechaAdmision),
-          horaAdmision: horaAdmision ? new Date(`2000-01-01T${horaAdmision}`) : null,
+          horaAdmision: horaAdmision || null,
           habitacion: habitacion || null,
           firmaFacultativo: firmaFacultativo || null,
           diagnosticoIngreso: diagnosticoIngreso || null,

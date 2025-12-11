@@ -262,6 +262,68 @@ export const registerUser = async (payload: RegisterPayload): Promise<TokenRespo
 };
 
 /**
+ * Reset user password
+ * Validates email + CI before allowing password change
+ */
+export const resetPasswordUser = async (payload: {
+  email: string;
+  ci: string;
+  newPassword: string;
+}): Promise<void> => {
+  const { email, ci, newPassword } = payload;
+
+  // Validation
+  if (!email || !ci || !newPassword) {
+    throw new ValidationError('Email, C.I., and new password are required');
+  }
+
+  // Normalize inputs
+  const emailNormalized = email.toLowerCase().trim();
+  const ciNormalized = ci.toUpperCase().trim();
+
+  // Find user by email AND CI (dual verification)
+  const user = await prisma.usuario.findFirst({
+    where: {
+      email: emailNormalized,
+      ci: ciNormalized,
+    },
+  });
+
+  if (!user) {
+    logger.warn(`Password reset attempt with invalid credentials: ${emailNormalized} / ${ciNormalized}`);
+    throw new UnauthorizedError(
+      'No se encontró ningún usuario con ese correo y cédula. Verifique los datos ingresados.'
+    );
+  }
+
+  // Hash new password
+  const hashedPassword = await hashPassword(newPassword);
+
+  // Update password
+  await prisma.usuario.update({
+    where: { id: user.id },
+    data: { password: hashedPassword },
+  });
+
+  logger.info(`[AUTH] Password reset successful for user: ${user.email} (ID: ${user.id})`);
+
+  // Log audit trail
+  await prisma.auditLog.create({
+    data: {
+      usuarioId: user.id,
+      tabla: 'Usuario',
+      registroId: user.id,
+      accion: 'PASSWORD_RESET',
+      detalle: {
+        message: 'Password reset via forgot-password flow',
+        email: user.email,
+        timestamp: new Date().toISOString(),
+      },
+    },
+  });
+};
+
+/**
  * Verify token validity
  */
 export const verifyToken = (token: string): boolean => {

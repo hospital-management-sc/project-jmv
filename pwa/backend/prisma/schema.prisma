@@ -179,9 +179,9 @@ model Admision {
 
   // Fechas y horas
   fechaAdmision DateTime  @db.Date
-  horaAdmision  DateTime? @db.Time
+  horaAdmision  String?   @db.VarChar(8) // Formato: HH:MM
   fechaAlta     DateTime? @db.Date
-  horaAlta      DateTime? @db.Time
+  horaAlta      String?   @db.VarChar(8) // Formato: HH:MM
 
   // Datos de ingreso
   formaIngreso String? @db.VarChar(20) // AMBULANTE | AMBULANCIA | TRANSFERENCIA
@@ -261,7 +261,7 @@ model Encuentro {
   admisionId       Int?
   tipo             String    @db.VarChar(30) // CHECK: EMERGENCIA, HOSPITALIZACION, CONSULTA, OTRO
   fecha            DateTime  @db.Date
-  hora             DateTime? @db.Time
+  hora             String?   @db.VarChar(8) // Formato: HH:MM
   motivoConsulta   String?   @db.VarChar(1000)
   enfermedadActual String?   @db.Text
   procedencia      String?   @db.VarChar(200)

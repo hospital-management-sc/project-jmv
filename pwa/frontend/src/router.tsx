@@ -4,6 +4,7 @@ import MainLayout from "@layouts/MainLayout";
 import AuthLayout from "@layouts/AuthLayout";
 import Login from "@/pages/Login/Login";
 import Register from "@/pages/Register/Register";
+import ForgotPassword from "@/pages/ForgotPassword";
 import DoctorDashboard from "@pages/DoctorDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
 import SuperAdminDashboard from "@pages/SuperAdminDashboard";
@@ -28,6 +29,10 @@ export default function Router() {
           <Route
             path="/register"
             element={user ? <Navigate to="/dashboard" replace /> : <Register />}
+          />
+          <Route
+            path="/forgot-password"
+            element={user ? <Navigate to="/dashboard" replace /> : <ForgotPassword />}
           />
         </Route>
 

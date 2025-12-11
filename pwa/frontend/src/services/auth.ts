@@ -46,4 +46,11 @@ export const authService = {
   isAuthenticated: (): boolean => {
     return !!localStorage.getItem(STORAGE_KEYS.TOKEN)
   },
+
+  /**
+   * Forgot password - Reset password with email + CI verification
+   */
+  forgotPassword: (data: { email: string; ci: string; newPassword: string }): Promise<{ success: boolean; message: string }> => {
+    return apiService.post<{ success: boolean; message: string }>('/auth/forgot-password', data)
+  },
 }

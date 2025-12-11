@@ -6,7 +6,7 @@
  */
 
 // Zona horaria de Venezuela
-export const VENEZUELA_TIMEZONE = 'America/Los_Angeles'; // Cambiado a zona horaria local (GMT-8)
+export const VENEZUELA_TIMEZONE = 'America/Caracas'; // UTC-4
 export const VENEZUELA_LOCALE = 'es-VE';
 
 /**
@@ -286,8 +286,8 @@ export function toISOStringFromVenezuela(dateString: string, timeString?: string
     
     // MÉTODO SIMPLIFICADO:
     // Crear el string en formato ISO compatible con la zona horaria
-    // America/Los_Angeles es GMT-8, entonces cuando es 07:00 allí, en UTC son las 15:00
-    const offsetHours = 8; // GMT-8 significa +8 horas para convertir a UTC
+    // America/Caracas es UTC-4, entonces cuando es 10:00 allí, en UTC son las 14:00
+    const offsetHours = 4; // UTC-4 significa +4 horas para convertir a UTC
     
     // Calcular la hora UTC
     let utcHours = hours + offsetHours;
