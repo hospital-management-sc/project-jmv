@@ -58,6 +58,8 @@ export const crearPaciente = async (
       horaAdmision,
       firmaFacultativo,
       habitacion,
+      tipoAdmision, // NUEVO: Tipo de admisión (EMERGENCIA, HOSPITALIZACION, etc.) o null
+      servicioAdmision, // NUEVO: Servicio de la admisión
       
       // Datos personales
       apellidosNombres,
@@ -180,8 +182,8 @@ export const crearPaciente = async (
       });
 
       // Crear registro de admisión inicial
-      // NOTA: Esta es la admisión de registro. No incluye tipo/servicio específico.
-      // Para admisiones de emergencia/hospitalización, usar el endpoint de admisiones.
+      // Si se proporciona tipoAdmision, la admisión tendrá ese tipo.
+      // Si no, será una admisión de registro general (tipo null).
       const admision = await tx.admision.create({
         data: {
           pacienteId: paciente.id,
@@ -191,9 +193,8 @@ export const crearPaciente = async (
           habitacion: habitacion || null,
           firmaFacultativo: firmaFacultativo || null,
           diagnosticoIngreso: diagnosticoIngreso || null,
-          // tipo y servicio se asignan cuando se usa "Registrar Admisión"
-          tipo: null,
-          servicio: null,
+          tipo: tipoAdmision || null, // EMERGENCIA, HOSPITALIZACION, o null
+          servicio: servicioAdmision || null,
           estado: 'ACTIVA',
         },
       });

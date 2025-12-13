@@ -7,18 +7,52 @@
 
 .header {
   margin-bottom: 30px;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header > div {
+  flex: 1;
 }
 
 .header h2 {
-  color: #2c3e50;
+  color: var(--text-primary);
   font-size: 24px;
   margin-bottom: 5px;
 }
 
 .subtitle {
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-size: 14px;
+}
+
+.backTypeBtn {
+  padding: 8px 16px;
+  background: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.backTypeBtn:hover:not(:disabled) {
+  background: #4b5563;
+}
+
+.backTypeBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+  font-weight: normal;
 }
 
 .form {
@@ -155,6 +189,36 @@
 .cancelBtn:hover:not(:disabled) {
   background: #f8f9fa;
   border-color: #aaa;
+}
+
+/* Mensajes de error */
+.errorMessage {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.85em;
+  color: #dc3545;
+}
+
+/* Radio buttons */
+.radioGroup {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.radioLabel input[type="radio"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
 }
 
 /* Alertas */

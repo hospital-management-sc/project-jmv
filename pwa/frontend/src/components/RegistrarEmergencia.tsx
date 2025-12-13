@@ -64,9 +64,44 @@ export default function RegistrarEmergencia({ onBack }: RegistrarEmergenciaProps
     }
   };
 
-  const handlePacienteRegistrado = (paciente: any) => {
-    setPacienteEncontrado(paciente);
-    setPaso('paciente-encontrado');
+  const handlePacienteRegistrado = async (datosRegistro: any) => {
+    try {
+      // Crear Paciente + Admisión de EMERGENCIA en una sola operación
+      const datosCompletos = {
+        ...datosRegistro,
+        tipoAdmision: 'EMERGENCIA', // Indica que la admisión inicial es de tipo EMERGENCIA
+        servicioAdmision: 'EMERGENCIA',
+      };
+
+      const response = await fetch('http://localhost:3001/api/pacientes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datosCompletos),
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.message || 'Error al registrar el paciente');
+      }
+
+      const result = await response.json();
+      
+      // Construir objeto paciente completo para mostrar
+      const pacienteCompleto = {
+        id: result.data.pacienteId,
+        nroHistoria: result.data.nroHistoria,
+        ci: result.data.ci,
+        apellidosNombres: result.data.apellidosNombres,
+        ...datosRegistro,
+      };
+      
+      setPacienteEncontrado(pacienteCompleto);
+      setAdmisionId(Number(result.data.admisionId)); // La admisión ya viene creada con tipo EMERGENCIA
+      setPaso('paciente-encontrado');
+    } catch (err: any) {
+      alert('Error al registrar paciente: ' + err.message);
+      console.error(err);
+    }
   };
 
   const handleCancelarRegistro = () => {
@@ -75,7 +110,13 @@ export default function RegistrarEmergencia({ onBack }: RegistrarEmergenciaProps
   };
 
   const handleIrAFormatoEmergencia = async () => {
-    // Crear admisión de EMERGENCIA automáticamente
+    // Si ya tenemos admisionId (paciente recién registrado), ir directo al formato
+    if (admisionId) {
+      setPaso('formato-emergencia');
+      return;
+    }
+
+    // Si no hay admisionId, crear una nueva admisión de EMERGENCIA (paciente existente)
     try {
       const response = await fetch('http://localhost:3001/api/admisiones', {
         method: 'POST',

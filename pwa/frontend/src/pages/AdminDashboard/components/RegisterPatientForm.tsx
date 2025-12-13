@@ -222,6 +222,8 @@ export function RegisterPatientForm() {
       horaAdmision: formData.horaAdmision,
       firmaFacultativo: formData.firmaFacultativo,
       habitacion: formData.habitacion,
+      tipoAdmision: 'HOSPITALIZACION', // Especificar tipo de admisión
+      servicioAdmision: 'HOSPITALIZACION', // Servicio de la admisión
       apellidosNombres: formData.apellidosNombres,
       ci: ciCompleta,
       ciTipo: formData.ciTipo,
