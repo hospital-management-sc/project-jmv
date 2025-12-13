@@ -1,5 +1,6 @@
 export type ViewMode = 
   | 'main' 
+  | 'register-emergency'
   | 'hospitalized-patients' 
   | 'register-encounter' 
   | 'search-patient' 

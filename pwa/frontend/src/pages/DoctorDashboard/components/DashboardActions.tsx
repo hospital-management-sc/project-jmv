@@ -12,6 +12,30 @@ export default function DashboardActions({ onClick }: Props) {
       <div className={styles["action-grid"]}>
         <button
           className={styles["action-btn"]}
+          onClick={() => onClick("register-emergency")}
+          style={{ background: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)' }}
+        >
+          <svg
+            className={styles.icon}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+          </svg>
+          <div className={styles["btn-content"]}>
+            <span className={styles["btn-title"]}>🚨 Nuevo Paciente en Emergencia</span>
+            <span className={styles["btn-description"]}>
+              Atención inmediata 24/7 - Buscar o registrar paciente
+            </span>
+          </div>
+        </button>
+
+        <button
+          className={styles["action-btn"]}
           onClick={() => onClick("register-encounter")}
         >
           <svg
@@ -31,7 +55,7 @@ export default function DashboardActions({ onClick }: Props) {
           <div className={styles["btn-content"]}>
             <span className={styles["btn-title"]}>Registrar Encuentro</span>
             <span className={styles["btn-description"]}>
-              Documente consultas, emergencias y evoluciones
+              Documente consultas y evoluciones
             </span>
           </div>
         </button>

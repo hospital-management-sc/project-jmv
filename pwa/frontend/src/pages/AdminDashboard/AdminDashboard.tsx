@@ -131,8 +131,8 @@ export default function AdminDashboard() {
               <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
             </svg>
             <div className={styles['btn-content']}>
-              <span className={styles['btn-title']}>Registrar Admisión</span>
-              <span className={styles['btn-description']}>Registre ingresos hospitalarios y asignaciones</span>
+              <span className={styles['btn-title']}>🏥 Nueva Admisión de Hospitalización</span>
+              <span className={styles['btn-description']}>Asigne cama y servicio para pacientes que requieren hospitalización</span>
             </div>
           </button>
           <button 

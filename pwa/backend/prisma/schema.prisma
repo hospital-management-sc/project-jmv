@@ -407,23 +407,53 @@ model FormatoEmergencia {
   id         Int @id @default(autoincrement())
   admisionId Int @unique
 
-  // Datos clínicos
+  // 1. ANAMNESIS
+  // 1.1. FILIACION (se obtiene del paciente, no se duplica aquí)
+  
+  // MOTIVO DE CONSULTA
   motivoConsulta   String? @db.Text
+  
+  // 1.2. ENFERMEDAD ACTUAL
   enfermedadActual String? @db.Text
-  procedencia      String? @db.VarChar(200)
+  
+  // 1.3. ANTECEDENTES PATOLOGICOS
+  antecedentesPersonales    String? @db.Text
+  antecedentesFamiliares    String? @db.Text
+  habitosPsicobiologicos    String? @db.Text
 
-  // Signos vitales al ingreso
-  taSistolica  Int?
-  taDiastolica Int?
-  fc           Int? // Frecuencia Cardíaca
-  fr           Int? // Frecuencia Respiratoria
-  temperatura  Decimal? @db.Decimal(4, 2)
-  spo2         Int? // Saturación de Oxígeno
-
-  // Evaluación
+  // 2. EXAMEN FISICO
+  // 2.1. FUNCIONES VITALES
+  fechaExamen  DateTime? @db.Date
+  horaExamen   DateTime? @db.Time
+  peso         Decimal?  @db.Decimal(5, 2) // en kg
+  talla        Decimal?  @db.Decimal(5, 2) // en cm
+  fc           Int?      // Frecuencia Cardíaca (x')
+  fr           Int?      // Frecuencia Respiratoria (x')
+  temperatura  Decimal?  @db.Decimal(4, 2) // en °C
+  taSistolica  Int?      // Presión Arterial Sistólica
+  taDiastolica Int?      // Presión Arterial Diastólica
+  
+  // 2.2. EXAMEN GENERAL
+  examenGeneral String? @db.Text
+  
+  // 2.3. EXAMEN REGIONAL
+  piel            String? @db.Text
+  cabeza          String? @db.Text
+  cuello          String? @db.Text
+  torax           String? @db.Text
+  pulmones        String? @db.Text
+  cardiovascular  String? @db.Text
+  abdomen         String? @db.Text
+  genital         String? @db.Text
+  anoRecto        String? @db.Text
+  neurologico     String? @db.Text
+  
+  // 3. IMPRESION DIAGNOSTICA
   impresionDx             String? @db.Text
-  indicaciones            String? @db.Text
+  
+  // Control y seguimiento
   requiereHospitalizacion Boolean @default(false)
+  observaciones           String? @db.Text
 
   createdAt DateTime @default(now()) @db.Timestamptz()
   updatedAt DateTime @updatedAt @db.Timestamptz()
@@ -432,6 +462,7 @@ model FormatoEmergencia {
   admision Admision @relation(fields: [admisionId], references: [id], onDelete: Cascade)
 
   @@index([admisionId])
+  @@index([fechaExamen])
 }
 
 // ============================================

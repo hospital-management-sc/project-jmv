@@ -1,6 +1,7 @@
 /**
- * Componente para Registrar Nueva Admisión
- * Permite crear admisiones de tipo EMERGENCIA o HOSPITALIZACIÓN para pacientes existentes
+ * Componente para Registrar Nueva Admisión de HOSPITALIZACIÓN
+ * Solo para personal administrativo (AdminDashboard)
+ * Permite buscar paciente y asignar cama/servicio
  */
 
 import { useState, useEffect } from 'react';
@@ -8,6 +9,7 @@ import styles from './RegistrarAdmision.module.css';
 import type { CrearAdmisionDTO } from '../services/admisiones.service';
 import admisionesService from '../services/admisiones.service';
 import pacientesService from '../services/pacientes.service';
+import RegistrarPaciente from './RegistrarPaciente';
 
 interface RegistrarAdmisionProps {
   onBack: () => void;
@@ -26,7 +28,7 @@ const SERVICIOS_DISPONIBLES = [
 ];
 
 export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
-  const [tipoAdmision, setTipoAdmision] = useState<'EMERGENCIA' | 'HOSPITALIZACION' | null>(null);
+  const [paso, setPaso] = useState<'busqueda' | 'registro' | 'formulario'>('busqueda');
   
   // Búsqueda de paciente
   const [busquedaCITipo, setBusquedaCITipo] = useState('V');
@@ -35,9 +37,9 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
   const [buscando, setBuscando] = useState(false);
   const [errorBusqueda, setErrorBusqueda] = useState('');
 
-  // Formulario de admisión
+  // Formulario de admisión (siempre HOSPITALIZACIÓN)
   const [formData, setFormData] = useState<Partial<CrearAdmisionDTO>>({
-    tipo: undefined,
+    tipo: 'HOSPITALIZACION',
     servicio: '',
     fechaAdmision: new Date().toISOString().split('T')[0],
     horaAdmision: new Date().toTimeString().slice(0, 5),
@@ -51,20 +53,9 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Actualizar tipo en formData cuando cambia tipoAdmision
-  useEffect(() => {
-    if (tipoAdmision) {
-      setFormData((prev) => ({
-        ...prev,
-        tipo: tipoAdmision,
-        servicio: tipoAdmision === 'EMERGENCIA' ? 'EMERGENCIA' : '',
-      }));
-    }
-  }, [tipoAdmision]);
-
   const buscarPaciente = async () => {
-    if (!busquedaCINumeros.trim()) {
-      setErrorBusqueda('Ingrese un número de CI');
+    if (!busquedaCINumeros.trim() || busquedaCINumeros.length < 7) {
+      setErrorBusqueda('CI debe tener al menos 7 dígitos');
       return;
     }
 
@@ -82,7 +73,9 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
           ...prev,
           pacienteId: result.id.toString(),
         }));
+        setPaso('formulario');
       } else {
+        // Paciente no existe → Mostrar opción de registro
         setErrorBusqueda('No se encontró paciente con ese CI');
       }
     } catch (err) {
@@ -91,6 +84,21 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
     } finally {
       setBuscando(false);
     }
+  };
+
+  const handlePacienteRegistrado = (paciente: any) => {
+    setPacienteSeleccionado(paciente);
+    setFormData((prev) => ({
+      ...prev,
+      pacienteId: paciente.id.toString(),
+    }));
+    setPaso('formulario');
+  };
+
+  const handleCancelarRegistro = () => {
+    setPaso('busqueda');
+    setBusquedaCINumeros('');
+    setErrorBusqueda('');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -111,8 +119,8 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
       return;
     }
 
-    if (!formData.tipo || !formData.fechaAdmision) {
-      setError('Complete los campos requeridos');
+    if (!formData.servicio || !formData.fechaAdmision) {
+      setError('Complete los campos requeridos (Servicio, Fecha)');
       return;
     }
 
@@ -121,8 +129,8 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
     try {
       const dataToSend: CrearAdmisionDTO = {
         pacienteId: pacienteSeleccionado.id,
-        tipo: formData.tipo!,
-        servicio: formData.servicio || undefined,
+        tipo: 'HOSPITALIZACION',
+        servicio: formData.servicio,
         fechaAdmision: formData.fechaAdmision!,
         horaAdmision: formData.horaAdmision || undefined,
         formaIngreso: formData.formaIngreso as any,
@@ -133,16 +141,17 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
 
       const response = await admisionesService.crearAdmision(dataToSend);
       
-      setSuccess(`Admisión creada exitosamente. ID: ${response.admision.id}`);
+      setSuccess(`Admisión de hospitalización creada exitosamente. ID: ${response.admision.id}`);
       
-      // Limpiar formulario después de 2 segundos
+      // Limpiar formulario después de 3 segundos
       setTimeout(() => {
         setPacienteSeleccionado(null);
         setBusquedaCITipo('V');
         setBusquedaCINumeros('');
+        setPaso('busqueda');
         setFormData({
-          tipo: tipoAdmision!,
-          servicio: tipoAdmision === 'EMERGENCIA' ? 'EMERGENCIA' : '',
+          tipo: 'HOSPITALIZACION',
+          servicio: '',
           fechaAdmision: new Date().toISOString().split('T')[0],
           horaAdmision: new Date().toTimeString().slice(0, 5),
           formaIngreso: 'AMBULANTE',
@@ -181,49 +190,17 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Registrar Nueva Admisión</h1>
+        <h1>🏥 Nueva Admisión de Hospitalización</h1>
+        <p className={styles.subtitle}>
+          Busque al paciente y asigne cama/servicio para hospitalización
+        </p>
       </div>
 
-      {/* Selección de Tipo de Admisión */}
-      {!tipoAdmision && (
-        <div className={styles.tipoSeleccion}>
-          <h2>Seleccione el tipo de admisión:</h2>
-          <div className={styles.tipoGrid}>
-            <button
-              className={`${styles.tipoBtn} ${styles.emergencia}`}
-              onClick={() => setTipoAdmision('EMERGENCIA')}
-            >
-              <span className={styles.tipoIcon}>🚨</span>
-              <h3>EMERGENCIA</h3>
-              <p>Paciente llega sin cita previa. Atención médica inmediata.</p>
-            </button>
-            <button
-              className={`${styles.tipoBtn} ${styles.hospitalizacion}`}
-              onClick={() => setTipoAdmision('HOSPITALIZACION')}
-            >
-              <span className={styles.tipoIcon}>🏥</span>
-              <h3>HOSPITALIZACIÓN</h3>
-              <p>Paciente con orden de internación. Requiere cama asignada.</p>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Formulario de Admisión */}
-      {tipoAdmision && (
-        <div className={styles.formContainer}>
-          <div className={styles.tipoHeader}>
-            <span className={styles.tipoLabel}>
-              {tipoAdmision === 'EMERGENCIA' ? '🚨 EMERGENCIA' : '🏥 HOSPITALIZACIÓN'}
-            </span>
-            <button onClick={() => setTipoAdmision(null)} className={styles.cambiarTipoBtn}>
-              Cambiar tipo
-            </button>
-          </div>
-
-          {/* Paso 1: Buscar Paciente */}
+      {/* Paso 1: Búsqueda de Paciente */}
+      {paso === 'busqueda' && (
+        <>
           <div className={styles.section}>
-            <h3>1. Buscar Paciente</h3>
+            <h3>Paso 1: Buscar Paciente por CI</h3>
             <div className={styles.busquedaContainer}>
               <div className={styles.busquedaInput}>
                 <select
@@ -245,44 +222,96 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
                   maxLength={8}
                 />
                 <button onClick={buscarPaciente} disabled={buscando}>
-                  {buscando ? 'Buscando...' : 'Buscar'}
+                  {buscando ? '🔍 Buscando...' : '🔍 Buscar'}
                 </button>
               </div>
-              {errorBusqueda && <div className={styles.errorMsg}>{errorBusqueda}</div>}
+              {errorBusqueda && (
+                <>
+                  <div className={styles.errorMsg}>⚠️ {errorBusqueda}</div>
+                  <div className={styles.registroSuggestion}>
+                    <p>¿El paciente no está registrado?</p>
+                    <button
+                      onClick={() => setPaso('registro')}
+                      className={styles.registrarBtn}
+                    >
+                      Registrar nuevo paciente
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
-
-            {pacienteSeleccionado && (
-              <div className={styles.pacienteInfo}>
-                <h4>✓ Paciente Encontrado:</h4>
-                <div className={styles.pacienteGrid}>
-                  <div>
-                    <strong>Nombre:</strong> {pacienteSeleccionado.apellidosNombres}
-                  </div>
-                  <div>
-                    <strong>CI:</strong> {pacienteSeleccionado.ci}
-                  </div>
-                  <div>
-                    <strong>Historia:</strong> {pacienteSeleccionado.nroHistoria}
-                  </div>
-                  <div>
-                    <strong>Edad:</strong> {calcularEdad(pacienteSeleccionado.fechaNacimiento)} años
-                  </div>
-                  <div>
-                    <strong>Sexo:</strong> {pacienteSeleccionado.sexo === 'M' ? 'Masculino' : 'Femenino'}
-                  </div>
-                  <div>
-                    <strong>Admisiones previas:</strong> {pacienteSeleccionado.admisiones?.length || 0}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Paso 2: Datos de Admisión */}
+          <div className={styles.actions}>
+            <button onClick={onBack} className={styles.cancelBtn}>
+              ← Volver
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Paso 2: Registrar Paciente Nuevo */}
+      {paso === 'registro' && (
+        <>
+          <div className={styles.registroHeader}>
+            <h2>Registrar Nuevo Paciente</h2>
+            <p>
+              CI buscado: <strong>{busquedaCITipo}-{busquedaCINumeros}</strong>
+            </p>
+          </div>
+
+          <RegistrarPaciente
+            ciPreFilled={`${busquedaCITipo}-${busquedaCINumeros}`}
+            onSuccess={handlePacienteRegistrado}
+            onCancel={handleCancelarRegistro}
+          />
+        </>
+      )}
+
+      {/* Paso 3: Formulario de Admisión */}
+      {paso === 'formulario' && pacienteSeleccionado && (
+        <>
+          <div className={styles.section}>
+            <h3>Paso 2: Paciente Seleccionado</h3>
+            <div className={styles.pacienteInfo}>
+              <h4>✓ Paciente Encontrado:</h4>
+              <div className={styles.pacienteGrid}>
+                <div>
+                  <strong>Nombre:</strong> {pacienteSeleccionado.apellidosNombres}
+                </div>
+                <div>
+                  <strong>CI:</strong> {pacienteSeleccionado.ci}
+                </div>
+                <div>
+                  <strong>Historia:</strong> {pacienteSeleccionado.nroHistoria}
+                </div>
+                <div>
+                  <strong>Edad:</strong> {calcularEdad(pacienteSeleccionado.fechaNacimiento)} años
+                </div>
+                <div>
+                  <strong>Sexo:</strong> {pacienteSeleccionado.sexo === 'M' ? 'Masculino' : 'Femenino'}
+                </div>
+                <div>
+                  <strong>Admisiones previas:</strong> {pacienteSeleccionado.admisiones?.length || 0}
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setPacienteSeleccionado(null);
+                  setPaso('busqueda');
+                }}
+                className={styles.cambiarPacienteBtn}
+              >
+                Buscar otro paciente
+              </button>
+            </div>
+          </div>
+
+          {/* Paso 3: Datos de Admisión */}
           {pacienteSeleccionado && (
             <form onSubmit={handleSubmit}>
               <div className={styles.section}>
-                <h3>2. Datos de la Admisión</h3>
+                <h3>Paso 3: Datos de la Admisión de Hospitalización</h3>
                 
                 <div className={styles.formGrid}>
                   <div className={styles.formGroup}>
@@ -306,48 +335,45 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
                     />
                   </div>
 
-                  {tipoAdmision === 'HOSPITALIZACION' && (
-                    <>
-                      <div className={styles.formGroup}>
-                        <label>Servicio *</label>
-                        <select
-                          name="servicio"
-                          value={formData.servicio}
-                          onChange={handleInputChange}
-                          required
-                        >
-                          <option value="">Seleccione...</option>
-                          {SERVICIOS_DISPONIBLES.filter(s => s !== 'EMERGENCIA').map((servicio) => (
-                            <option key={servicio} value={servicio}>
-                              {servicio.replace(/_/g, ' ')}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                  <div className={styles.formGroup}>
+                    <label>Servicio Hospitalario *</label>
+                    <select
+                      name="servicio"
+                      value={formData.servicio}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="">Seleccione servicio...</option>
+                      {SERVICIOS_DISPONIBLES.filter(s => s !== 'EMERGENCIA').map((servicio) => (
+                        <option key={servicio} value={servicio}>
+                          {servicio.replace(/_/g, ' ')}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                      <div className={styles.formGroup}>
-                        <label>Habitación</label>
-                        <input
-                          type="text"
-                          name="habitacion"
-                          value={formData.habitacion}
-                          onChange={handleInputChange}
-                          placeholder="Ej: 201"
-                        />
-                      </div>
+                  <div className={styles.formGroup}>
+                    <label>Habitación/Piso</label>
+                    <input
+                      type="text"
+                      name="habitacion"
+                      value={formData.habitacion}
+                      onChange={handleInputChange}
+                      placeholder="Ej: Piso 2 - Hab 201"
+                    />
+                  </div>
 
-                      <div className={styles.formGroup}>
-                        <label>Cama</label>
-                        <input
-                          type="text"
-                          name="cama"
-                          value={formData.cama}
-                          onChange={handleInputChange}
-                          placeholder="Ej: Cama A"
-                        />
-                      </div>
-                    </>
-                  )}
+                  <div className={styles.formGroup}>
+                    <label>Cama *</label>
+                    <input
+                      type="text"
+                      name="cama"
+                      value={formData.cama}
+                      onChange={handleInputChange}
+                      placeholder="Ej: Cama A"
+                      required
+                    />
+                  </div>
 
                   <div className={styles.formGroup}>
                     <label>Forma de Ingreso</label>
@@ -379,16 +405,23 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
               {success && <div className={styles.successAlert}>{success}</div>}
 
               <div className={styles.formActions}>
-                <button type="button" onClick={onBack} className={styles.cancelBtn}>
-                  Cancelar
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPacienteSeleccionado(null);
+                    setPaso('busqueda');
+                  }}
+                  className={styles.cancelBtn}
+                >
+                  ← Volver a búsqueda
                 </button>
                 <button type="submit" className={styles.submitBtn} disabled={submitting}>
-                  {submitting ? 'Creando...' : 'Crear Admisión'}
+                  {submitting ? 'Creando admisión...' : 'Crear Admisión de Hospitalización'}
                 </button>
               </div>
             </form>
           )}
-        </div>
+        </>
       )}
     </div>
   );

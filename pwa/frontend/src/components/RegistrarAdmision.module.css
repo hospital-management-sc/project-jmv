@@ -5,10 +5,20 @@
 }
 
 .header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  text-align: center;
   margin-bottom: 2rem;
+}
+
+.header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: white;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
 }
 
 .backButton {
@@ -24,13 +34,6 @@
 
 .backButton:hover {
   background: #4b5563;
-}
-
-.header h1 {
-  margin: 0;
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: white;
 }
 
 /* Selección de Tipo de Admisión */
@@ -348,6 +351,84 @@
 .submitBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Estilos adicionales para flujo de búsqueda/registro */
+.registroSuggestion {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border: 2px dashed #667eea;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.registroSuggestion p {
+  margin-bottom: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.registrarBtn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.registrarBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.registroHeader {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  color: white;
+  margin-bottom: 2rem;
+}
+
+.registroHeader h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.registroHeader p {
+  margin: 0.25rem 0;
+  font-size: 1rem;
+  opacity: 0.95;
+}
+
+.cambiarPacienteBtn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cambiarPacienteBtn:hover {
+  background: #667eea;
+  color: white;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
 /* Responsivo */

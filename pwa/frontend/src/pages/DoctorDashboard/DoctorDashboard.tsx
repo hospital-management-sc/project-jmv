@@ -18,6 +18,7 @@ import {
   TodayEncounters,
 } from "./components/";
 import { useAuth } from "@/contexts/AuthContext";
+import RegistrarEmergencia from "@/components/RegistrarEmergencia";
 
 export default function DoctorDashboard() {
   const { user } = useAuth();
@@ -99,6 +100,9 @@ export default function DoctorDashboard() {
         )}
         {viewMode === "interconsultas" && (
           <Interconsultas doctorId={user?.id as number} />
+        )}
+        {viewMode === "register-emergency" && (
+          <RegistrarEmergencia onBack={() => setViewMode("main")} />
         )}
       </main>
     </div>
