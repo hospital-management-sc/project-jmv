@@ -3,4 +3,5 @@ export interface DoctorStats {
   encuentrosHoy: number
   citasHoy: number
   altasPendientes: number
+  pacientesEnEmergencia: number
 }

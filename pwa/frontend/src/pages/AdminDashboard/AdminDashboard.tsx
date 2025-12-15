@@ -17,6 +17,7 @@ import styles from './AdminDashboard.module.css'
 import { useDashboardStats } from '@/hooks/useDashboardStats'
 import RegistrarAdmision from '@/components/RegistrarAdmision'
 import PacientesHospitalizados from '@/components/PacientesHospitalizados'
+import PacientesEnEmergencia from '@/components/PacientesEnEmergencia'
 
 // Componentes modulares extraídos
 import {
@@ -24,9 +25,10 @@ import {
   CreateAppointmentForm,
   SearchPatientView,
   PatientHistoryView,
+  EmergenciasPendientes,
 } from './components'
 
-type ViewMode = 'main' | 'register-patient' | 'create-appointment' | 'search-patient' | 'register-admission' | 'patient-history' | 'hospitalized-patients'
+type ViewMode = 'main' | 'register-patient' | 'create-appointment' | 'search-patient' | 'register-admission' | 'patient-history' | 'hospitalized-patients' | 'emergencias-pendientes' | 'pacientes-emergencia'
 
 export default function AdminDashboard() {
   const [viewMode, setViewMode] = useState<ViewMode>('main')
@@ -68,6 +70,27 @@ export default function AdminDashboard() {
           <h2>Registros de Auditoría</h2>
           <div className={styles['stat-value']}>
             {loading ? '...' : stats?.registrosAuditoria ?? 0}
+          </div>
+        </div>
+        <div className={styles.card}>
+          <h2>🏥 Pacientes Hospitalizados</h2>
+          <div className={styles['stat-value']}>
+            {loading ? '...' : stats?.pacientesHospitalizados ?? 0}
+          </div>
+        </div>
+        <div className={styles.card}>
+          <h2>🚨 Pacientes en Emergencia</h2>
+          <div className={styles['stat-value']}>
+            {loading ? '...' : stats?.pacientesEnEmergencia ?? 0}
+          </div>
+        </div>
+        <div className={styles.card} style={{ background: 'linear-gradient(135deg, var(--color-warning) 0%, rgba(217, 119, 6, 0.9) 100%)' }}>
+          <h2>⚠️ Emergencias Pendientes</h2>
+          <div className={styles['stat-value']}>
+            {loading ? '...' : stats?.emergenciasPendientesHospitalizacion ?? 0}
+          </div>
+          <div style={{ fontSize: '0.85rem', color: 'white', marginTop: '0.5rem', opacity: 0.9 }}>
+            Pacientes requieren asignación de cama
           </div>
         </div>
       </section>
@@ -148,6 +171,32 @@ export default function AdminDashboard() {
               <span className={styles['btn-description']}>Visualice pacientes actualmente internados</span>
             </div>
           </button>
+          <button 
+            className={styles['admin-btn']}
+            onClick={() => setViewMode('emergencias-pendientes')}
+          >
+            <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <div className={styles['btn-content']}>
+              <span className={styles['btn-title']}>🚨 Emergencias Pendientes de Hospitalización</span>
+              <span className={styles['btn-description']}>Asigne cama a pacientes de emergencia que requieren hospitalización</span>
+            </div>
+          </button>
+          <button 
+            className={styles['admin-btn']}
+            onClick={() => setViewMode('pacientes-emergencia')}
+          >
+            <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+            <div className={styles['btn-content']}>
+              <span className={styles['btn-title']}>📊 Pacientes en Emergencia Actualmente</span>
+              <span className={styles['btn-description']}>Monitoree pacientes en atención de emergencia</span>
+            </div>
+          </button>
         </div>
       </section>
     </>
@@ -190,6 +239,8 @@ export default function AdminDashboard() {
         )}
         {viewMode === 'register-admission' && <RegistrarAdmision onBack={() => setViewMode('main')} />}
         {viewMode === 'hospitalized-patients' && <PacientesHospitalizados onBack={() => setViewMode('main')} />}
+        {viewMode === 'emergencias-pendientes' && <EmergenciasPendientes onBack={() => setViewMode('main')} />}
+        {viewMode === 'pacientes-emergencia' && <PacientesEnEmergencia onBack={() => setViewMode('main')} />}
         {viewMode === 'patient-history' && selectedPatientForHistory && (
           <PatientHistoryView 
             patient={selectedPatientForHistory}

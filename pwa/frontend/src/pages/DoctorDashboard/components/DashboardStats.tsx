@@ -13,6 +13,7 @@ export default function DashboardStats({}: Props) {
     encuentrosHoy: 0,
     citasHoy: 0,
     altasPendientes: 0,
+    pacientesEnEmergencia: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -24,6 +25,16 @@ export default function DashboardStats({}: Props) {
 
   const fetchStats = async () => {
     try {
+      // Obtener stats globales del dashboard
+      let dashboardData = null;
+      try {
+        const dashboardResponse = await fetch(`${API_BASE_URL}/dashboard/stats`);
+        const dashboardResult = await dashboardResponse.json();
+        dashboardData = dashboardResult.data;
+      } catch {
+        // Si falla, continuamos con otros stats
+      }
+
       // Obtener pacientes hospitalizados activos
       const admisionesResponse =
         await admisionesService.listarAdmisionesActivas({});
@@ -37,21 +48,12 @@ export default function DashboardStats({}: Props) {
         // Si falla, dejamos en 0
       }
 
-      // Obtener citas de hoy
-      let citasHoyCount = 0;
-      try {
-        const citasResponse = await fetch(`${API_BASE_URL}/dashboard/stats`);
-        const citasData = await citasResponse.json();
-        citasHoyCount = citasData.data?.citasProgramadasHoy || 0;
-      } catch {
-        // Si falla, dejamos en 0
-      }
-
       setStats({
-        pacientesHospitalizados: admisionesResponse.total || 0,
+        pacientesHospitalizados: dashboardData?.pacientesHospitalizados || admisionesResponse.total || 0,
         encuentrosHoy: encuentrosHoyCount,
-        citasHoy: citasHoyCount,
+        citasHoy: dashboardData?.citasProgramadasHoy || 0,
         altasPendientes: 0, // Por implementar
+        pacientesEnEmergencia: dashboardData?.pacientesEnEmergencia || 0,
       });
     } catch (error) {
       console.error("Error fetching doctor stats:", error);
@@ -68,6 +70,13 @@ export default function DashboardStats({}: Props) {
           {loading ? "..." : stats?.pacientesHospitalizados}
         </div>
         <span className={styles["stat-label"]}>Actualmente internados</span>
+      </div>
+      <div className={styles.card}>
+        <h2>🚨 Pacientes en Emergencia</h2>
+        <div className={styles["stat-value"]}>
+          {loading ? "..." : stats?.pacientesEnEmergencia}
+        </div>
+        <span className={styles["stat-label"]}>Atención de emergencia</span>
       </div>
       <div className={styles.card}>
         <h2>Atenciones Hoy</h2>

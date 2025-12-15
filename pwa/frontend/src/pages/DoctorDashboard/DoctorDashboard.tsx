@@ -19,6 +19,7 @@ import {
 } from "./components/";
 import { useAuth } from "@/contexts/AuthContext";
 import RegistrarEmergencia from "@/components/RegistrarEmergencia";
+import PacientesEnEmergencia from "@/components/PacientesEnEmergencia";
 
 export default function DoctorDashboard() {
   const { user } = useAuth();
@@ -103,6 +104,9 @@ export default function DoctorDashboard() {
         )}
         {viewMode === "register-emergency" && (
           <RegistrarEmergencia onBack={() => setViewMode("main")} />
+        )}
+        {viewMode === "pacientes-emergencia" && (
+          <PacientesEnEmergencia onBack={() => setViewMode("main")} />
         )}
       </main>
     </div>

@@ -20,7 +20,10 @@ export const getDashboardStats = async (_req: Request, res: Response): Promise<v
       pacientesAfiliados,
       pacientesPNA,
       citasProgramadasHoy,
-      registrosAuditoria
+      registrosAuditoria,
+      pacientesHospitalizados,
+      pacientesEnEmergencia,
+      emergenciasPendientesHospitalizacion,
     ] = await Promise.all([
       // 1. Total de pacientes registrados
       prisma.paciente.count(),
@@ -60,6 +63,35 @@ export const getDashboardStats = async (_req: Request, res: Response): Promise<v
           },
         },
       }),
+
+      // 7. Pacientes hospitalizados actualmente
+      prisma.admision.count({
+        where: {
+          estado: 'ACTIVA',
+          tipo: {
+            in: ['HOSPITALIZACION', 'UCI', 'CIRUGIA'],
+          },
+        },
+      }),
+
+      // 8. Pacientes en emergencia actualmente
+      prisma.admision.count({
+        where: {
+          estado: 'ACTIVA',
+          tipo: 'EMERGENCIA',
+        },
+      }),
+
+      // 9. Emergencias pendientes de hospitalización
+      prisma.admision.count({
+        where: {
+          estado: 'ACTIVA',
+          tipo: 'EMERGENCIA',
+          formatoEmergencia: {
+            requiereHospitalizacion: true,
+          },
+        },
+      }),
     ])
 
     res.status(200).json({
@@ -71,6 +103,9 @@ export const getDashboardStats = async (_req: Request, res: Response): Promise<v
         pacientesPNA,
         citasProgramadasHoy,
         registrosAuditoria,
+        pacientesHospitalizados,
+        pacientesEnEmergencia,
+        emergenciasPendientesHospitalizacion,
       },
     })
   } catch (error: any) {

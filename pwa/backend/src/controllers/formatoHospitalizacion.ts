@@ -85,21 +85,14 @@ export const createFormato = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // Verificar si ya existe
-    const existente = await prisma.formatoHospitalizacion.findFirst({
+    // Usar upsert para crear o devolver el existente
+    const formato = await prisma.formatoHospitalizacion.upsert({
       where: { admisionId: Number(admisionId) },
-    });
-
-    if (existente) {
-      res.status(400).json({ error: 'Ya existe un formato para esta admisión' });
-      return;
-    }
-
-    const formato = await prisma.formatoHospitalizacion.create({
-      data: {
+      create: {
         admisionId: Number(admisionId),
         pacienteId: Number(pacienteId),
       },
+      update: {}, // No actualizar nada si ya existe, solo devolverlo
       include: {
         signosVitales: true,
         laboratorios: true,

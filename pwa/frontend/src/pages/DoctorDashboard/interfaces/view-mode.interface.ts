@@ -8,3 +8,4 @@ export type ViewMode =
   | 'today-encounters'
   | 'my-appointments'
   | 'interconsultas'
+  | 'pacientes-emergencia'

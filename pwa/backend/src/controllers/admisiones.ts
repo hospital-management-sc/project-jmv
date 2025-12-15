@@ -589,6 +589,308 @@ export const listarAdmisionesActivas = async (req: Request, res: Response) => {
 };
 
 /**
+ * Listar pacientes en emergencia actualmente
+ * GET /api/admisiones/emergencias-activas
+ * 
+ * Retorna todas las admisiones de tipo EMERGENCIA con estado ACTIVA
+ */
+export const listarEmergenciasActivas = async (_req: Request, res: Response) => {
+  try {
+    const admisiones = await prisma.admision.findMany({
+      where: {
+        tipo: 'EMERGENCIA',
+        estado: 'ACTIVA',
+      },
+      include: {
+        paciente: {
+          select: {
+            id: true,
+            nroHistoria: true,
+            apellidosNombres: true,
+            ci: true,
+            fechaNacimiento: true,
+            sexo: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            nombre: true,
+            cargo: true,
+          },
+        },
+        formatoEmergencia: {
+          select: {
+            requiereHospitalizacion: true,
+            impresionDx: true,
+            observaciones: true,
+          },
+        },
+      },
+      orderBy: {
+        fechaAdmision: 'desc',
+      },
+    });
+
+    // Calcular tiempo en emergencia para cada admisión
+    const admisionesConTiempo = admisiones.map((admision) => {
+      const fechaAdmision = new Date(admision.fechaAdmision);
+      const hoy = new Date();
+      const horasEnEmergencia = Math.ceil(
+        (hoy.getTime() - fechaAdmision.getTime()) / (1000 * 60 * 60)
+      );
+
+      return {
+        ...admision,
+        horasEnEmergencia,
+      };
+    });
+
+    // Serializar BigInt a string
+    const admisionesSerializadas = JSON.parse(
+      JSON.stringify(admisionesConTiempo, (_key, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      )
+    );
+
+    return res.status(200).json({
+      total: admisiones.length,
+      admisiones: admisionesSerializadas,
+    });
+  } catch (error) {
+    console.error('Error al listar emergencias activas:', error);
+    return res.status(500).json({
+      error: 'Error al listar emergencias activas',
+      details: error instanceof Error ? error.message : 'Error desconocido',
+    });
+  }
+};
+
+/**
+ * Listar emergencias pendientes de hospitalización
+ * GET /api/admisiones/emergencias-pendientes-hospitalizacion
+ * 
+ * Retorna admisiones EMERGENCIA donde:
+ * - Estado: ACTIVA
+ * - formatoEmergencia.requiereHospitalizacion = true
+ * - NO tienen admisión de HOSPITALIZACION asociada
+ */
+export const listarEmergenciasPendientesHospitalizacion = async (_req: Request, res: Response) => {
+  try {
+    // Obtener todas las admisiones de emergencia activas con requiereHospitalizacion=true
+    const emergencias = await prisma.admision.findMany({
+      where: {
+        tipo: 'EMERGENCIA',
+        estado: 'ACTIVA',
+        formatoEmergencia: {
+          requiereHospitalizacion: true,
+        },
+      },
+      include: {
+        paciente: {
+          select: {
+            id: true,
+            nroHistoria: true,
+            apellidosNombres: true,
+            ci: true,
+            fechaNacimiento: true,
+            sexo: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            nombre: true,
+            cargo: true,
+          },
+        },
+        formatoEmergencia: {
+          select: {
+            impresionDx: true,
+            observaciones: true,
+            requiereHospitalizacion: true,
+          },
+        },
+      },
+      orderBy: {
+        fechaAdmision: 'asc', // Más antiguos primero (más urgentes)
+      },
+    });
+
+    // Filtrar solo los que NO tienen admisión de hospitalización
+    const pendientes = [];
+    for (const emergencia of emergencias) {
+      // Verificar si ya existe una admisión de hospitalización para este paciente
+      const hospitalizacionExistente = await prisma.admision.findFirst({
+        where: {
+          pacienteId: emergencia.pacienteId,
+          tipo: {
+            in: ['HOSPITALIZACION', 'UCI', 'CIRUGIA'],
+          },
+          estado: 'ACTIVA',
+        },
+      });
+
+      if (!hospitalizacionExistente) {
+        // Calcular tiempo en emergencia
+        const fechaAdmision = new Date(emergencia.fechaAdmision);
+        const hoy = new Date();
+        const horasEnEmergencia = Math.ceil(
+          (hoy.getTime() - fechaAdmision.getTime()) / (1000 * 60 * 60)
+        );
+
+        pendientes.push({
+          ...emergencia,
+          horasEnEmergencia,
+        });
+      }
+    }
+
+    // Serializar BigInt a string
+    const pendientesSerializados = JSON.parse(
+      JSON.stringify(pendientes, (_key, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      )
+    );
+
+    return res.status(200).json({
+      total: pendientes.length,
+      admisiones: pendientesSerializados,
+    });
+  } catch (error) {
+    console.error('Error al listar emergencias pendientes:', error);
+    return res.status(500).json({
+      error: 'Error al listar emergencias pendientes de hospitalización',
+      details: error instanceof Error ? error.message : 'Error desconocido',
+    });
+  }
+};
+
+/**
+ * Crear admisión de hospitalización desde emergencia
+ * POST /api/admisiones/hospitalizar-desde-emergencia
+ * 
+ * Crea una nueva admisión de HOSPITALIZACION para un paciente
+ * que está en EMERGENCIA y requiere hospitalización
+ */
+export const hospitalizarDesdeEmergencia = async (req: Request, res: Response) => {
+  try {
+    const {
+      admisionEmergenciaId,
+      servicio,
+      habitacion,
+      cama,
+      observaciones,
+      createdById,
+    } = req.body;
+
+    // Validaciones
+    if (!admisionEmergenciaId || !servicio || !cama) {
+      return res.status(400).json({
+        error: 'Campos requeridos: admisionEmergenciaId, servicio, cama',
+      });
+    }
+
+    // Verificar que la admisión de emergencia existe y requiere hospitalización
+    const admisionEmergencia = await prisma.admision.findUnique({
+      where: { id: Number(admisionEmergenciaId) },
+      include: {
+        formatoEmergencia: true,
+        paciente: true,
+      },
+    });
+
+    if (!admisionEmergencia) {
+      return res.status(404).json({
+        error: 'Admisión de emergencia no encontrada',
+      });
+    }
+
+    if (admisionEmergencia.tipo !== 'EMERGENCIA') {
+      return res.status(400).json({
+        error: 'La admisión proporcionada no es de tipo EMERGENCIA',
+      });
+    }
+
+    if (!admisionEmergencia.formatoEmergencia?.requiereHospitalizacion) {
+      return res.status(400).json({
+        error: 'Esta emergencia no requiere hospitalización según el formato',
+      });
+    }
+
+    // Verificar que no exista ya una hospitalización activa
+    const hospitalizacionExistente = await prisma.admision.findFirst({
+      where: {
+        pacienteId: admisionEmergencia.pacienteId,
+        tipo: {
+          in: ['HOSPITALIZACION', 'UCI', 'CIRUGIA'],
+        },
+        estado: 'ACTIVA',
+      },
+    });
+
+    if (hospitalizacionExistente) {
+      return res.status(400).json({
+        error: 'El paciente ya tiene una admisión de hospitalización activa',
+      });
+    }
+
+    // Crear la nueva admisión de hospitalización
+    const admisionHospitalizacion = await prisma.admision.create({
+      data: {
+        pacienteId: admisionEmergencia.pacienteId,
+        tipo: 'HOSPITALIZACION',
+        servicio,
+        fechaAdmision: new Date(),
+        horaAdmision: new Date().toTimeString().slice(0, 5),
+        habitacion: habitacion || null,
+        cama,
+        estado: 'ACTIVA',
+        observaciones: observaciones || null,
+        createdById: createdById ? Number(createdById) : null,
+      },
+      include: {
+        paciente: {
+          select: {
+            id: true,
+            nroHistoria: true,
+            apellidosNombres: true,
+            ci: true,
+            fechaNacimiento: true,
+            sexo: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            nombre: true,
+            cargo: true,
+          },
+        },
+      },
+    });
+
+    // Serializar BigInt a string
+    const admisionSerializada = JSON.parse(
+      JSON.stringify(admisionHospitalizacion, (_key, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      )
+    );
+
+    return res.status(201).json({
+      message: 'Paciente hospitalizado exitosamente',
+      admision: admisionSerializada,
+    });
+  } catch (error) {
+    console.error('Error al hospitalizar desde emergencia:', error);
+    return res.status(500).json({
+      error: 'Error al crear admisión de hospitalización',
+      details: error instanceof Error ? error.message : 'Error desconocido',
+    });
+  }
+};
+
+/**
  * Listar admisiones por servicio
  * GET /api/admisiones/servicio/:servicio
  */

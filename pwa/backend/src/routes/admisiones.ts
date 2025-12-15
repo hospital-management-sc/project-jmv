@@ -8,6 +8,9 @@ import {
   activarAdmision,
   listarAdmisionesActivas,
   listarAdmisionesPorServicio,
+  listarEmergenciasActivas,
+  listarEmergenciasPendientesHospitalizacion,
+  hospitalizarDesdeEmergencia,
 } from '../controllers/admisiones';
 
 const router = Router();
@@ -26,6 +29,27 @@ router.post('/', crearAdmision);
  * @query   ?servicio=MEDICINA_INTERNA&tipo=HOSPITALIZACION
  */
 router.get('/activas', listarAdmisionesActivas);
+
+/**
+ * @route   GET /api/admisiones/emergencias-activas
+ * @desc    Listar pacientes en emergencia actualmente
+ * @access  Private
+ */
+router.get('/emergencias-activas', listarEmergenciasActivas);
+
+/**
+ * @route   GET /api/admisiones/emergencias-pendientes-hospitalizacion
+ * @desc    Listar emergencias que requieren hospitalización pero aún no tienen cama asignada
+ * @access  Private (Administrativo)
+ */
+router.get('/emergencias-pendientes-hospitalizacion', listarEmergenciasPendientesHospitalizacion);
+
+/**
+ * @route   POST /api/admisiones/hospitalizar-desde-emergencia
+ * @desc    Crear admisión de hospitalización para un paciente en emergencia
+ * @access  Private (Administrativo)
+ */
+router.post('/hospitalizar-desde-emergencia', hospitalizarDesdeEmergencia);
 
 /**
  * @route   GET /api/admisiones/servicio/:servicio

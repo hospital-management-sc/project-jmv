@@ -88,6 +88,30 @@ export default function DashboardActions({ onClick }: Props) {
 
         <button
           className={styles["action-btn"]}
+          onClick={() => onClick("pacientes-emergencia")}
+          style={{ background: 'linear-gradient(135deg, var(--color-warning) 0%, rgba(245, 158, 11, 0.8) 100%)' }}
+        >
+          <svg
+            className={styles.icon}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+          </svg>
+          <div className={styles["btn-content"]}>
+            <span className={styles["btn-title"]}>📊 Pacientes en Emergencia</span>
+            <span className={styles["btn-description"]}>
+              Monitoree pacientes en atención de emergencia
+            </span>
+          </div>
+        </button>
+
+        <button
+          className={styles["action-btn"]}
           onClick={() => onClick("today-encounters")}
         >
           <svg

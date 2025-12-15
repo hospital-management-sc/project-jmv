@@ -8,6 +8,9 @@ interface DashboardStats {
   pacientesPNA: number
   citasProgramadasHoy: number
   registrosAuditoria: number
+  pacientesHospitalizados?: number
+  pacientesEnEmergencia?: number
+  emergenciasPendientesHospitalizacion?: number
 }
 
 interface UseDashboardStatsResult {
