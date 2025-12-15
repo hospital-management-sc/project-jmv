@@ -292,7 +292,25 @@ export const obtenerPaciente = async (
       include: {
         personalMilitar: true,
         afiliado: true,
-        admisiones: true,
+        admisiones: {
+          include: {
+            formatoEmergencia: true,
+            formatoHospitalizacion: {
+              include: {
+                signosVitales: true,
+                laboratorios: true,
+                estudiosEspeciales: true,
+                electrocardiogramas: true,
+                antecedentesDetallados: true,
+                examenFuncional: true,
+                examenFisicoCompleto: true,
+                resumenIngreso: true,
+                ordenesMedicas: true,
+                evolucionesMedicas: true,
+              },
+            },
+          },
+        },
         encuentros: true,
         citas: {
           orderBy: {

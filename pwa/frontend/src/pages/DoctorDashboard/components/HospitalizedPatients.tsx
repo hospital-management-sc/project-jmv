@@ -2,7 +2,7 @@
 // COMPONENTE: Pacientes Hospitalizados
 // ==========================================
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../DoctorDashboard.module.css";
 import admisionesService, {
@@ -20,26 +20,57 @@ export default function HospitalizedPatientsView({}: Props) {
   const [error, setError] = useState("");
   const [servicioFiltro, setServicioFiltro] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  
+  // Debounce para evitar solicitudes repetidas (429 Too Many Requests)
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    cargarPacientes();
+    // Usar debounce para evitar llamadas repetidas al cambiar filtro
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    debounceTimerRef.current = setTimeout(() => {
+      cargarPacientes();
+    }, 500); // Esperar 500ms antes de hacer la solicitud
+    
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
   }, [servicioFiltro]);
 
-  const cargarPacientes = async () => {
+  const cargarPacientes = useCallback(async () => {
     setLoading(true);
+    setError("");
     try {
       const filters: { servicio?: string } = {};
       if (servicioFiltro) filters.servicio = servicioFiltro;
       const response = await admisionesService.listarAdmisionesActivas(filters);
       setAdmisiones(response.admisiones);
     } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Error al cargar pacientes";
+      let errorMessage = "Error al cargar pacientes";
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        
+        // Si es error de token, mostrar mensaje más específico
+        if (err.message.includes("401") || err.message.includes("Token is invalid")) {
+          errorMessage = "❌ Sesión expirada. Por favor, inicie sesión nuevamente.";
+        }
+        // Manejar error 429 específicamente
+        else if (errorMessage.includes("429") || errorMessage.includes("Too Many Requests")) {
+          errorMessage = "⏳ Demasiadas solicitudes. Por favor, intente nuevamente en unos momentos.";
+        }
+      }
+      
+      console.error("[HospitalizedPatients] Error:", err);
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [servicioFiltro]);
 
   const calcularEdad = (fechaNac?: string) => {
     if (!fechaNac) return "N/A";

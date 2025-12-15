@@ -4,7 +4,7 @@
  * Permite buscar paciente y asignar cama/servicio
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styles from './RegistrarAdmision.module.css';
 import type { CrearAdmisionDTO } from '../services/admisiones.service';
 import admisionesService from '../services/admisiones.service';

@@ -8,8 +8,8 @@ import {
   encuentrosService,
   type Encuentro,
 } from "@/services/encuentros.service";
+import pacientesService from "@/services/pacientes.service";
 import { EncuentroDetailModal } from "@/components";
-import { API_BASE_URL } from "@/utils/constants";
 import { formatDateVenezuela, formatDateLocal, formatTimeMilitaryVenezuela, calculateAge } from "@/utils/dateUtils";
 
 interface Props {
@@ -31,13 +31,9 @@ export default function PatientHistory({ patient, onBack }: Props) {
   const cargarHistoriaCompleta = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/pacientes/${patient.id}`);
-      const result = await response.json();
-
-      if (result.success) {
-        console.log("📊 Datos completos del paciente:", result.data);
-        setHistoriaCompleta(result.data);
-      }
+      const data = await pacientesService.buscarPorId(Number(patient.id));
+      console.log("📊 Datos completos del paciente:", data);
+      setHistoriaCompleta(data);
     } catch (err) {
       console.error("Error al cargar historia:", err);
     } finally {
@@ -47,7 +43,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
 
   const cargarEncuentros = async () => {
     try {
-      const data = await encuentrosService.obtenerPorPaciente(patient.id);
+      const data = await encuentrosService.obtenerPorPaciente(Number(patient.id));
       setEncuentros(data);
       console.log("✅ Encuentros cargados:", data.length);
     } catch (err) {
@@ -117,6 +113,59 @@ export default function PatientHistory({ patient, onBack }: Props) {
             detalles: admision,
             color: tipoAdmision === "EMERGENCIA" ? "#ef4444" : "#3b82f6",
           });
+
+          // Eventos: Información completada en Formato de Emergencia
+          if (admision.formatoEmergencia) {
+            const formato = admision.formatoEmergencia;
+            let resumenDatos = [];
+            
+            if (formato.motivoConsulta) resumenDatos.push(`Motivo: ${formato.motivoConsulta.substring(0, 40)}`);
+            if (formato.signosVitales && formato.signosVitales.length > 0) {
+              resumenDatos.push(`Signos vitales registrados (${formato.signosVitales.length})`);
+            }
+            if (formato.diagnostico) resumenDatos.push(`Diagnóstico: ${formato.diagnostico.substring(0, 40)}`);
+
+            eventos.push({
+              tipo: "FORMATO_EMERGENCIA",
+              fecha: formato.createdAt || admision.fechaAdmision,
+              hora: formato.createdAt || admision.horaAdmision,
+              icono: "📋",
+              titulo: "Formato de Emergencia Completado",
+              descripcion: resumenDatos.length > 0 ? resumenDatos.join(" • ") : "Información clínica de emergencia registrada",
+              detalles: formato,
+              color: "#ec4899",
+            });
+          }
+
+          // Eventos: Información completada en Formato de Hospitalización
+          if (admision.formatoHospitalizacion) {
+            const formato = admision.formatoHospitalizacion;
+            let resumenDatos = [];
+            
+            if (formato.signosVitales && formato.signosVitales.length > 0) {
+              resumenDatos.push(`Signos vitales (${formato.signosVitales.length})`);
+            }
+            if (formato.laboratorios && formato.laboratorios.length > 0) {
+              resumenDatos.push(`Laboratorios (${formato.laboratorios.length})`);
+            }
+            if (formato.evolucionesMedicas && formato.evolucionesMedicas.length > 0) {
+              resumenDatos.push(`Evoluciones (${formato.evolucionesMedicas.length})`);
+            }
+            if (formato.resumenIngreso?.diagnostico) {
+              resumenDatos.push(`Diagnóstico: ${formato.resumenIngreso.diagnostico.substring(0, 40)}`);
+            }
+
+            eventos.push({
+              tipo: "FORMATO_HOSPITALIZACION",
+              fecha: formato.createdAt || admision.fechaAdmision,
+              hora: formato.createdAt || admision.horaAdmision,
+              icono: "📊",
+              titulo: "Formato de Hospitalización Completado",
+              descripcion: resumenDatos.length > 0 ? resumenDatos.join(" • ") : "Documentación clínica de hospitalización registrada",
+              detalles: formato,
+              color: "#06b6d4",
+            });
+          }
         }
       });
     }

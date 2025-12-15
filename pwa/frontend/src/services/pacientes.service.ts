@@ -19,6 +19,12 @@ export interface Paciente {
   religion?: string;
   createdAt?: Date | string;
   updatedAt?: Date | string;
+  // Relaciones
+  admisiones?: any[];
+  encuentros?: any[];
+  citas?: any[];
+  personalMilitar?: any;
+  afiliado?: any;
 }
 
 class PacientesService {

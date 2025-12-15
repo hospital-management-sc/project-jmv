@@ -665,7 +665,7 @@ export const obtenerDetalleInterconsulta = async (
               orderBy: { fecha: 'desc' },
               take: 10,
               include: {
-                signosVitales: true,
+                examenRegional: true,
                 impresiones: true,
               },
             },

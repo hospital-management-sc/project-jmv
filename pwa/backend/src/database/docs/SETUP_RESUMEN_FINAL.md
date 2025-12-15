@@ -54,7 +54,6 @@ Tu SQL con 12 tablas fue traducido completamente a Prisma:
 ### **Encuentros y Observaciones**
 ```prisma
 ✅ Encuentro            - Visitas (emergencia, consulta, hospitalización)
-✅ SignosVitales        - Presión, pulso, temperatura, FR
 ✅ ExamenRegional       - Examen físico regional
 ```
 
@@ -87,7 +86,6 @@ Tu SQL con 12 tablas fue traducido completamente a Prisma:
 | Paciente | Antecedente | 1:n | Sí (delete) |
 | Admision | EstanciaHospitalaria | 1:1 | Sí (delete) |
 | Admision | Encuentro | 1:n | No |
-| Encuentro | SignosVitales | 1:n | Sí (delete) |
 | Encuentro | ExamenRegional | 1:1 | Sí (delete) |
 | Encuentro | ImpresionDiagnostica | 1:n | Sí (delete) |
 

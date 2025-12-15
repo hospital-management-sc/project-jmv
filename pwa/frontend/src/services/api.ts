@@ -55,6 +55,18 @@ async function request<T>(
         errorData = { message: response.statusText }
       }
       console.error('[API] Error response:', { status: response.status, errorData })
+      
+      // Si es error de autenticación (401), limpiar token y redirigir a login
+      if (response.status === 401) {
+        console.warn('[API] Token inválido o expirado, limpiando sesión')
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        // Redirigir al login
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login'
+        }
+      }
+      
       throw new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`)
     }
 

@@ -4,6 +4,39 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 /**
+ * Helper: Procesar fecha/hora desde strings del frontend
+ * Frontend envía fecha (YYYY-MM-DD) y hora (HH:MM) separados
+ * Backend necesita convertir a DateTime para Prisma
+ */
+function processFechaHora(data: any): any {
+  const processedData: any = { ...data };
+  
+  // Procesar fecha
+  if (typeof data.fecha === 'string') {
+    processedData.fecha = new Date(data.fecha);
+  }
+  
+  // Procesar hora (combinar con fecha si ambos existen)
+  if (typeof data.hora === 'string') {
+    if (typeof data.fecha === 'string') {
+      // Combinar fecha + hora para correcta zona horaria
+      const [hours, minutes] = data.hora.split(':');
+      const fechaHora = new Date(data.fecha);
+      fechaHora.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      processedData.hora = fechaHora;
+    } else {
+      // Solo hora, usar fecha actual
+      const [hours, minutes] = data.hora.split(':');
+      const timeDate = new Date();
+      timeDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      processedData.hora = timeDate;
+    }
+  }
+  
+  return processedData;
+}
+
+/**
  * Obtener formato de hospitalización por admisionId
  * GET /api/formato-hospitalizacion/admision/:admisionId
  */
@@ -97,17 +130,29 @@ export const addSignosVitales = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;
 
+    // Procesar fecha/hora
+    let processedData = processFechaHora(data);
+    
+    // Convertir campos numéricos
+    if (data.taSistolica) processedData.taSistolica = Number(data.taSistolica);
+    if (data.taDiastolica) processedData.taDiastolica = Number(data.taDiastolica);
+    if (data.tam) processedData.tam = parseFloat(data.tam);
+    if (data.fc) processedData.fc = Number(data.fc);
+    if (data.fr) processedData.fr = Number(data.fr);
+    if (data.temperatura) processedData.temperatura = parseFloat(data.temperatura);
+    if (data.spo2) processedData.spo2 = Number(data.spo2);
+
     const registro = await prisma.signosVitalesHosp.create({
       data: {
         formatoHospId: Number(id),
-        ...data,
+        ...processedData,
       },
     });
 
     res.status(201).json(registro);
   } catch (error: any) {
     console.error('Error al agregar signos vitales:', error);
-    res.status(500).json({ error: 'Error al agregar signos vitales' });
+    res.status(500).json({ error: 'Error al agregar signos vitales', details: error.message });
   }
 };
 
@@ -120,15 +165,27 @@ export const updateSignosVitales = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;
 
+    // Procesar fecha/hora
+    let processedData = processFechaHora(data);
+    
+    // Convertir campos numéricos
+    if (data.taSistolica) processedData.taSistolica = Number(data.taSistolica);
+    if (data.taDiastolica) processedData.taDiastolica = Number(data.taDiastolica);
+    if (data.tam) processedData.tam = parseFloat(data.tam);
+    if (data.fc) processedData.fc = Number(data.fc);
+    if (data.fr) processedData.fr = Number(data.fr);
+    if (data.temperatura) processedData.temperatura = parseFloat(data.temperatura);
+    if (data.spo2) processedData.spo2 = Number(data.spo2);
+
     const registro = await prisma.signosVitalesHosp.update({
       where: { id: Number(id) },
-      data,
+      data: processedData,
     });
 
     res.json(registro);
   } catch (error: any) {
     console.error('Error al actualizar signos vitales:', error);
-    res.status(500).json({ error: 'Error al actualizar signos vitales' });
+    res.status(500).json({ error: 'Error al actualizar signos vitales', details: error.message });
   }
 };
 
@@ -160,38 +217,20 @@ export const addLaboratorio = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;
 
+    // Procesar fecha/hora
+    const processedData = processFechaHora(data);
+
     const registro = await prisma.laboratorio.create({
       data: {
         formatoHospId: Number(id),
-        ...data,
+        ...processedData,
       },
     });
 
     res.status(201).json(registro);
   } catch (error: any) {
     console.error('Error al agregar laboratorio:', error);
-    res.status(500).json({ error: 'Error al agregar laboratorio' });
-  }
-};
-
-/**
- * Actualizar laboratorio
- * PUT /api/formato-hospitalizacion/laboratorio/:id
- */
-export const updateLaboratorio = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const data = req.body;
-
-    const registro = await prisma.laboratorio.update({
-      where: { id: Number(id) },
-      data,
-    });
-
-    res.json(registro);
-  } catch (error: any) {
-    console.error('Error al actualizar laboratorio:', error);
-    res.status(500).json({ error: 'Error al actualizar laboratorio' });
+    res.status(500).json({ error: 'Error al agregar laboratorio', details: error.message });
   }
 };
 
@@ -223,38 +262,20 @@ export const addEstudioEspecial = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;
 
+    // Procesar fecha/hora
+    const processedData = processFechaHora(data);
+
     const registro = await prisma.estudioEspecial.create({
       data: {
         formatoHospId: Number(id),
-        ...data,
+        ...processedData,
       },
     });
 
     res.status(201).json(registro);
   } catch (error: any) {
     console.error('Error al agregar estudio especial:', error);
-    res.status(500).json({ error: 'Error al agregar estudio especial' });
-  }
-};
-
-/**
- * Actualizar estudio especial
- * PUT /api/formato-hospitalizacion/estudio-especial/:id
- */
-export const updateEstudioEspecial = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const data = req.body;
-
-    const registro = await prisma.estudioEspecial.update({
-      where: { id: Number(id) },
-      data,
-    });
-
-    res.json(registro);
-  } catch (error: any) {
-    console.error('Error al actualizar estudio especial:', error);
-    res.status(500).json({ error: 'Error al actualizar estudio especial' });
+    res.status(500).json({ error: 'Error al agregar estudio especial', details: error.message });
   }
 };
 
@@ -286,17 +307,20 @@ export const addElectrocardiograma = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;
 
+    // Procesar fecha/hora
+    const processedData = processFechaHora(data);
+
     const registro = await prisma.electrocardiograma.create({
       data: {
         formatoHospId: Number(id),
-        ...data,
+        ...processedData,
       },
     });
 
     res.status(201).json(registro);
   } catch (error: any) {
     console.error('Error al agregar electrocardiograma:', error);
-    res.status(500).json({ error: 'Error al agregar electrocardiograma' });
+    res.status(500).json({ error: 'Error al agregar electrocardiograma', details: error.message });
   }
 };
 
@@ -309,15 +333,18 @@ export const updateElectrocardiograma = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;
 
+    // Procesar fecha/hora
+    const processedData = processFechaHora(data);
+
     const registro = await prisma.electrocardiograma.update({
       where: { id: Number(id) },
-      data,
+      data: processedData,
     });
 
     res.json(registro);
   } catch (error: any) {
     console.error('Error al actualizar electrocardiograma:', error);
-    res.status(500).json({ error: 'Error al actualizar electrocardiograma' });
+    res.status(500).json({ error: 'Error al actualizar electrocardiograma', details: error.message });
   }
 };
 
@@ -510,17 +537,20 @@ export const addOrdenMedica = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;
 
+    // Procesar fecha/hora
+    const processedData = processFechaHora(data);
+
     const registro = await prisma.ordenMedica.create({
       data: {
         formatoHospId: Number(id),
-        ...data,
+        ...processedData,
       },
     });
 
     res.status(201).json(registro);
   } catch (error: any) {
     console.error('Error al agregar orden médica:', error);
-    res.status(500).json({ error: 'Error al agregar orden médica' });
+    res.status(500).json({ error: 'Error al agregar orden médica', details: error.message });
   }
 };
 
@@ -533,15 +563,18 @@ export const updateOrdenMedica = async (req: Request, res: Response): Promise<vo
     const { id } = req.params;
     const data = req.body;
 
+    // Procesar fecha/hora
+    const processedData = processFechaHora(data);
+
     const registro = await prisma.ordenMedica.update({
       where: { id: Number(id) },
-      data,
+      data: processedData,
     });
 
     res.json(registro);
   } catch (error: any) {
     console.error('Error al actualizar orden médica:', error);
-    res.status(500).json({ error: 'Error al actualizar orden médica' });
+    res.status(500).json({ error: 'Error al actualizar orden médica', details: error.message });
   }
 };
 
@@ -573,17 +606,20 @@ export const addEvolucionMedica = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;
 
+    // Procesar fecha/hora
+    const processedData = processFechaHora(data);
+
     const registro = await prisma.evolucionMedica.create({
       data: {
         formatoHospId: Number(id),
-        ...data,
+        ...processedData,
       },
     });
 
     res.status(201).json(registro);
   } catch (error: any) {
     console.error('Error al agregar evolución médica:', error);
-    res.status(500).json({ error: 'Error al agregar evolución médica' });
+    res.status(500).json({ error: 'Error al agregar evolución médica', details: error.message });
   }
 };
 
@@ -596,15 +632,18 @@ export const updateEvolucionMedica = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;
 
+    // Procesar fecha/hora
+    const processedData = processFechaHora(data);
+
     const registro = await prisma.evolucionMedica.update({
       where: { id: Number(id) },
-      data,
+      data: processedData,
     });
 
     res.json(registro);
   } catch (error: any) {
     console.error('Error al actualizar evolución médica:', error);
-    res.status(500).json({ error: 'Error al actualizar evolución médica' });
+    res.status(500).json({ error: 'Error al actualizar evolución médica', details: error.message });
   }
 };
 

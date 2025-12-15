@@ -39,7 +39,18 @@ export default function Seccion2_SignosVitales({ formato, onUpdate, setSaving }:
   }, [formato.signosVitales]);
 
   const handleInputChange = (field: keyof SignosVitalesHosp, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      
+      // Auto-calcular TAM cuando cambian TA Sistólica o Diastólica
+      if ((field === 'taSistolica' || field === 'taDiastolica') && newData.taSistolica && newData.taDiastolica) {
+        const sistolica = Number(newData.taSistolica);
+        const diastolica = Number(newData.taDiastolica);
+        newData.tam = parseFloat(((sistolica + 2 * diastolica) / 3).toFixed(2));
+      }
+      
+      return newData;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,12 +63,18 @@ export default function Seccion2_SignosVitales({ formato, onUpdate, setSaving }:
 
     setSaving(true);
     try {
+      // Preparar datos con TAM calculado si no existe
+      const dataToSend = { ...formData };
+      if (dataToSend.taSistolica && dataToSend.taDiastolica && !dataToSend.tam) {
+        dataToSend.tam = parseFloat(((Number(dataToSend.taSistolica) + 2 * Number(dataToSend.taDiastolica)) / 3).toFixed(2));
+      }
+      
       if (editingId) {
         // Actualizar existente
-        await formatoService.updateSignosVitales(editingId, formData);
+        await formatoService.updateSignosVitales(editingId, dataToSend);
       } else {
         // Crear nuevo
-        await formatoService.addSignosVitales(formato.id, formData as any);
+        await formatoService.addSignosVitales(formato.id, dataToSend as any);
       }
       
       // Recargar datos
@@ -336,12 +353,29 @@ export default function Seccion2_SignosVitales({ formato, onUpdate, setSaving }:
                 </tr>
               </thead>
               <tbody>
-                {signosVitales.map((signo) => (
+                {signosVitales.map((signo) => {
+                  // Formatear hora desde DateTime
+                  let horaStr = '-';
+                  if (signo.hora) {
+                    try {
+                      const horaDate = new Date(signo.hora);
+                      horaStr = horaDate.toLocaleTimeString('es-VE', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: false,
+                        timeZone: 'America/Caracas'
+                      });
+                    } catch {
+                      horaStr = '-';
+                    }
+                  }
+                  
+                  return (
                   <tr key={signo.id}>
                     <td>
                       <div className={styles.dateCell}>
                         <span>{formatDateVenezuela(signo.fecha)}</span>
-                        <span className={styles.time}>{signo.hora}</span>
+                        <span className={styles.time}>{horaStr}</span>
                       </div>
                     </td>
                     <td>
@@ -355,8 +389,8 @@ export default function Seccion2_SignosVitales({ formato, onUpdate, setSaving }:
                     </td>
                     <td>
                       {signo.tam ? (
-                        <span className={getSignoStatus('tam', signo.tam)}>
-                          {signo.tam}
+                        <span className={getSignoStatus('tam', Number(signo.tam))}>
+                          {Number(signo.tam).toFixed(2)}
                         </span>
                       ) : (
                         <span className={styles.noData}>-</span>
@@ -420,7 +454,8 @@ export default function Seccion2_SignosVitales({ formato, onUpdate, setSaving }:
                       </div>
                     </td>
                   </tr>
-                ))}
+                );
+                })}
               </tbody>
             </table>
           </div>

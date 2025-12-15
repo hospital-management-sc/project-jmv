@@ -13,25 +13,23 @@ router.get('/admision/:admisionId', formatoController.getFormatoByAdmision);
 // Crear nuevo formato
 router.post('/', formatoController.createFormato);
 
-// Signos Vitales
-router.post('/:id/signos-vitales', formatoController.addSignosVitales);
+// Signos Vitales (específicas primero para evitar conflictos con /:id)
 router.put('/signos-vitales/:id', formatoController.updateSignosVitales);
 router.delete('/signos-vitales/:id', formatoController.deleteSignosVitales);
+router.post('/:id/signos-vitales', formatoController.addSignosVitales);
 
-// Laboratorios
-router.post('/:id/laboratorio', formatoController.addLaboratorio);
-router.put('/laboratorio/:id', formatoController.updateLaboratorio);
+// Laboratorios (específicas primero para evitar conflictos)
 router.delete('/laboratorio/:id', formatoController.deleteLaboratorio);
+router.post('/:id/laboratorio', formatoController.addLaboratorio);
 
-// Estudios Especiales
-router.post('/:id/estudio-especial', formatoController.addEstudioEspecial);
-router.put('/estudio-especial/:id', formatoController.updateEstudioEspecial);
+// Estudios Especiales (específicas primero)
 router.delete('/estudio-especial/:id', formatoController.deleteEstudioEspecial);
+router.post('/:id/estudio-especial', formatoController.addEstudioEspecial);
 
-// Electrocardiogramas
-router.post('/:id/electrocardiograma', formatoController.addElectrocardiograma);
+// Electrocardiogramas (específicas primero)
 router.put('/electrocardiograma/:id', formatoController.updateElectrocardiograma);
 router.delete('/electrocardiograma/:id', formatoController.deleteElectrocardiograma);
+router.post('/:id/electrocardiograma', formatoController.addElectrocardiograma);
 
 // Antecedentes Detallados
 router.put('/:id/antecedentes-detallados', formatoController.updateAntecedentesDetallados);

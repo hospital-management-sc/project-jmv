@@ -274,31 +274,10 @@ model Encuentro {
   paciente       Paciente               @relation(fields: [pacienteId], references: [id])
   admision       Admision?              @relation(fields: [admisionId], references: [id])
   createdBy      Usuario?               @relation(fields: [createdById], references: [id])
-  signosVitales  SignosVitales[]
   examenRegional ExamenRegional?
   impresiones    ImpresionDiagnostica[]
 
   @@index([pacienteId, fecha])
-}
-
-// ============================================
-// SIGNOS VITALES - Presión, pulso, temperatura, etc
-// ============================================
-model SignosVitales {
-  id            Int   @id @default(autoincrement())
-  encuentroId   Int
-  taSistolica   Int?
-  taDiastolica  Int?
-  pulso         Int?
-  temperatura   Decimal? @db.Decimal(4, 2)
-  fr            Int? // Frecuencia respiratoria
-  observaciones String?  @db.VarChar(500)
-  registradoEn  DateTime @default(now()) @db.Timestamptz()
-
-  // Relaciones
-  encuentro Encuentro @relation(fields: [encuentroId], references: [id], onDelete: Cascade)
-
-  @@index([encuentroId])
 }
 
 // ============================================

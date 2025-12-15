@@ -62,8 +62,6 @@ export const crearEncuentro = async (
       procedencia,
       nroCama,
       createdById,
-      // Signos vitales
-      signosVitales,
       // Impresión diagnóstica
       impresionDiagnostica,
       tratamiento,
@@ -109,21 +107,6 @@ export const crearEncuentro = async (
         },
       });
 
-      // Crear signos vitales si se proporcionaron
-      if (signosVitales) {
-        await tx.signosVitales.create({
-          data: {
-            encuentroId: encuentro.id,
-            taSistolica: signosVitales.taSistolica ? parseInt(signosVitales.taSistolica) : null,
-            taDiastolica: signosVitales.taDiastolica ? parseInt(signosVitales.taDiastolica) : null,
-            pulso: signosVitales.pulso ? parseInt(signosVitales.pulso) : null,
-            temperatura: signosVitales.temperatura ? parseFloat(signosVitales.temperatura) : null,
-            fr: signosVitales.fr ? parseInt(signosVitales.fr) : null,
-            observaciones: signosVitales.observaciones,
-          },
-        });
-      }
-
       // Crear impresión diagnóstica si se proporcionó
       if (impresionDiagnostica) {
         await tx.impresionDiagnostica.create({
@@ -155,7 +138,6 @@ export const crearEncuentro = async (
               cargo: true,
             },
           },
-          signosVitales: true,
           impresiones: true,
         },
       });
@@ -192,7 +174,6 @@ export const crearEncuentroDesdeCita = async (
       medicoId,
       motivoConsulta,
       enfermedadActual,
-      signosVitales,
       impresionDiagnostica,
       tratamiento,
       observaciones,
@@ -246,21 +227,6 @@ export const crearEncuentroDesdeCita = async (
         },
       });
 
-      // Crear signos vitales
-      if (signosVitales) {
-        await tx.signosVitales.create({
-          data: {
-            encuentroId: encuentro.id,
-            taSistolica: signosVitales.taSistolica ? parseInt(signosVitales.taSistolica) : null,
-            taDiastolica: signosVitales.taDiastolica ? parseInt(signosVitales.taDiastolica) : null,
-            pulso: signosVitales.pulso ? parseInt(signosVitales.pulso) : null,
-            temperatura: signosVitales.temperatura ? parseFloat(signosVitales.temperatura) : null,
-            fr: signosVitales.fr ? parseInt(signosVitales.fr) : null,
-            observaciones: observaciones,
-          },
-        });
-      }
-
       // Crear impresión diagnóstica
       if (impresionDiagnostica || tratamiento) {
         await tx.impresionDiagnostica.create({
@@ -300,7 +266,6 @@ export const crearEncuentroDesdeCita = async (
               nombre: true,
             },
           },
-          signosVitales: true,
           impresiones: true,
         },
       });
@@ -370,7 +335,6 @@ export const obtenerEncuentrosPorPaciente = async (
             role: true,
           },
         },
-        signosVitales: true,
         impresiones: true,
         admision: {
           select: {
@@ -447,11 +411,6 @@ export const obtenerEncuentroPorId = async (
             cargo: true,
             role: true,
             email: true,
-          },
-        },
-        signosVitales: {
-          orderBy: {
-            registradoEn: 'desc',
           },
         },
         examenRegional: true,
@@ -538,7 +497,6 @@ export const obtenerEncuentrosHoy = async (
             cargo: true,
           },
         },
-        signosVitales: true,
       },
       orderBy: [
         { hora: 'desc' },

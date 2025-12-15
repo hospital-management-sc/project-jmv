@@ -481,6 +481,12 @@ export const activarAdmision = async (req: Request, res: Response) => {
 /**
  * Listar pacientes hospitalizados actualmente (admisiones activas)
  * GET /api/admisiones/activas
+ * 
+ * Filtra:
+ * - Estado: ACTIVA
+ * - Tipo: EMERGENCIA, HOSPITALIZACION, UCI, CIRUGIA
+ * - Para EMERGENCIA: Solo si requiereHospitalizacion = true
+ * - Para otros tipos: Todos se consideran hospitalizados
  */
 export const listarAdmisionesActivas = async (req: Request, res: Response) => {
   try {
@@ -523,22 +529,41 @@ export const listarAdmisionesActivas = async (req: Request, res: Response) => {
             cargo: true,
           },
         },
+        // Incluir formato de emergencia para verificar requiereHospitalizacion
+        formatoEmergencia: {
+          select: {
+            requiereHospitalizacion: true,
+          },
+        },
       },
       orderBy: {
         fechaAdmision: 'desc',
       },
     });
 
+    // Filtrar admisiones: excluir emergencias que NO requieran hospitalización
+    const admisionesFiltradas = admisiones.filter((admision) => {
+      // Si es emergencia, solo incluir si requiereHospitalizacion = true
+      if (admision.tipo === 'EMERGENCIA') {
+        return admision.formatoEmergencia?.requiereHospitalizacion === true;
+      }
+      // Otros tipos (HOSPITALIZACION, UCI, CIRUGIA) siempre se incluyen
+      return true;
+    });
+
     // Calcular días de hospitalización para cada admisión activa
-    const admisionesConDias = admisiones.map((admision) => {
+    const admisionesConDias = admisionesFiltradas.map((admision) => {
       const fechaAdmision = new Date(admision.fechaAdmision);
       const hoy = new Date();
       const diasHospitalizacion = Math.ceil(
         (hoy.getTime() - fechaAdmision.getTime()) / (1000 * 60 * 60 * 24)
       );
 
+      // Remover formatoEmergencia del objeto antes de serializar
+      const { formatoEmergencia, ...admisionSinFormato } = admision;
+
       return {
-        ...admision,
+        ...admisionSinFormato,
         diasHospitalizacion,
       };
     });
@@ -551,7 +576,7 @@ export const listarAdmisionesActivas = async (req: Request, res: Response) => {
     );
 
     return res.status(200).json({
-      total: admisiones.length,
+      total: admisionesFiltradas.length,
       admisiones: admisionesSerializadas,
     });
   } catch (error) {
