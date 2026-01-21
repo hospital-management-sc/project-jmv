@@ -1,20 +1,32 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
+// ** Dependencies
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+
+// ** Utils
+import { testAPI } from './utils/testAPI';
+import { setupDiagnosticsCommand } from './utils/diagnostics';
+
+// ** Providers
+import ThemeProvider from './providers/ThemeProvider';
+
+// ** Components
 import App from './App.tsx'
-import { testAPI } from './utils/testAPI'
-import { setupDiagnosticsCommand } from './utils/diagnostics'
+
+// ** Styles
+import './index.css';
 
 // Make testAPI available in console for debugging
-if (typeof window !== 'undefined') {
-  ;(window as any)._testAPI = testAPI
+if ( typeof window !== 'undefined' ) {
+  (window as any)._testAPI = testAPI;
   
   // Setup diagnostics
-  setupDiagnosticsCommand()
+  setupDiagnosticsCommand();
 }
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
-)
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  </StrictMode>
+);

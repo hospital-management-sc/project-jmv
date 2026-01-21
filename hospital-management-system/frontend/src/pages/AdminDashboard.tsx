@@ -3,15 +3,31 @@
  * Vista especializada para gestión administrativa y control de usuarios
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type ReactElement as JSX } from 'react'
 import styles from './AdminDashboard.module.css'
 import { useDashboardStats } from '../hooks/useDashboardStats'
 
+// import { Sidebar, SidebarInset } from '@components/ui/sidebar';
+import { Avatar, AvatarFallback, AvatarImage } from '@components/ui/avatar';
+import { Button } from '@components/ui/button';
+import { LogOut, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+import useAuth from '@hooks/useAuth';
+
 type ViewMode = 'main' | 'register-patient' | 'create-appointment' | 'search-patient'
 
-export default function AdminDashboard() {
-  const [viewMode, setViewMode] = useState<ViewMode>('main')
-  const { stats, loading, error } = useDashboardStats(30000) // Actualizar cada 30 segundos
+function AdminDashboard(): JSX {
+
+  const [ viewMode, setViewMode ] = useState<ViewMode>('main');
+  const { stats, loading, error } = useDashboardStats(30000); // Actualizar cada 30 segundos
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const renderMainView = () => (
     <>
@@ -78,39 +94,105 @@ export default function AdminDashboard() {
         </div>
       </section>
     </>
-  )
+  );
+  
+  // <div className={styles['dashboard-container']}>
 
   return (
-    <div className={styles['dashboard-container']}>
-      <header className={styles['dashboard-header']}>
-        <div className={styles['header-content']}>
-          <div>
-            <h1>Dashboard Administrativo</h1>
-            <p className={styles.subtitle}>Panel de control administrativo del sistema</p>
+    <div className="flex h-screen w-full text-foreground overflow-hidden">
+      {/* <Sidebar> */}
+        <div className="flex flex-col h-full sidebar w-[20%] border-r-1 border-gray-600">
+          <div className="p-10 border-b border-gray-600" style={{ padding: '10px' }}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-12 w-12 bg-white">
+                  <AvatarImage src="" alt={user?.nombre}/>
+                  <AvatarFallback className="border-1 border-gray-300">
+                    {user?.nombre.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-semibold text-white">
+                  {user?.nombre}
+                </span>
+              </div> 
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  style={{ background: 'transparent' }}
+                  onClick={handleLogout}
+                  className="h-8 w-8 hover:bg-gray-300 rounded-full cursor-pointer"
+                >
+                  <LogOut className="h-5 w-5 text-(--color-primary)" />
+                  <span className="sr-only">Logout</span>
+                </Button>
+            </div>
           </div>
-          {viewMode !== 'main' && (
-            <button 
-              className={styles['back-btn']}
-              onClick={() => setViewMode('main')}
-            >
-              ← Volver al Dashboard
-            </button>
-          )}
+          <ul>
+            <li className="flex items-center justify-between gap-3 border-b border-gray-600" style={{ padding: '10px' }}>
+              <a onClick={() => setViewMode('register-patient')} className="flex items-center gap-3 relative w-full cursor-pointer">
+                <span className="text-sm font-semibold text-white">
+                  Registrar nuevo paciente
+                </span>
+                <ArrowRight className="h-5 w-5 text-(--color-primary) absolute right-0" />
+                <span className="sr-only">Logout</span>
+              </a> 
+            </li>
+            <li className="flex items-center justify-between gap-3 border-b border-gray-600" style={{ padding: '10px' }}>
+              <a onClick={() => setViewMode('create-appointment')} className="flex items-center gap-3 relative w-full cursor-pointer">
+                <span className="text-sm font-semibold text-white">
+                  Generar cita medica
+                </span>
+                <ArrowRight className="h-5 w-5 text-(--color-primary) absolute right-0" />
+                <span className="sr-only">Logout</span>
+              </a> 
+            </li>
+            <li className="flex items-center justify-between gap-3 border-b border-gray-600" style={{ padding: '10px' }}>
+              <a onClick={() => setViewMode('search-patient')} className="flex items-center gap-3 relative w-full cursor-pointer">
+                <span className="text-sm font-semibold text-white">
+                  Consultar historia clinica
+                </span>
+                <ArrowRight className="h-5 w-5 text-(--color-primary) absolute right-0" />
+                <span className="sr-only">Logout</span>
+              </a> 
+            </li>
+          </ul>
         </div>
-      </header>
+      {/* </Sidebar> */}
+      {/* <SidebarInset> */}
+        {/* <div className={styles['dashboard-header']}> */}
+        <div className="content w-[80%]" style={{ padding: '10px' }}>
+          <div className={styles['dashboard-header']}>
+            <div className={styles['header-content']}>
+              <div>
+                <h1>Dashboard Administrativo</h1>
+                <p className={styles.subtitle}>Panel de control administrativo del sistema</p>
+              </div>
+              {viewMode !== 'main' && (
+                <button 
+                  className={styles['back-btn']}
+                  onClick={() => setViewMode('main')}
+                >
+                  ← Volver al Dashboard
+                </button>
+              )}
+            </div>
+          </div>
 
-      <main className={styles['dashboard-main']}>
-        {viewMode === 'main' && renderMainView()}
-        {viewMode === 'register-patient' && <RegisterPatientForm />}
-        {viewMode === 'create-appointment' && <CreateAppointmentForm />}
-        {viewMode === 'search-patient' && <SearchPatientView />}
-      </main>
+          <div className={styles['dashboard-main']}>
+            {viewMode === 'main' && renderMainView()}
+            {viewMode === 'register-patient' && <RegisterPatientForm />}
+            {viewMode === 'create-appointment' && <CreateAppointmentForm />}
+            {viewMode === 'search-patient' && <SearchPatientView />}
+          </div>
+        </div>
+      {/* </SidebarInset> */}
     </div>
-  )
+  );
 }
 
 // Componente para registrar nuevo paciente
 function RegisterPatientForm() {
+
   const [formData, setFormData] = useState({
     // ADMISION
     nroHistoria: '',
@@ -724,17 +806,18 @@ function RegisterPatientForm() {
         </div>
       </form>
     </section>
-  )
+  );
 }
 
 // Componente para crear cita médica
 function CreateAppointmentForm() {
-  const [searchCITipo, setSearchCITipo] = useState('V')
-  const [searchCINumeros, setSearchCINumeros] = useState('')
-  const [selectedPatient, setSelectedPatient] = useState<any>(null)
-  const [searchLoading, setSearchLoading] = useState(false)
-  const [searchError, setSearchError] = useState('')
-  const [especialidades, setEspecialidades] = useState<string[]>([
+
+  const [ searchCITipo, setSearchCITipo ] = useState('V');
+  const [ searchCINumeros, setSearchCINumeros ] = useState('');
+  const [ selectedPatient, setSelectedPatient ] = useState<any>(null);
+  const [ searchLoading, setSearchLoading ] = useState(false);
+  const [ searchError, setSearchError ] = useState('');
+  const [ especialidades, setEspecialidades ] = useState<string[]>([
     'Medicina General',
     'Cardiología',
     'Traumatología',
@@ -743,27 +826,26 @@ function CreateAppointmentForm() {
     'Cirugía',
     'Neurología',
     'Oftalmología',
-  ])
-  const [citasExistentes, setCitasExistentes] = useState<any[]>([])
-
+  ]);
+  const [ citasExistentes, setCitasExistentes ] = useState<any[]>([]);
   const [appointmentData, setAppointmentData] = useState({
     fecha: '',
     hora: '',
     especialidad: '',
     medico: '',
     motivo: '',
-  })
+  });
 
-  const [errors, setErrors] = useState<{[key: string]: string}>({})
-  const [submitLoading, setSubmitLoading] = useState(false)
-  const [submitMessage, setSubmitMessage] = useState('')
+  const [ errors, setErrors ] = useState<{[key: string]: string}>({});
+  const [ submitLoading, setSubmitLoading ] = useState(false);
+  const [ submitMessage, setSubmitMessage ] = useState('');
 
   const handleSearchCINumerosChange = (value: string) => {
     // Solo permitir dígitos, extraer solo los números del paste
-    const soloNumeros = value.replace(/\D/g, '').slice(0, 8)
-    setSearchCINumeros(soloNumeros)
-    setSearchError('')
-  }
+    const soloNumeros = value.replace(/\D/g, '').slice(0, 8);
+    setSearchCINumeros(soloNumeros);
+    setSearchError('');
+  };
 
   // Cargar especialidades al montar el componente
   useEffect(() => {
@@ -1557,3 +1639,5 @@ function SearchPatientView() {
     </section>
   )
 }
+
+export default AdminDashboard;

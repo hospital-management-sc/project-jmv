@@ -19,15 +19,17 @@
     /* Path aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@pages/*": ["src/pages/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@types/*": ["src/types/*"],
-      "@utils/*": ["src/utils/*"],
-      "@services/*": ["src/services/*"],
-      "@styles/*": ["src/styles/*"],
-      "@hooks/*": ["src/hooks/*"]
+      "@/*": [" src/*" ],
+      "@components/*": [ "src/components/*" ],
+      "@providers/*": [ "src/providers/*" ],
+      "@contexts/*": [ "src/contexts/*" ],
+      "@pages/*": [ "src/pages/*" ],
+      "@layouts/*": [ "src/layouts/*" ],
+      "@types/*": [ "src/types/*" ],
+      "@utils/*": [ "src/utils/*" ],
+      "@services/*": [ "src/services/*" ],
+      "@styles/*": [ "src/styles/*" ],
+      "@hooks/*": [ "src/hooks/*" ]
     },
 
     /* Linting */
