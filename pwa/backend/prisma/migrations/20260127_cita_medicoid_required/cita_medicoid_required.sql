@@ -1,0 +1,3 @@
+ALTER TABLE "Cita"
+ALTER COLUMN "medicoId"
+SET NOT NULL;

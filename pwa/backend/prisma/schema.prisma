@@ -482,7 +482,7 @@ model FormatoHospitalizacion {
 model SignosVitalesHosp {
   id            Int   @id @default(autoincrement())
   formatoHospId Int
-  fecha         DateTime @db.Date
+    medicoId            Int
   hora          DateTime @db.Time
 
   // Signos vitales completos
@@ -502,6 +502,25 @@ model SignosVitalesHosp {
   formatoHosp FormatoHospitalizacion @relation(fields: [formatoHospId], references: [id], onDelete: Cascade)
 
   @@index([formatoHospId])
+  model HorarioMedico {
+    id               Int      @id @default(autoincrement())
+    usuarioId        Int
+    especialidad     String   @db.VarChar(100)
+    diaSemana        Int
+    horaInicio       String   @db.VarChar(8)
+    horaFin          String   @db.VarChar(8)
+    capacidadPorDia  Int
+    activo           Boolean  @default(true)
+    createdAt        DateTime @default(now()) @db.Timestamptz()
+    updatedAt        DateTime @updatedAt @db.Timestamptz()
+
+    usuario          Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+    @@index([usuarioId])
+    @@index([especialidad])
+    @@index([diaSemana])
+    @@unique([usuarioId, especialidad, diaSemana])
+  }
   @@index([fecha])
 }
 
