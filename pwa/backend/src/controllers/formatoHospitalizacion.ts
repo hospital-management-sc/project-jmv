@@ -47,7 +47,7 @@ export const getFormatoByAdmision = async (req: Request, res: Response): Promise
     const formato = await prisma.formatoHospitalizacion.findFirst({
       where: { admisionId: Number(admisionId) },
       include: {
-        signosVitales: { orderBy: { fecha: 'desc' } },
+        signosVitales: { orderBy: { createdAt: 'desc' } },
         laboratorios: { orderBy: { fecha: 'desc' } },
         estudiosEspeciales: { orderBy: { fecha: 'desc' } },
         electrocardiogramas: { orderBy: { fecha: 'desc' } },

@@ -21,19 +21,19 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
   const [searchError, setSearchError] = useState('')
   const [especialidades, setEspecialidades] = useState<string[]>([
     'Medicina Interna',
-    'Medicina Paleativa',
+    'Medicina Paliativa',
     'Cirugía General',
     'Pediatría',
-    'Neumo Pediatría',
+    'Neumología Pediátrica',
     'Traumatología',
     'Cirugía de Manos',
     'Odontología',
     'Otorrinolaringología',
-    'Permatología',
+    'Dermatología',
     'Fisiatría',
     'Ginecología',
     'Gastroenterología',
-    'Ematología',
+    'Hematología',
     'Psicología'
   ])
   const [citasExistentes, setCitasExistentes] = useState<any[]>([])
@@ -86,19 +86,19 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
     // Siempre usar las especialidades por defecto
     const especialidadesDefecto = [
       'Medicina Interna',
-      'Medicina Paleativa',
+      'Medicina Paliativa',
       'Cirugía General',
       'Pediatría',
-      'Neumo Pediatría',
+      'Neumología Pediátrica',
       'Traumatología',
       'Cirugía de Manos',
       'Odontología',
       'Otorrinolaringología',
-      'Permatología',
+      'Dermatología',
       'Fisiatría',
       'Ginecología',
       'Gastroenterología',
-      'Ematología',
+      'Hematología',
       'Psicología'
     ]
     setEspecialidades(especialidadesDefecto)

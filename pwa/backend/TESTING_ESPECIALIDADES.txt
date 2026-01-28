@@ -1,0 +1,194 @@
+═══════════════════════════════════════════════════════════════════════════════
+  DATOS DE PRUEBA - DOCTORES POR ESPECIALIDAD
+  Para testear dashboards especializados
+═══════════════════════════════════════════════════════════════════════════════
+
+SUPER ADMIN (para crear/gestionar personal autorizado):
+─────────────────────────────────────────────────────
+Email:    superadmin@hospital.com
+Password: SuperAdmin2024!
+Rol:      SUPER_ADMIN
+CI:       V00000001
+
+═══════════════════════════════════════════════════════════════════════════════
+DOCTORES DE PRUEBA - UNA POR CADA ESPECIALIDAD (15 TOTAL)
+═══════════════════════════════════════════════════════════════════════════════
+
+1️⃣  MEDICINA INTERNA
+   Nombre:      Dr. Carlos Eduardo García Méndez
+   CI:          V12345678
+   Email:       carlos.garcia@hospital.com
+   Rol:         MEDICO
+   Especialidad: Medicina Interna
+
+2️⃣  MEDICINA PALIATIVA
+   Nombre:      Dra. Francisca del Carmen Henríquez Soto
+   CI:          V13579246
+   Email:       francisca.henriquez@hospital.com
+   Rol:         MEDICO
+   Especialidad: Medicina Paliativa
+
+3️⃣  CIRUGÍA GENERAL
+   Nombre:      Dr. Juan Alberto Pérez Ramírez
+   CI:          V11223344
+   Email:       juan.perez@hospital.com
+   Rol:         MEDICO
+   Especialidad: Cirugía General
+
+4️⃣  PEDIATRÍA
+   Nombre:      Dra. Ana Sofía Martínez García
+   CI:          V87654321
+   Email:       ana.martinez@hospital.com
+   Rol:         MEDICO
+   Especialidad: Pediatría
+
+5️⃣  NEUMOLOGÍA PEDIÁTRICA
+   Nombre:      Dr. Andrés Felipe Rodríguez Cortés
+   CI:          V24681357
+   Email:       andres.rodriguez@hospital.com
+   Rol:         MEDICO
+   Especialidad: Neumología Pediátrica
+
+6️⃣  TRAUMATOLOGÍA
+   Nombre:      Dr. Luis Fernando Castro Mendoza
+   CI:          V44332211
+   Email:       luis.castro@hospital.com
+   Rol:         MEDICO
+   Especialidad: Traumatología
+
+7️⃣  CIRUGÍA DE MANOS
+   Nombre:      Dr. Gonzalo Javier Valenzuela Rivas
+   CI:          V35791113
+   Email:       gonzalo.valenzuela@hospital.com
+   Rol:         MEDICO
+   Especialidad: Cirugía de Manos
+
+8️⃣  ODONTOLOGÍA
+   Nombre:      Dra. Viviana Catalina Morales Bravo
+   CI:          V46802468
+   Email:       viviana.morales@hospital.com
+   Rol:         MEDICO
+   Especialidad: Odontología
+
+9️⃣  OTORRINOLARINGOLOGÍA
+   Nombre:      Dr. Pedro Andrés Flores Reyes
+   CI:          V66778899
+   Email:       pedro.flores@hospital.com
+   Rol:         MEDICO
+   Especialidad: Otorrinolaringología
+
+🔟 DERMATOLOGÍA
+   Nombre:      Dra. Vanessa Irina Moreno Díaz
+   CI:          V22334455
+   Email:       vanessa.moreno@hospital.com
+   Rol:         MEDICO
+   Especialidad: Dermatología
+
+1️⃣1️⃣ FISIATRÍA
+   Nombre:      Dr. Cristóbal Miguel Sánchez López
+   CI:          V57912346
+   Email:       cristobal.sanchez@hospital.com
+   Rol:         MEDICO
+   Especialidad: Fisiatría
+
+1️⃣2️⃣ GINECOLOGÍA
+   Nombre:      Dra. María Elena López Rodríguez
+   CI:          V55667788
+   Email:       maria.elena@hospital.com
+   Rol:         MEDICO
+   Especialidad: Ginecología
+
+1️⃣3️⃣ GASTROENTEROLOGÍA
+   Nombre:      Dr. Roberto Ignacio Vargas Muñoz
+   CI:          V68024680
+   Email:       roberto.vargas@hospital.com
+   Rol:         MEDICO
+   Especialidad: Gastroenterología
+
+1️⃣4️⃣ HEMATOLOGÍA
+   Nombre:      Dra. Eliana Patricia Reyes Serrano
+   CI:          V79135792
+   Email:       eliana.reyes@hospital.com
+   Rol:         MEDICO
+   Especialidad: Hematología
+
+1️⃣5️⃣ PSICOLOGÍA
+   Nombre:      Dr. Enrique Sebastián Díaz Flores
+   CI:          V80246813
+   Email:       enrique.diaz@hospital.com
+   Rol:         MEDICO
+   Especialidad: Psicología
+
+ADMIN:
+   Nombre:      Dr. Roberto José Hernández Blanco
+   CI:          V99887766
+   Email:       roberto.hernandez@hospital.com
+   Rol:         ADMIN
+
+═══════════════════════════════════════════════════════════════════════════════
+CÓMO TESTEAR
+═══════════════════════════════════════════════════════════════════════════════
+
+1. REGISTRAR UN DOCTOR:
+   - Ve a la página de registro
+   - Selecciona uno de los doctores de la lista anterior
+   - El CI y nombre deben coincidir EXACTAMENTE con la whitelist
+   - El doctor quedará registrado con su especialidad
+
+2. HACER LOGIN:
+   - Usa email + password (que configures en el registro)
+   - El JWT incluirá la especialidad
+
+3. ACCEDER AL DASHBOARD:
+   - El dashboard se personalizará según la especialidad
+   - Podrás ver opciones específicas de esa especialidad
+   - Los campos del formulario serán específicos
+
+4. VERIFICAR ESPECIALIDAD EN TOKEN:
+   - Abre DevTools (F12)
+   - Ve a Storage → Local Storage
+   - Busca "authToken"
+   - Decodifica el JWT (usa jwt.io)
+   - Verifica que contenga la especialidad
+
+═══════════════════════════════════════════════════════════════════════════════
+CASOS DE PRUEBA RECOMENDADOS
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ Caso 1: Registro con especialidad
+   - Registrar: Dra. Ana Sofía Martínez García (Pediatría)
+   - Verificar que el dashboard muestre opciones de Pediatría
+   - Verificar especialidad en JWT
+
+✅ Caso 2: Dashboard especializado
+   - Hacer login como doctor de Cirugía General
+   - Verificar que muestre opciones de cirugía
+   - Comparar con dashboard de Pediatría (debe ser diferente)
+
+✅ Caso 3: Múltiples especialidades
+   - Registrar doctores de 3-4 especialidades diferentes
+   - Cambiar entre ellos
+   - Verificar que cada uno vea su dashboard personalizado
+
+✅ Caso 4: Rechazo sin whitelist
+   - Intentar registrar con CI no autorizado
+   - Debe mostrar error: "Personal no autorizado"
+
+═══════════════════════════════════════════════════════════════════════════════
+NOTAS IMPORTANTES
+═══════════════════════════════════════════════════════════════════════════════
+
+⚠️  Los datos se crearon con el seed en:
+    pwa/backend/prisma/seeds/seed.ts
+
+⚠️  El CI y nombre deben coincidir EXACTAMENTE durante registro
+
+⚠️  La especialidad se captura de PersonalAutorizado durante el registro
+
+⚠️  El JWT incluye especialidad en payload para acceso inmediato
+
+⚠️  Las 15 especialidades están centralizadas en:
+    - pwa/frontend/src/config/especialidades.config.ts
+    - pwa/backend/src/config/especialidades.config.ts
+
+═══════════════════════════════════════════════════════════════════════════════

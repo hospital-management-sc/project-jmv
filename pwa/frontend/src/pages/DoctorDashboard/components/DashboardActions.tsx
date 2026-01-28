@@ -1,14 +1,16 @@
 import type { ViewMode } from "../interfaces";
 import styles from "../DoctorDashboard.module.css";
+import { useEspecialidad } from "@/hooks/useEspecialidad";
 
 interface Props {
   onClick: (view: ViewMode) => void;
 }
 
 export default function DashboardActions({ onClick }: Props) {
+  const { nombre, opcionesEspeciales } = useEspecialidad()
   return (
     <section className={styles["management-section"]}>
-      <h2>Acciones Clínicas</h2>
+      <h2>Acciones Clínicas {nombre && `- ${nombre}`}</h2>
       <div className={styles["action-grid"]}>
         <button
           className={styles["action-btn"]}
