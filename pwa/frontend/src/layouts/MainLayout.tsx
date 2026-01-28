@@ -19,7 +19,10 @@ export default function MainLayout() {
           <nav className={styles.nav}>
             {isAuthenticated && (
               <>
-                <span className={styles.userInfo}>{user?.nombre}</span>
+                <span className={styles.userInfo}>
+                  {user?.nombre}
+                  {user?.especialidad && <span className={styles.especialidad}> • {user.especialidad}</span>}
+                </span>
                 <button onClick={handleLogout} className={styles.logoutBtn}>
                   Cerrar Sesión
                 </button>

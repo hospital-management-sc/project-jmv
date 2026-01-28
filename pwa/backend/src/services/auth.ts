@@ -39,6 +39,7 @@ interface TokenResponse {
   nombre: string;
   email: string;
   role: string;
+  especialidad?: string | null;
   token: string;
   refreshToken?: string;
 }
@@ -48,13 +49,14 @@ interface TokenResponse {
  */
 export const generateToken = (
   id: number,
+  nombre: string,
   email: string,
   role: string,
   especialidad?: string | null,
   departamento?: string | null
 ): string => {
   return jwt.sign(
-    { id, email, role, especialidad: especialidad || undefined, departamento: departamento || undefined },
+    { id, nombre, email, role, especialidad: especialidad || undefined, departamento: departamento || undefined },
     JWT_SECRET as string,
     { expiresIn: JWT_EXPIRY as any }
   );
@@ -109,7 +111,8 @@ export const loginUser = async (payload: LoginPayload): Promise<TokenResponse> =
 
   // Generate token
   const token = generateToken(
-    Number(user.id), 
+    Number(user.id),
+    user.nombre || '',
     user.email || '', 
     user.role || '',
     user.especialidad,
@@ -123,6 +126,7 @@ export const loginUser = async (payload: LoginPayload): Promise<TokenResponse> =
     nombre: user.nombre,
     email: user.email || '',
     role: user.role || '',
+    especialidad: user.especialidad,
     token,
   };
 };
@@ -258,7 +262,8 @@ export const registerUser = async (payload: RegisterPayload): Promise<TokenRespo
 
   // Generate token
   const token = generateToken(
-    Number(newUser.id), 
+    Number(newUser.id),
+    newUser.nombre || '',
     newUser.email || '', 
     newUser.role || '',
     newUser.especialidad,
@@ -272,6 +277,7 @@ export const registerUser = async (payload: RegisterPayload): Promise<TokenRespo
     nombre: newUser.nombre,
     email: newUser.email || '',
     role: newUser.role || '',
+    especialidad: newUser.especialidad,
     token,
   };
 };
