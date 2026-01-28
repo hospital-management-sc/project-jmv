@@ -268,6 +268,7 @@ model Encuentro {
   enfermedadActual String?   @db.Text
   procedencia      String?   @db.VarChar(200)
   nroCama          String?   @db.VarChar(50)
+  examenFisico     Json?     // Examen físico genérico (JSONB) - personalizable por especialidad
   createdById      Int?
   createdAt        DateTime  @default(now()) @db.Timestamptz()
   updatedAt        DateTime  @updatedAt @db.Timestamptz()

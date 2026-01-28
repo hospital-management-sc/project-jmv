@@ -1,52 +1,63 @@
 // ==========================================
-// COMPONENTE: Registrar Encuentro
+// COMPONENTE: Registrar Encuentro (DINÁMICO)
 // ==========================================
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import styles from "../DoctorDashboard.module.css";
 import type { PatientBasic } from "../interfaces";
 import { API_BASE_URL } from "@/utils/constants";
 import { getTodayVenezuelaISO, getCurrentTimeVenezuela } from "@/utils/dateUtils";
 import { encuentrosService } from "@/services";
+import { obtenerEspecialidadPorId, type CampoFormulario } from "@/config/especialidades.config";
 import { toast } from "sonner";
 
 interface Props {
   patient: PatientBasic | null;
   doctorId: number;
+  especialidadId: string; // NUEVO: ID de especialidad para personalización
 }
-export default function RegisterEncounter({ patient = null, doctorId }: Props) {
+
+export default function RegisterEncounter({ patient = null, doctorId, especialidadId }: Props) {
+  // Obtener configuración de especialidad por ID
+  const especialidad = useMemo(() => obtenerEspecialidadPorId(especialidadId), [especialidadId]);
+  const formularioConfig = especialidad?.formularioEspecializado;
+
+  // Log para debugging
+  if (!formularioConfig) {
+    console.warn(`⚠️ No hay formularioEspecializado para ID: ${especialidadId}. Especialidad encontrada:`, especialidad?.nombre);
+  }
+
   const [step, setStep] = useState(patient ? 2 : 1);
-  // Dual input para CI
-  const [searchCITipo, setSearchCITipo] = useState<'V' | 'E' | 'P'>('V');
-  const [searchCINumeros, setSearchCINumeros] = useState(patient ? patient?.ci.split('-')[1] : "");
   const [paciente, setPaciente] = useState<PatientBasic | null>(patient);
   const [searching, setSearching] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [ciErrors, setCIErrors] = useState<{[key: string]: string}>({});
-  const [formData, setFormData] = useState({
-    tipo: "CONSULTA" as "EMERGENCIA" | "HOSPITALIZACION" | "CONSULTA" | "OTRO",
+  const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({});
+  
+  // FormData dinámico: inicializar todos los campos de la configuración
+  const [formData, setFormData] = useState<{[key: string]: string | number}>({
+    tipo: "CONSULTA",
+    ciTipo: "V",
+    ciNumeros: patient ? patient?.ci.split('-')[1] : "",
+    ...initializeFormDataFromConfig(formularioConfig),
+    // Estos valores SIEMPRE deben tener la fecha/hora actual de Venezuela
     fecha: getTodayVenezuelaISO(),
     hora: getCurrentTimeVenezuela(),
-    motivoConsulta: "",
-    enfermedadActual: "",
-    procedencia: "",
-    nroCama: "",
-    // Signos vitales
-    taSistolica: "",
-    taDiastolica: "",
-    pulso: "",
-    temperatura: "",
-    fr: "",
-    // Diagnóstico
-    diagnostico: "",
-    codigoCie: "",
-    tratamiento: "",
-    observaciones: "",
   });
 
-  // TODO: Obtener ID del médico del contexto de autenticación
-  // const medicoId = 1;
+  function initializeFormDataFromConfig(config?: typeof formularioConfig): {[key: string]: string} {
+    if (!config) return {};
+    const initial: {[key: string]: string} = {};
+    config.pasos.forEach(paso => {
+      paso.campos.forEach(campo => {
+        // NO inicializar fecha y hora aquí, se establecen después
+        if (campo.id !== 'fecha' && campo.id !== 'hora') {
+          initial[campo.id] = "";
+        }
+      });
+    });
+    return initial;
+  }
 
   // Validar números de cédula (7-9 dígitos)
   const validateCINumeros = (value: string): boolean => {
@@ -59,29 +70,35 @@ export default function RegisterEncounter({ patient = null, doctorId }: Props) {
     return value.length >= 7 && value.length <= 9
   }
 
+  const handleFieldChange = (fieldId: string, value: string | number) => {
+    setFormData({ ...formData, [fieldId]: value });
+    setFieldErrors({ ...fieldErrors, [fieldId]: '' });
+  }
+
   const handleCINumerosChange = (value: string) => {
     if (validateCINumeros(value)) {
-      setSearchCINumeros(value)
-      setCIErrors({...ciErrors, searchCINumeros: ''})
+      handleFieldChange('ciNumeros', value);
     }
   }
 
   const buscarPaciente = async () => {
     const newErrors: {[key: string]: string} = {}
+    const ciNumeros = String(formData.ciNumeros || "").trim();
+    const ciTipo = String(formData.ciTipo || "V").trim();
     
-    if (!searchCINumeros.trim()) {
-      newErrors.searchCINumeros = "Ingrese un número de cédula";
+    if (!ciNumeros) {
+      newErrors.ciNumeros = "Ingrese un número de cédula";
     }
-    if (searchCINumeros && !validateCINumerosLength(searchCINumeros)) {
-      newErrors.searchCINumeros = "Debe tener entre 7 y 9 dígitos";
+    if (ciNumeros && !validateCINumerosLength(ciNumeros)) {
+      newErrors.ciNumeros = "Debe tener entre 7 y 9 dígitos";
     }
 
     if (Object.keys(newErrors).length > 0) {
-      setCIErrors(newErrors)
+      setFieldErrors(newErrors)
       return;
     }
 
-    const fullCI = `${searchCITipo}-${searchCINumeros}`;
+    const fullCI = `${ciTipo}-${ciNumeros}`;
     setSearching(true);
     setError("");
     try {
@@ -96,8 +113,10 @@ export default function RegisterEncounter({ patient = null, doctorId }: Props) {
         toast.error('Paciente no encontrado')
         setError("Paciente no encontrado");
       }
-    } catch {
+    } catch (err) {
+      console.error("Error buscando paciente:", err);
       setError("Error al buscar paciente");
+      toast.error("Error al buscar paciente");
     } finally {
       setSearching(false);
     }
@@ -112,7 +131,7 @@ export default function RegisterEncounter({ patient = null, doctorId }: Props) {
       return;
     }
 
-    if (!formData.motivoConsulta.trim()) {
+    if (!formData.motivoConsulta) {
       toast.error('El motivo de consulta es obligatorio')
       setError("El motivo de consulta es obligatorio");
       return;
@@ -132,39 +151,53 @@ export default function RegisterEncounter({ patient = null, doctorId }: Props) {
         formData.fr
           ? {
               taSistolica: formData.taSistolica
-                ? parseInt(formData.taSistolica)
+                ? parseInt(String(formData.taSistolica))
                 : undefined,
               taDiastolica: formData.taDiastolica
-                ? parseInt(formData.taDiastolica)
+                ? parseInt(String(formData.taDiastolica))
                 : undefined,
-              pulso: formData.pulso ? parseInt(formData.pulso) : undefined,
+              pulso: formData.pulso ? parseInt(String(formData.pulso)) : undefined,
               temperatura: formData.temperatura
-                ? parseFloat(formData.temperatura)
+                ? parseFloat(String(formData.temperatura))
                 : undefined,
-              fr: formData.fr ? parseInt(formData.fr) : undefined,
+              fr: formData.fr ? parseInt(String(formData.fr)) : undefined,
             }
           : undefined;
 
       // Construir objeto de impresión diagnóstica solo si hay datos
       const impresionDiagnostica = formData.diagnostico
         ? {
-            descripcion: formData.diagnostico,
-            codigoCie: formData.codigoCie || undefined,
+            descripcion: String(formData.diagnostico),
+            codigoCie: formData.codigoCie ? String(formData.codigoCie) : undefined,
           }
         : undefined;
 
+      // Construir objeto de examen físico (JSONB) desde campos dinámicos
+      const examenFisico: {[key: string]: string | undefined} = {};
+      if (formularioConfig) {
+        const pasoExamen = formularioConfig.pasos.find(p => p.numero === 3);
+        if (pasoExamen) {
+          pasoExamen.campos.forEach(campo => {
+            if (formData[campo.id]) {
+              examenFisico[campo.id] = String(formData[campo.id]);
+            }
+          });
+        }
+      }
+
       const encuentroData = {
         pacienteId: parseInt(paciente.id),
-        tipo: formData.tipo,
-        fecha: formData.fecha,
-        hora: formData.hora,
-        motivoConsulta: formData.motivoConsulta,
-        enfermedadActual: formData.enfermedadActual || undefined,
-        procedencia: formData.procedencia || undefined,
-        nroCama: formData.nroCama || undefined,
+        tipo: String(formData.tipo) as "CONSULTA" | "EMERGENCIA" | "HOSPITALIZACION" | "OTRO",
+        fecha: String(formData.fecha),
+        hora: String(formData.hora),
+        motivoConsulta: String(formData.motivoConsulta),
+        enfermedadActual: formData.enfermedadActual ? String(formData.enfermedadActual) : undefined,
+        procedencia: formData.procedencia ? String(formData.procedencia) : undefined,
+        nroCama: formData.nroCama ? String(formData.nroCama) : undefined,
         createdById: doctorId,
         signosVitales,
         impresionDiagnostica,
+        examenFisico: Object.keys(examenFisico).length > 0 ? examenFisico : undefined,
       };
 
       await encuentrosService.crearEncuentro(encuentroData);
@@ -176,28 +209,16 @@ export default function RegisterEncounter({ patient = null, doctorId }: Props) {
       setTimeout(() => {
         setStep(1);
         setPaciente(null);
-        setSearchCITipo('V');
-        setSearchCINumeros("");
         setFormData({
           tipo: "CONSULTA",
           fecha: getTodayVenezuelaISO(),
           hora: getCurrentTimeVenezuela(),
-          motivoConsulta: "",
-          enfermedadActual: "",
-          procedencia: "",
-          nroCama: "",
-          taSistolica: "",
-          taDiastolica: "",
-          pulso: "",
-          temperatura: "",
-          fr: "",
-          diagnostico: "",
-          codigoCie: "",
-          tratamiento: "",
-          observaciones: "",
+          ciTipo: "V",
+          ciNumeros: "",
+          ...initializeFormDataFromConfig(formularioConfig),
         });
         setSuccessMessage("");
-        setCIErrors({});
+        setFieldErrors({});
       }, 2000);
     } catch (err: unknown) {
       const errorMessage =
@@ -214,363 +235,242 @@ export default function RegisterEncounter({ patient = null, doctorId }: Props) {
       <div className={styles["section-header"]}>
         <h2>📝 Registrar Nuevo Encuentro</h2>
         <p className={styles["section-subtitle"]}>
-          Documente atenciones médicas: consultas, emergencias o evoluciones
-          hospitalarias
+          {especialidad?.nombre || "Especialidad"} - Documente atenciones médicas
         </p>
       </div>
 
-      {/* Step Indicator */}
-      <div className={styles["step-indicator"]}>
-        <div className={`${styles.step} ${step >= 1 ? styles.active : ""}`}>
-          <span className={styles["step-number"]}>1</span>
-          <span className={styles["step-label"]}>Buscar Paciente</span>
-        </div>
-        <div className={styles["step-line"]}></div>
-        <div className={`${styles.step} ${step >= 2 ? styles.active : ""}`}>
-          <span className={styles["step-number"]}>2</span>
-          <span className={styles["step-label"]}>Datos del Encuentro</span>
-        </div>
-        <div className={styles["step-line"]}></div>
-        <div className={`${styles.step} ${step >= 3 ? styles.active : ""}`}>
-          <span className={styles["step-number"]}>3</span>
-          <span className={styles["step-label"]}>Signos y Diagnóstico</span>
-        </div>
-      </div>
-
-      {/* Step 1: Buscar Paciente */}
-      {step === 1 && (
+      {!formularioConfig ? (
         <div className={styles["form-card"]}>
-          <h3>Buscar Paciente por Cédula</h3>
-          <div className={styles["search-box"]}>
-            <div className={styles["dual-input-group"]}>
-              <select
-                value={searchCITipo}
-                onChange={(e) => setSearchCITipo(e.target.value as 'V' | 'E' | 'P')}
-              >
-                <option value="V">V</option>
-                <option value="E">E</option>
-                <option value="P">P</option>
-              </select>
-              <input
-                type="text"
-                placeholder="12345678"
-                value={searchCINumeros}
-                onChange={(e) => handleCINumerosChange(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && buscarPaciente()}
-                maxLength={9}
-              />
-            </div>
-            <button onClick={buscarPaciente} disabled={searching}>
-              {searching ? "🔄 Buscando..." : "🔍 Buscar"}
-            </button>
-          </div>
-          {ciErrors.searchCINumeros && <p className={styles["error-text"]}>{ciErrors.searchCINumeros}</p>}
-          {error && <p className={styles["error-text"]}>{error}</p>}
+          <p style={{ color: 'var(--error-color)' }}>
+            ⚠️ Configuración de formulario no disponible para esta especialidad
+          </p>
         </div>
-      )}
-
-      {/* Step 2: Datos del Encuentro */}
-      {step === 2 && paciente && (
-        <div className={styles["form-card"]}>
-          {/* Info del paciente */}
-          <div className={styles["patient-summary"]}>
-            <h3>Paciente Seleccionado</h3>
-            <div className={styles["patient-details"]}>
-              <p>
-                <strong>Nombre:</strong> {paciente.apellidosNombres}
-              </p>
-              <p>
-                <strong>CI:</strong> {paciente.ci}
-              </p>
-              <p>
-                <strong>Historia:</strong> {paciente.nroHistoria}
-              </p>
-            </div>
-            <button
-              className={styles["change-patient-btn"]}
-              onClick={() => {
-                setStep(1);
-                setPaciente(null);
-              }}
-            >
-              Cambiar paciente
-            </button>
+      ) : (
+        <>
+          {/* Step Indicator Dinámico */}
+          <div className={styles["step-indicator"]}>
+            {formularioConfig.pasos.map((paso, idx) => (
+              <div key={paso.numero}>
+                <div className={`${styles.step} ${step >= paso.numero ? styles.active : ""}`}>
+                  <span className={styles["step-number"]}>{paso.numero}</span>
+                  <span className={styles["step-label"]}>{paso.titulo}</span>
+                </div>
+                {idx < formularioConfig.pasos.length - 1 && (
+                  <div className={styles["step-line"]}></div>
+                )}
+              </div>
+            ))}
           </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setStep(3);
-            }}
-          >
-            <div className={styles["form-grid"]}>
-              <div className={styles["form-group"]}>
-                <label>Tipo de Encuentro *</label>
-                <select
-                  value={formData.tipo}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      tipo: e.target.value as
-                        | "EMERGENCIA"
-                        | "HOSPITALIZACION"
-                        | "CONSULTA"
-                        | "OTRO",
-                    })
-                  }
-                >
-                  <option value="CONSULTA">🩺 Consulta</option>
-                  <option value="EMERGENCIA">🚨 Emergencia</option>
-                  <option value="HOSPITALIZACION">
-                    🛏️ Evolución Hospitalización
-                  </option>
-                  <option value="OTRO">📋 Otro</option>
-                </select>
-              </div>
-
-              <div className={styles["form-group"]}>
-                <label>Fecha *</label>
-                <input
-                  type="date"
-                  value={formData.fecha}
-                  onChange={(e) =>
-                    setFormData({ ...formData, fecha: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className={styles["form-group"]}>
-                <label>Hora *</label>
-                <input
-                  type="time"
-                  value={formData.hora}
-                  onChange={(e) =>
-                    setFormData({ ...formData, hora: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className={styles["form-group"]}>
-                <label>Procedencia</label>
-                <input
-                  type="text"
-                  placeholder="Ej: Consulta externa, Referido de..."
-                  value={formData.procedencia}
-                  onChange={(e) =>
-                    setFormData({ ...formData, procedencia: e.target.value })
-                  }
-                />
-              </div>
-
-              <div
-                className={`${styles["form-group"]} ${styles["full-width"]}`}
-              >
-                <label>Motivo de Consulta *</label>
-                <textarea
-                  rows={3}
-                  placeholder="Describa el motivo de la consulta..."
-                  value={formData.motivoConsulta}
-                  onChange={(e) =>
-                    setFormData({ ...formData, motivoConsulta: e.target.value })
-                  }
-                />
-              </div>
-
-              <div
-                className={`${styles["form-group"]} ${styles["full-width"]}`}
-              >
-                <label>Enfermedad Actual</label>
-                <textarea
-                  rows={4}
-                  placeholder="Historia de la enfermedad actual..."
-                  value={formData.enfermedadActual}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      enfermedadActual: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </div>
-
-            <div className={styles["form-actions"]}>
-              <button
-                type="button"
-                className={styles["btn-secondary"]}
-                onClick={() => setStep(1)}
-              >
-                ← Atrás
-              </button>
-              <button type="submit" className={styles["btn-primary"]}>
-                Continuar →
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Step 3: Signos Vitales y Diagnóstico */}
-      {step === 3 && (
-        <div className={styles["form-card"]}>
-          <h3>Signos Vitales y Diagnóstico</h3>
-
-          <form onSubmit={handleSubmit}>
-            {/* Signos Vitales */}
-            <div className={styles["form-section"]}>
-              <h4>📊 Signos Vitales</h4>
-              <div className={styles["form-grid"]}>
-                <div className={styles["form-group"]}>
-                  <label>T.A. Sistólica (mmHg)</label>
-                  <input
-                    type="number"
-                    placeholder="120"
-                    value={formData.taSistolica}
-                    onChange={(e) =>
-                      setFormData({ ...formData, taSistolica: e.target.value })
-                    }
-                  />
-                </div>
-                <div className={styles["form-group"]}>
-                  <label>T.A. Diastólica (mmHg)</label>
-                  <input
-                    type="number"
-                    placeholder="80"
-                    value={formData.taDiastolica}
-                    onChange={(e) =>
-                      setFormData({ ...formData, taDiastolica: e.target.value })
-                    }
-                  />
-                </div>
-                <div className={styles["form-group"]}>
-                  <label>Pulso (lpm)</label>
-                  <input
-                    type="number"
-                    placeholder="72"
-                    value={formData.pulso}
-                    onChange={(e) =>
-                      setFormData({ ...formData, pulso: e.target.value })
-                    }
-                  />
-                </div>
-                <div className={styles["form-group"]}>
-                  <label>Temperatura (°C)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    placeholder="36.5"
-                    value={formData.temperatura}
-                    onChange={(e) =>
-                      setFormData({ ...formData, temperatura: e.target.value })
-                    }
-                  />
-                </div>
-                <div className={styles["form-group"]}>
-                  <label>Frec. Respiratoria (rpm)</label>
-                  <input
-                    type="number"
-                    placeholder="18"
-                    value={formData.fr}
-                    onChange={(e) =>
-                      setFormData({ ...formData, fr: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Diagnóstico */}
-            <div className={styles["form-section"]}>
-              <h4>🩺 Impresión Diagnóstica</h4>
-              <div className={styles["form-grid"]}>
-                <div
-                  className={`${styles["form-group"]} ${styles["full-width"]}`}
-                >
-                  <label>Diagnóstico *</label>
-                  <textarea
-                    rows={3}
-                    placeholder="Describa el diagnóstico..."
-                    value={formData.diagnostico}
-                    onChange={(e) =>
-                      setFormData({ ...formData, diagnostico: e.target.value })
-                    }
-                  />
-                </div>
-                <div className={styles["form-group"]}>
-                  <label>Código CIE-10 (opcional)</label>
+          {/* Step 1: Buscar Paciente */}
+          {step === 1 && (
+            <div className={styles["form-card"]}>
+              <h3>🔍 Buscar Paciente por Cédula</h3>
+              <div className={styles["search-box"]}>
+                <div className={styles["dual-input-group"]}>
+                  <select
+                    value={formData.ciTipo}
+                    onChange={(e) => handleFieldChange('ciTipo', e.target.value)}
+                  >
+                    <option value="V">V</option>
+                    <option value="E">E</option>
+                    <option value="P">P</option>
+                  </select>
                   <input
                     type="text"
-                    placeholder="Ej: J06.9"
-                    value={formData.codigoCie}
-                    onChange={(e) =>
-                      setFormData({ ...formData, codigoCie: e.target.value })
-                    }
+                    placeholder="12345678"
+                    value={formData.ciNumeros}
+                    onChange={(e) => handleCINumerosChange(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && buscarPaciente()}
+                    maxLength={9}
                   />
                 </div>
+                <button onClick={buscarPaciente} disabled={searching}>
+                  {searching ? "🔄 Buscando..." : "🔍 Buscar"}
+                </button>
               </div>
+              {fieldErrors.ciNumeros && <p className={styles["error-text"]}>{fieldErrors.ciNumeros}</p>}
+              {error && <p className={styles["error-text"]}>{error}</p>}
             </div>
+          )}
 
-            {/* Tratamiento */}
-            <div className={styles["form-section"]}>
-              <h4>💊 Plan de Tratamiento</h4>
-              <div className={styles["form-grid"]}>
-                <div
-                  className={`${styles["form-group"]} ${styles["full-width"]}`}
-                >
-                  <label>Indicaciones y Tratamiento</label>
-                  <textarea
-                    rows={4}
-                    placeholder="Indique el tratamiento y recomendaciones..."
-                    value={formData.tratamiento}
-                    onChange={(e) =>
-                      setFormData({ ...formData, tratamiento: e.target.value })
+          {/* Steps 2+ Dinámicos */}
+          {step > 1 && formularioConfig.pasos.map(paso => 
+            paso.numero === step && (
+              <div key={paso.numero} className={styles["form-card"]}>
+                <h3>{paso.emoji} {paso.titulo}</h3>
+
+                {/* Mostrar info del paciente en paso 2 */}
+                {paso.numero === 2 && paciente && (
+                  <div className={styles["patient-summary"]}>
+                    <h4>Paciente Seleccionado</h4>
+                    <div className={styles["patient-details"]}>
+                      <p><strong>Nombre:</strong> {paciente.apellidosNombres}</p>
+                      <p><strong>CI:</strong> {paciente.ci}</p>
+                      <p><strong>Historia:</strong> {paciente.nroHistoria}</p>
+                    </div>
+                    <button
+                      className={styles["change-patient-btn"]}
+                      onClick={() => { setStep(1); setPaciente(null); }}
+                    >
+                      Cambiar paciente
+                    </button>
+                  </div>
+                )}
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (paso.numero < formularioConfig.pasos.length) {
+                      setStep(paso.numero + 1);
+                    } else {
+                      handleSubmit(e);
                     }
-                  />
-                </div>
-                <div
-                  className={`${styles["form-group"]} ${styles["full-width"]}`}
+                  }}
                 >
-                  <label>Observaciones Adicionales</label>
-                  <textarea
-                    rows={2}
-                    placeholder="Notas adicionales..."
-                    value={formData.observaciones}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        observaciones: e.target.value,
-                      })
-                    }
+                  <RenderizarCampos 
+                    campos={paso.campos}
+                    formData={formData}
+                    handleFieldChange={handleFieldChange}
+                    styles={styles}
                   />
-                </div>
+
+                  {error && paso.numero === formularioConfig.pasos.length && (
+                    <div className={styles["error-alert"]}>{error}</div>
+                  )}
+                  {successMessage && (
+                    <div className={styles["success-alert"]}>{successMessage}</div>
+                  )}
+
+                  <div className={styles["form-actions"]}>
+                    {paso.numero > 1 && (
+                      <button
+                        type="button"
+                        className={styles["btn-secondary"]}
+                        onClick={() => setStep(paso.numero - 1)}
+                        disabled={guardando}
+                      >
+                        ← Atrás
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      className={styles["btn-primary"]}
+                      disabled={guardando}
+                    >
+                      {guardando 
+                        ? "⏳ Guardando..." 
+                        : paso.numero < formularioConfig.pasos.length 
+                        ? "Continuar →" 
+                        : "💾 Guardar Encuentro"
+                      }
+                    </button>
+                  </div>
+                </form>
               </div>
-            </div>
-
-            {error && <div className={styles["error-alert"]}>{error}</div>}
-            {successMessage && (
-              <div className={styles["success-alert"]}>{successMessage}</div>
-            )}
-
-            <div className={styles["form-actions"]}>
-              <button
-                type="button"
-                className={styles["btn-secondary"]}
-                onClick={() => setStep(2)}
-                disabled={guardando}
-              >
-                ← Atrás
-              </button>
-              <button
-                type="submit"
-                className={styles["btn-primary"]}
-                disabled={guardando}
-              >
-                {guardando ? "⏳ Guardando..." : "💾 Guardar Encuentro"}
-              </button>
-            </div>
-          </form>
-        </div>
+            )
+          )}
+        </>
       )}
     </section>
+  );
+}
+
+// Componente auxiliar para renderizar campos dinámicamente
+function RenderizarCampos({ 
+  campos, 
+  formData, 
+  handleFieldChange, 
+  styles 
+}: {
+  campos: CampoFormulario[];
+  formData: {[key: string]: string | number};
+  handleFieldChange: (id: string, value: string | number) => void;
+  styles: any;
+}) {
+  // Agrupar campos por grupo
+  const camposPorGrupo = campos.reduce((acc, campo) => {
+    const grupo = campo.grupo || 'general';
+    if (!acc[grupo]) acc[grupo] = [];
+    acc[grupo].push(campo);
+    return acc;
+  }, {} as {[key: string]: CampoFormulario[]});
+
+  return (
+    <>
+      {Object.entries(camposPorGrupo).map(([grupo, camposGrupo]) => (
+        <div key={grupo} className={styles["form-grid"]}>
+          {camposGrupo.map(campo => (
+            <div 
+              key={campo.id}
+              className={`${styles["form-group"]} ${
+                campo.tipo === 'textarea' ? styles["full-width"] : ''
+              }`}
+            >
+              <label>{campo.label}</label>
+              {campo.tipo === 'textarea' && (
+                <textarea
+                  rows={campo.rows || 3}
+                  placeholder={campo.placeholder}
+                  value={formData[campo.id] || ''}
+                  onChange={(e) => handleFieldChange(campo.id, e.target.value)}
+                />
+              )}
+              {campo.tipo === 'input' && (
+                <input
+                  type="text"
+                  placeholder={campo.placeholder}
+                  value={formData[campo.id] || ''}
+                  onChange={(e) => handleFieldChange(campo.id, e.target.value)}
+                  maxLength={campo.max ? parseInt(campo.max) : undefined}
+                />
+              )}
+              {campo.tipo === 'number' && (
+                <input
+                  type="number"
+                  placeholder={campo.placeholder}
+                  value={formData[campo.id] || ''}
+                  onChange={(e) => handleFieldChange(campo.id, e.target.value)}
+                  step={campo.step || '1'}
+                  min={campo.min}
+                  max={campo.max}
+                />
+              )}
+              {campo.tipo === 'date' && (
+                <input
+                  type="date"
+                  disabled={campo.id === 'fecha'}
+                  value={formData[campo.id] || ''}
+                  onChange={(e) => handleFieldChange(campo.id, e.target.value)}
+                  title={campo.id === 'fecha' ? 'La fecha se establece automáticamente a hoy' : ''}
+                />
+              )}
+              {campo.tipo === 'time' && (
+                <input
+                  type="time"
+                  disabled={campo.id === 'hora'}
+                  value={formData[campo.id] || ''}
+                  onChange={(e) => handleFieldChange(campo.id, e.target.value)}
+                  title={campo.id === 'hora' ? 'La hora se establece automáticamente a la actual' : ''}
+                />
+              )}
+              {campo.tipo === 'select' && (
+                <select
+                  value={formData[campo.id] || ''}
+                  onChange={(e) => handleFieldChange(campo.id, e.target.value)}
+                >
+                  <option value="">Seleccione una opción</option>
+                  {campo.opciones?.map(opt => (
+                    <option key={opt.valor} value={opt.valor}>
+                      {opt.etiqueta}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          ))}
+        </div>
+      ))}
+    </>
   );
 }

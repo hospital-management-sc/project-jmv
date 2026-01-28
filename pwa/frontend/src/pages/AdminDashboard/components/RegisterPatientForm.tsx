@@ -314,7 +314,22 @@ export function RegisterPatientForm() {
         fechaAlta: '',
         diasHospitalizacion: '',
       })
+      // Limpiar datos de afiliado
+      setAfiliadoData({
+        nroCarnet: '',
+        parentesco: '',
+        titularNombre: '',
+        titularCi: '',
+        titularCiTipo: 'V',
+        titularCiNumeros: '',
+        titularGrado: '',
+        titularComponente: '',
+        fechaAfiliacion: '',
+        vigente: true,
+      })
       setErrors({})
+      // Cargar siguiente número de historia
+      cargarSiguienteNroHistoria()
     } catch (error: any) {
       console.error('Error:', error)
       // Mostrar error SIN limpiar el formulario

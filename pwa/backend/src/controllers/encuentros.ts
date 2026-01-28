@@ -62,6 +62,8 @@ export const crearEncuentro = async (
       procedencia,
       nroCama,
       createdById,
+      // Examen físico genérico (JSONB)
+      examenFisico,
       // Impresión diagnóstica
       impresionDiagnostica,
       tratamiento,
@@ -103,6 +105,7 @@ export const crearEncuentro = async (
           enfermedadActual,
           procedencia,
           nroCama,
+          examenFisico: examenFisico || null,
           createdById: Number(createdById),
         },
       });

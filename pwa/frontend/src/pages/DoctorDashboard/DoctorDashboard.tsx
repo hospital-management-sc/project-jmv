@@ -3,7 +3,7 @@
  * Vista especializada para atención médica y gestión de pacientes
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import styles from "./DoctorDashboard.module.css";
 import type { PatientBasic, ViewMode } from "./interfaces";
 import {
@@ -18,11 +18,33 @@ import {
   TodayEncounters,
 } from "./components/";
 import { useAuth } from "@/contexts/AuthContext";
+import { obtenerEspecialidadPorCodigo, obtenerEspecialidad } from "@/config/especialidades.config";
 import RegistrarEmergencia from "@/components/RegistrarEmergencia";
 import PacientesEnEmergencia from "@/components/PacientesEnEmergencia";
 
 export default function DoctorDashboard() {
   const { user } = useAuth();
+  
+  // Obtener especialidad del usuario - intenta código primero, luego nombre, luego fallback a ORL
+  const especialidad = useMemo(() => {
+    if (!user?.especialidad) {
+      // Fallback a Otorrinolaringología si no hay especialidad
+      return obtenerEspecialidadPorCodigo("ORL");
+    }
+    
+    // Intentar obtener por código (ej: "ORL", "MI")
+    let esp = obtenerEspecialidadPorCodigo(user.especialidad);
+    if (esp) return esp;
+    
+    // Si no funciona por código, intentar por nombre
+    esp = obtenerEspecialidad(user.especialidad);
+    if (esp) return esp;
+    
+    // Fallback: retornar ORL
+    console.warn(`Especialidad "${user.especialidad}" no encontrada, usando ORL como fallback`);
+    return obtenerEspecialidadPorCodigo("ORL");
+  }, [user?.especialidad]);
+  
   const [viewMode, setViewMode] = useState<ViewMode>("main");
   const [selectedPatient, setSelectedPatient] = useState<PatientBasic | null>(
     null
@@ -81,6 +103,7 @@ export default function DoctorDashboard() {
           <RegisterEncounter
             patient={selectedPatient}
             doctorId={user?.id as number}
+            especialidadId={especialidad?.id || 'otorrinolaringologia'}
           />
         )}
         {viewMode === "search-patient" && (

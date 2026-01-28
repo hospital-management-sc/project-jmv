@@ -7,12 +7,40 @@
 
 export type MetricaDashboard = 'pacientesHospitalizados' | 'citasHoy' | 'encuentrosHoy' | 'pacientesEnEmergencia' | 'altasPendientes';
 export type AccionClinica = 'registrar-emergency' | 'registrar-encuentro' | 'hospitalized-patients' | 'pacientes-emergencia' | 'today-encounters' | 'search-patient' | 'my-appointments' | 'interconsultas' | 'registrar-alta';
+export type TipoCampo = 'textarea' | 'input' | 'number' | 'date' | 'time' | 'select';
 
 export interface VistaDashboard {
   metricas: MetricaDashboard[];
   acciones: AccionClinica[];
 }
 
+export interface CampoFormulario {
+  id: string;
+  tipo: TipoCampo;
+  label: string;
+  placeholder?: string;
+  emoji?: string;
+  requerido?: boolean;
+  grupo?: string;
+  rows?: number; // para textarea
+  step?: string; // para number/time
+  min?: string;
+  max?: string;
+  opciones?: { valor: string; etiqueta: string }[]; // para select
+}
+
+export interface PasoFormulario {
+  numero: number;
+  titulo: string;
+  emoji?: string;
+  campos: CampoFormulario[];
+}
+
+export interface FormularioEspecializado {
+  pasos: PasoFormulario[];
+}
+
+// Legacy: Mantener para backward compatibility
 export interface FormularioEncuentro {
   camposPersonalizados: string[];
   opcionesEspeciales: string[];
@@ -31,8 +59,10 @@ export interface EspecialidadConfig {
   color?: string;
   // NUEVO: Configuración de vista del dashboard
   vistaDashboard: VistaDashboard;
-  // NUEVO: Configuración de formularios
+  // Legacy: Configuración de formularios (deprecated)
   formularioEncuentro: FormularioEncuentro;
+  // NUEVO: Configuración dinámica del formulario por especialidad
+  formularioEspecializado?: FormularioEspecializado;
 }
 
 export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
@@ -206,6 +236,196 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
       camposPersonalizados: ['audicion', 'equilibrio', 'hallazgosORL', 'sinusitis'],
       opcionesEspeciales: ['audiometria', 'endoscopia'],
     },
+    // NUEVO: Formulario dinámico especializado para ORL
+    formularioEspecializado: {
+      pasos: [
+        {
+          numero: 1,
+          titulo: "Buscar Paciente",
+          emoji: "🔍",
+          campos: [
+            {
+              id: "ciTipo",
+              tipo: "select",
+              label: "Tipo de Cédula",
+              requerido: true,
+              opciones: [
+                { valor: "V", etiqueta: "V (Venezolano)" },
+                { valor: "E", etiqueta: "E (Extranjero)" },
+                { valor: "P", etiqueta: "P (Pasaporte)" }
+              ]
+            },
+            {
+              id: "ciNumeros",
+              tipo: "input",
+              label: "Número de Cédula",
+              placeholder: "12345678",
+              requerido: true
+            }
+          ]
+        },
+        {
+          numero: 2,
+          titulo: "Datos del Encuentro",
+          emoji: "📋",
+          campos: [
+            {
+              id: "tipo",
+              tipo: "select",
+              label: "Tipo de Encuentro",
+              requerido: true,
+              opciones: [
+                { valor: "CONSULTA", etiqueta: "🩺 Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "🚨 Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "🛏️ Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "📋 Otro" }
+              ]
+            },
+            {
+              id: "fecha",
+              tipo: "date",
+              label: "Fecha",
+              requerido: true
+            },
+            {
+              id: "hora",
+              tipo: "time",
+              label: "Hora",
+              requerido: true
+            },
+            {
+              id: "procedencia",
+              tipo: "input",
+              label: "Procedencia",
+              placeholder: "Ej: Consulta externa, Referido de..."
+            },
+            {
+              id: "motivoConsulta",
+              tipo: "textarea",
+              label: "Motivo de Consulta",
+              placeholder: "Describa el motivo de la consulta...",
+              requerido: true,
+              rows: 3,
+              grupo: "principal"
+            },
+            {
+              id: "enfermedadActual",
+              tipo: "textarea",
+              label: "Enfermedad Actual",
+              placeholder: "Historia de la enfermedad actual...",
+              rows: 4,
+              grupo: "principal"
+            }
+          ]
+        },
+        {
+          numero: 3,
+          titulo: "Examen Físico ORL",
+          emoji: "👂",
+          campos: [
+            {
+              id: "oido",
+              tipo: "textarea",
+              label: "👂 Oído",
+              placeholder: "Hallazgos del examen del oído (conducto auditivo, tímpano, audición)...",
+              rows: 3,
+              grupo: "examenFisico"
+            },
+            {
+              id: "nariz",
+              tipo: "textarea",
+              label: "👃 Nariz",
+              placeholder: "Hallazgos del examen de la nariz (fosas nasales, tabique, mucosa)...",
+              rows: 3,
+              grupo: "examenFisico"
+            },
+            {
+              id: "bocaGarganta",
+              tipo: "textarea",
+              label: "👅 Boca y Garganta",
+              placeholder: "Hallazgos del examen de cavidad oral, faringe y laringe...",
+              rows: 3,
+              grupo: "examenFisico"
+            }
+          ]
+        },
+        {
+          numero: 4,
+          titulo: "Signos Vitales y Diagnóstico",
+          emoji: "📊",
+          campos: [
+            {
+              id: "taSistolica",
+              tipo: "number",
+              label: "T.A. Sistólica (mmHg)",
+              placeholder: "120",
+              grupo: "signosVitales"
+            },
+            {
+              id: "taDiastolica",
+              tipo: "number",
+              label: "T.A. Diastólica (mmHg)",
+              placeholder: "80",
+              grupo: "signosVitales"
+            },
+            {
+              id: "pulso",
+              tipo: "number",
+              label: "Pulso (lpm)",
+              placeholder: "72",
+              grupo: "signosVitales"
+            },
+            {
+              id: "temperatura",
+              tipo: "number",
+              label: "Temperatura (°C)",
+              placeholder: "36.5",
+              step: "0.1",
+              grupo: "signosVitales"
+            },
+            {
+              id: "fr",
+              tipo: "number",
+              label: "Frec. Respiratoria (rpm)",
+              placeholder: "18",
+              grupo: "signosVitales"
+            },
+            {
+              id: "diagnostico",
+              tipo: "textarea",
+              label: "Diagnóstico",
+              placeholder: "Describa el diagnóstico...",
+              requerido: true,
+              rows: 3,
+              grupo: "diagnostico"
+            },
+            {
+              id: "codigoCie",
+              tipo: "input",
+              label: "Código CIE-10 (opcional)",
+              placeholder: "Ej: J06.9",
+              grupo: "diagnostico"
+            },
+            {
+              id: "tratamiento",
+              tipo: "textarea",
+              label: "Indicaciones y Tratamiento",
+              placeholder: "Indique el tratamiento y recomendaciones...",
+              rows: 4,
+              grupo: "tratamiento"
+            },
+            {
+              id: "observaciones",
+              tipo: "textarea",
+              label: "Observaciones Adicionales",
+              placeholder: "Notas adicionales...",
+              rows: 2,
+              grupo: "tratamiento"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     id: 'dermatologia',
@@ -329,6 +549,15 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
 export function obtenerEspecialidad(nombre: string): EspecialidadConfig | undefined {
   return ESPECIALIDADES_MEDICAS.find(
     (esp) => esp.nombre.toLowerCase() === nombre.toLowerCase()
+  );
+}
+
+/**
+ * Obtener especialidad por ID
+ */
+export function obtenerEspecialidadPorId(id: string): EspecialidadConfig | undefined {
+  return ESPECIALIDADES_MEDICAS.find(
+    (esp) => esp.id.toLowerCase() === id.toLowerCase()
   );
 }
 
