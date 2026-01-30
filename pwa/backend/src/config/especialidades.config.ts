@@ -13,26 +13,16 @@ export interface VistaDashboard {
   acciones: AccionClinica[];
 }
 
-export interface FormularioEncuentro {
-  camposPersonalizados: string[];
-  opcionesEspeciales: string[];
-}
-
 export interface EspecialidadConfig {
   id: string;
   nombre: string;
   codigo: string;
   departamento: string;
   descripcion: string;
-  formularioPersonalizado?: boolean;
-  camposEspecificos?: string[];
-  opcionesEspeciales?: string[];
   icono?: string;
   color?: string;
-  // NUEVO: Configuración de vista del dashboard
+  // Configuración de vista del dashboard
   vistaDashboard: VistaDashboard;
-  // NUEVO: Configuración de formularios
-  formularioEncuentro: FormularioEncuentro;
 }
 
 export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
@@ -42,17 +32,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'MI',
     departamento: 'Medicina Interna',
     descripcion: 'Especialidad en el diagnóstico y tratamiento de enfermedades internas',
-    formularioPersonalizado: true,
-    camposEspecificos: ['sistemaOrgano', 'hallazgosLab', 'medicamentosActuales'],
-    opcionesEspeciales: ['consulta', 'seguimiento', 'interconsulta'],
     color: '#3B82F6',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['sistemaOrgano', 'hallazgosLab', 'medicamentosActuales'],
-      opcionesEspeciales: ['consulta', 'seguimiento', 'interconsulta'],
     },
   },
   {
@@ -61,17 +44,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'MP',
     departamento: 'Medicina Paliativa',
     descripcion: 'Cuidados paliativos y control de síntomas en enfermedades terminales',
-    formularioPersonalizado: true,
-    camposEspecificos: ['nivelesDolorPaliativos', 'cuidadosComfortables', 'apoyo-psicosocial'],
-    opcionesEspeciales: ['evaluar-dolor', 'manejo-sintomas'],
     color: '#8B5CF6',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['nivelesDolorPaliativos', 'cuidadosComfortables', 'apoyo-psicosocial'],
-      opcionesEspeciales: ['evaluar-dolor', 'manejo-sintomas'],
     },
   },
   {
@@ -80,17 +56,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'CG',
     departamento: 'Cirugía General',
     descripcion: 'Intervenciones quirúrgicas generales',
-    formularioPersonalizado: true,
-    camposEspecificos: ['diagnosticoPre', 'tipoIntervencion', 'hallazgoQx', 'complicaciones'],
-    opcionesEspeciales: ['programar-cirugia', 'reporte-quirurgico'],
     color: '#DC2626',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['diagnosticoPre', 'tipoIntervencion', 'hallazgoQx', 'complicaciones'],
-      opcionesEspeciales: ['programar-cirugia', 'reporte-quirurgico'],
     },
   },
   {
@@ -99,17 +68,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'PD',
     departamento: 'Pediatría',
     descripcion: 'Atención médica de niños y adolescentes',
-    formularioPersonalizado: true,
-    camposEspecificos: ['edad', 'pesoTalla', 'estadoNutricional', 'vacunacion', 'desarrolloNeuro'],
-    opcionesEspeciales: ['crecimiento-desarrollo', 'evaluacion-pediatrica'],
     color: '#EC4899',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['edad', 'pesoTalla', 'estadoNutricional', 'vacunacion', 'desarrolloNeuro'],
-      opcionesEspeciales: ['crecimiento-desarrollo', 'evaluacion-pediatrica'],
     },
   },
   {
@@ -118,17 +80,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'NP',
     departamento: 'Pediatría',
     descripcion: 'Enfermedades respiratorias en niños',
-    formularioPersonalizado: true,
-    camposEspecificos: ['funcionPulmonar', 'sibilancias', 'tosPatrones', 'asmaControl'],
-    opcionesEspeciales: ['espirometria', 'test-asma'],
     color: '#06B6D4',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['funcionPulmonar', 'sibilancias', 'tosPatrones', 'asmaControl'],
-      opcionesEspeciales: ['espirometria', 'test-asma'],
     },
   },
   {
@@ -137,17 +92,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'TR',
     departamento: 'Traumatología',
     descripcion: 'Lesiones óseas, articulares y del aparato locomotor',
-    formularioPersonalizado: true,
-    camposEspecificos: ['tipoLesion', 'imagenologia', 'clasificacionFractura', 'movilidad'],
-    opcionesEspeciales: ['radiografia', 'cirugia-ortopedica', 'rehabilitacion'],
     color: '#F59E0B',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['tipoLesion', 'imagenologia', 'clasificacionFractura', 'movilidad'],
-      opcionesEspeciales: ['radiografia', 'cirugia-ortopedica', 'rehabilitacion'],
     },
   },
   {
@@ -156,17 +104,22 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'CM',
     departamento: 'Cirugía General',
     descripcion: 'Cirugía especializada de manos y extremidades superiores',
-    formularioPersonalizado: true,
-    camposEspecificos: ['tipoLesion', 'nerviosaCompromiso', 'vascularizacion'],
-    opcionesEspeciales: ['cirugia-reparadora', 'seguimiento-post-op'],
     color: '#A16207',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
     },
-    formularioEncuentro: {
-      camposPersonalizados: ['tipoLesion', 'nerviosaCompromiso', 'vascularizacion'],
-      opcionesEspeciales: ['cirugia-reparadora', 'seguimiento-post-op'],
+  },
+  {
+    id: 'cirugia-pediatrica',
+    nombre: 'Cirugía Pediátrica',
+    codigo: 'CP',
+    departamento: 'Cirugía General',
+    descripcion: 'Intervenciones quirúrgicas en pacientes pediátricos',
+    color: '#FB7185',
+    vistaDashboard: {
+      metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
+      acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
     },
   },
   {
@@ -175,17 +128,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'OD',
     departamento: 'Odontología',
     descripcion: 'Cuidado y tratamiento de dientes y encías',
-    formularioPersonalizado: true,
-    camposEspecificos: ['diagnosticoDental', 'estadoOral', 'tratamientoRecomendado'],
-    opcionesEspeciales: ['limpieza', 'tratamiento-dental'],
     color: '#FBBF24',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['diagnosticoDental', 'estadoOral', 'tratamientoRecomendado'],
-      opcionesEspeciales: ['limpieza', 'tratamiento-dental'],
     },
   },
   {
@@ -194,17 +140,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'ORL',
     departamento: 'Otorrinolaringología',
     descripcion: 'Enfermedades del oído, nariz y garganta',
-    formularioPersonalizado: true,
-    camposEspecificos: ['audicion', 'equilibrio', 'hallazgosORL', 'sinusitis'],
-    opcionesEspeciales: ['audiometria', 'endoscopia'],
     color: '#10B981',
     vistaDashboard: {
       metricas: ['citasHoy', 'encuentrosHoy'],
       acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['audicion', 'equilibrio', 'hallazgosORL', 'sinusitis'],
-      opcionesEspeciales: ['audiometria', 'endoscopia'],
     },
   },
   {
@@ -213,17 +152,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'DE',
     departamento: 'Dermatología',
     descripcion: 'Enfermedades de la piel, cabello y uñas',
-    formularioPersonalizado: true,
-    camposEspecificos: ['lesionesDescripcion', 'distribucion', 'diagnosticoDiferencial'],
-    opcionesEspeciales: ['biopsia', 'tratamiento-topico'],
     color: '#F97316',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['lesionesDescripcion', 'distribucion', 'diagnosticoDiferencial'],
-      opcionesEspeciales: ['biopsia', 'tratamiento-topico'],
     },
   },
   {
@@ -232,17 +164,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'FI',
     departamento: 'Fisiatría',
     descripcion: 'Medicina física y rehabilitación',
-    formularioPersonalizado: true,
-    camposEspecificos: ['evaluacionMotora', 'rango-movimiento', 'discapacidad'],
-    opcionesEspeciales: ['rehabilitacion', 'terapia-fisica'],
     color: '#14B8A6',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['evaluacionMotora', 'rango-movimiento', 'discapacidad'],
-      opcionesEspeciales: ['rehabilitacion', 'terapia-fisica'],
     },
   },
   {
@@ -251,17 +176,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'GI',
     departamento: 'Ginecología y Obstetricia',
     descripcion: 'Salud reproductiva femenina y obstetricia',
-    formularioPersonalizado: true,
-    camposEspecificos: ['cicloMenstrual', 'hallazgosGineco', 'metodosAnticoncept'],
-    opcionesEspeciales: ['ultrasonido', 'papanicolaou', 'control-prenatal'],
     color: '#D946EF',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['cicloMenstrual', 'hallazgosGineco', 'metodosAnticoncept'],
-      opcionesEspeciales: ['ultrasonido', 'papanicolaou', 'control-prenatal'],
     },
   },
   {
@@ -270,17 +188,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'GA',
     departamento: 'Gastroenterología',
     descripcion: 'Enfermedades del tracto gastrointestinal',
-    formularioPersonalizado: true,
-    camposEspecificos: ['sintomasGI', 'hallazgosEndoscopicos', 'habitosAlimentarios'],
-    opcionesEspeciales: ['endoscopia', 'colonoscopia'],
     color: '#6366F1',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['sintomasGI', 'hallazgosEndoscopicos', 'habitosAlimentarios'],
-      opcionesEspeciales: ['endoscopia', 'colonoscopia'],
     },
   },
   {
@@ -289,17 +200,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'HE',
     departamento: 'Hematología',
     descripcion: 'Enfermedades de la sangre y médula ósea',
-    formularioPersonalizado: true,
-    camposEspecificos: ['hemoglobinaValoración', 'coagulacion', 'transfusiones'],
-    opcionesEspeciales: ['hemograma', 'coagulograma'],
     color: '#EF4444',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['hemoglobinaValoración', 'coagulacion', 'transfusiones'],
-      opcionesEspeciales: ['hemograma', 'coagulograma'],
     },
   },
   {
@@ -308,17 +212,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     codigo: 'PS',
     departamento: 'Psicología',
     descripcion: 'Evaluación y tratamiento de problemas de salud mental',
-    formularioPersonalizado: true,
-    camposEspecificos: ['estadoMental', 'historialPsicosocial', 'estrategiasCoping'],
-    opcionesEspeciales: ['evaluacion-psicologica', 'terapia'],
     color: '#8B5CF6',
     vistaDashboard: {
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
-    },
-    formularioEncuentro: {
-      camposPersonalizados: ['estadoMental', 'historialPsicosocial', 'estrategiasCoping'],
-      opcionesEspeciales: ['evaluacion-psicologica', 'terapia'],
     },
   },
 ];

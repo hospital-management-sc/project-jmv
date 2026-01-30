@@ -325,7 +325,7 @@ model Antecedente {
 model ImpresionDiagnostica {
   id          Int   @id @default(autoincrement())
   encuentroId Int
-  codigoCie   String?  @db.VarChar(20)
+  codigoCie   String?  @db.VarChar(100)
   descripcion String?  @db.Text
   clase       String   @default("PRESUNTIVO") @db.VarChar(20) // CHECK: PRESUNTIVO, CONFIRMADO
   createdAt   DateTime @default(now()) @db.Timestamptz()
