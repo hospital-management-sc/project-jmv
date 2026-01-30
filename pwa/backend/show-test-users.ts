@@ -28,25 +28,11 @@ const personalAutorizado = [
     departamento: 'Medicina Interna',
   },
   {
-    ci: 'V87654321',
-    nombre: 'Lic. María Elena López Rodríguez',
-    email: 'maria.lopez@hospital.com',
-    rol: 'ENFERMERO',
-    departamento: 'Emergencia',
-  },
-  {
     ci: 'V11223344',
     nombre: 'Juan Alberto Pérez Ramírez',
     email: 'juan.perez@hospital.com',
     rol: 'ADMIN',
     departamento: 'Admisiones',
-  },
-  {
-    ci: 'V55667788',
-    nombre: 'Dra. Ana Sofía Martínez Duarte',
-    email: 'ana.martinez@hospital.com',
-    rol: 'COORDINADOR',
-    departamento: 'Cirugía General',
   },
   {
     ci: 'V99887766',

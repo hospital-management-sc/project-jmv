@@ -20,7 +20,7 @@ model PersonalAutorizado {
   ci                String   @unique @db.VarChar(50) // Cédula de identidad (único identificador)
   nombreCompleto    String   @db.VarChar(200) // Nombre como aparece en documentos oficiales
   email             String?  @db.VarChar(200) // Email institucional (opcional para pre-registro)
-  rolAutorizado     String   @db.VarChar(50) // MEDICO | ADMIN | COORDINADOR | ENFERMERO | SUPER_ADMIN
+  rolAutorizado     String   @db.VarChar(50) // MEDICO | ADMIN | SUPER_ADMIN
   departamento      String?  @db.VarChar(100) // Departamento/Servicio asignado
   especialidad      String?  @db.VarChar(100) // Especialidad médica (si es MEDICO)
   cargo             String?  @db.VarChar(100) // Cargo específico
@@ -140,7 +140,7 @@ model Usuario {
   ci        String?  @unique @db.VarChar(50)
   cargo     String?  @db.VarChar(100)
   especialidad String? @db.VarChar(100) // Especialidad médica (para interconsultas)
-  role      String?  @db.VarChar(50) // MEDICO, ENFERMERO, ADMIN, COORDINADOR, SUPER_ADMIN
+  role      String?  @db.VarChar(50) // MEDICO, ADMIN, SUPER_ADMIN
   createdAt DateTime @default(now()) @db.Timestamptz()
   updatedAt DateTime @updatedAt @db.Timestamptz()
 

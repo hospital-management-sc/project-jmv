@@ -159,9 +159,295 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     descripcion: 'Cuidado y tratamiento de dientes y encías',
     color: '#FBBF24',
     vistaDashboard: {
-      metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
-      acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
+      metricas: ['citasHoy', 'encuentrosHoy'],
+      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
     },
+    formularioEspecializado: {
+      pasos: [
+        {
+          numero: 1,
+          titulo: "Buscar Paciente",
+          emoji: "🔍",
+          campos: [
+            {
+              id: "ciTipo",
+              tipo: "select",
+              label: "Tipo de Cédula",
+              requerido: true,
+              opciones: [
+                { valor: "V", etiqueta: "V (Venezolano)" },
+                { valor: "E", etiqueta: "E (Extranjero)" },
+                { valor: "P", etiqueta: "P (Pasaporte)" }
+              ]
+            },
+            {
+              id: "ciNumeros",
+              tipo: "input",
+              label: "Número de Cédula",
+              placeholder: "12345678",
+              requerido: true
+            }
+          ]
+        },
+        {
+          numero: 2,
+          titulo: "Datos del Encuentro y Antecedentes",
+          emoji: "📋",
+          campos: [
+            {
+              id: "tipo",
+              tipo: "select",
+              label: "Tipo de Encuentro",
+              requerido: true,
+              grupo: "encuentro",
+              opciones: [
+                { valor: "CONSULTA", etiqueta: "🩺 Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "🚨 Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "🛏️ Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "📋 Otro" }
+              ]
+            },
+            {
+              id: "fecha",
+              tipo: "date",
+              label: "Fecha",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "hora",
+              tipo: "time",
+              label: "Hora",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "procedencia",
+              tipo: "input",
+              label: "Procedencia",
+              placeholder: "Ej: Consulta externa, Referido de...",
+              grupo: "encuentro"
+            },
+            {
+              id: "motivoConsulta",
+              tipo: "textarea",
+              label: "Motivo de Consulta",
+              placeholder: "Describa el motivo de la consulta odontológica...",
+              requerido: true,
+              rows: 3,
+              grupo: "principal"
+            },
+            {
+              id: "enfermedadActual",
+              tipo: "textarea",
+              label: "Enfermedad Actual",
+              placeholder: "Historia de la enfermedad actual...",
+              rows: 4,
+              grupo: "principal"
+            },
+            {
+              id: "hospitalizacion",
+              tipo: "textarea",
+              label: "Hospitalización en los Últimos Años",
+              placeholder: "Motivo y fecha si aplica...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "atencionMedica",
+              tipo: "textarea",
+              label: "Atención por Médico (Últimos 6 Meses)",
+              placeholder: "Describa cualquier atención médica reciente...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "atencionOdontologica",
+              tipo: "textarea",
+              label: "Atención Odontológica (Últimos 6 Meses)",
+              placeholder: "Tratamientos odontológicos previos...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "problemasAnestesia",
+              tipo: "input",
+              label: "Problemas Durante Anestesia Local",
+              placeholder: "Sí/No y descripción si aplica",
+              grupo: "examenFisico"
+            },
+            {
+              id: "problemasCoagulacion",
+              tipo: "input",
+              label: "Problemas de Coagulación",
+              placeholder: "Sí/No y descripción si aplica",
+              grupo: "examenFisico"
+            },
+            {
+              id: "adiciones",
+              tipo: "textarea",
+              label: "Adicciones / Hábitos",
+              placeholder: "Tabaquismo, consumo de alcohol, etc...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "alergias",
+              tipo: "textarea",
+              label: "Alergias a Medicamentos",
+              placeholder: "Alergias conocidas a anestésicos, antibióticos, etc...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "enfermedades",
+              tipo: "textarea",
+              label: "Padecimiento de Enfermedades",
+              placeholder: "Enfermedades crónicas, sistémicas, etc...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "medicamentos",
+              tipo: "textarea",
+              label: "Medicamentos que Toma",
+              placeholder: "Listado de medicamentos actuales...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "menstruacion",
+              tipo: "input",
+              label: "Frecuencia de la Menstruación",
+              placeholder: "Regular/Irregular, ciclo en días",
+              grupo: "examenFisico"
+            },
+            {
+              id: "ultimoPeriodo",
+              tipo: "date",
+              label: "Fecha de Último Período",
+              grupo: "examenFisico"
+            },
+            {
+              id: "embarazada",
+              tipo: "input",
+              label: "¿Embarazada?",
+              placeholder: "Sí/No y semana de gestación si aplica",
+              grupo: "examenFisico"
+            },
+            {
+              id: "amamantando",
+              tipo: "input",
+              label: "¿Amamantando?",
+              placeholder: "Sí/No",
+              grupo: "examenFisico"
+            }
+          ]
+        },
+        {
+          numero: 3,
+          titulo: "Exploración Odontológica",
+          emoji: "🦷",
+          campos: [
+            {
+              id: "cuadrante1",
+              tipo: "textarea",
+              label: "Cuadrante I - Superior Derecho",
+              placeholder: "Ej: 11-Sano, 12-Caries, 13-Restaurado, 14-Extracción...",
+              rows: 3,
+              grupo: "examenFisico"
+            },
+            {
+              id: "cuadrante2",
+              tipo: "textarea",
+              label: "Cuadrante II - Superior Izquierdo",
+              placeholder: "Ej: 21-Sano, 22-Caries, 23-Restaurado, 24-Extracción...",
+              rows: 3,
+              grupo: "examenFisico"
+            },
+            {
+              id: "cuadrante3",
+              tipo: "textarea",
+              label: "Cuadrante III - Inferior Izquierdo",
+              placeholder: "Ej: 31-Sano, 32-Caries, 33-Restaurado, 34-Extracción...",
+              rows: 3,
+              grupo: "examenFisico"
+            },
+            {
+              id: "cuadrante4",
+              tipo: "textarea",
+              label: "Cuadrante IV - Inferior Derecho",
+              placeholder: "Ej: 41-Sano, 42-Caries, 43-Restaurado, 44-Extracción...",
+              rows: 3,
+              grupo: "examenFisico"
+            },
+            {
+              id: "estadoGeneral",
+              tipo: "textarea",
+              label: "Estado General de la Cavidad Oral",
+              placeholder: "Higiene oral, estado de encías, lengua, paladar, mucosa...",
+              rows: 3,
+              grupo: "examenFisico"
+            },
+            {
+              id: "hallazgos",
+              tipo: "textarea",
+              label: "Hallazgos Significativos",
+              placeholder: "Presencia de cálculos, halitosis, lesiones, infecciones, etc...",
+              rows: 3,
+              grupo: "examenFisico"
+            }
+          ]
+        },
+        {
+          numero: 4,
+          titulo: "Diagnóstico y Evolución",
+          emoji: "📊",
+          campos: [
+            {
+              id: "diagnostico",
+              tipo: "textarea",
+              label: "Diagnóstico Odontológico",
+              placeholder: "Describa el diagnóstico odontológico...",
+              requerido: true,
+              rows: 3,
+              grupo: "diagnostico"
+            },
+            {
+              id: "codigoCie",
+              tipo: "input",
+              label: "Código CIE-10 (opcional)",
+              placeholder: "Ej: K02.9 (Caries dental)",
+              grupo: "diagnostico"
+            },
+            {
+              id: "plan",
+              tipo: "textarea",
+              label: "Plan de Tratamiento",
+              placeholder: "Tratamientos propuestos, procedimientos a realizar...",
+              rows: 4,
+              grupo: "tratamiento"
+            },
+            {
+              id: "indicaciones",
+              tipo: "textarea",
+              label: "Indicaciones y Recomendaciones",
+              placeholder: "Cuidados bucales, higiene, medicamentos, seguimiento...",
+              rows: 3,
+              grupo: "tratamiento"
+            },
+            {
+              id: "observaciones",
+              tipo: "textarea",
+              label: "Observaciones Adicionales",
+              placeholder: "Notas adicionales, interconsultas si requiere...",
+              rows: 2,
+              grupo: "tratamiento"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     id: 'otorrinolaringologia',
@@ -835,9 +1121,251 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     descripcion: 'Evaluación y tratamiento de problemas de salud mental',
     color: '#8B5CF6',
     vistaDashboard: {
-      metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
-      acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
+      metricas: ['citasHoy', 'encuentrosHoy'],
+      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
     },
+    formularioEspecializado: {
+      pasos: [
+        {
+          numero: 1,
+          titulo: "Buscar Paciente",
+          emoji: "🔍",
+          campos: [
+            {
+              id: "ciTipo",
+              tipo: "select",
+              label: "Tipo de Cédula",
+              requerido: true,
+              opciones: [
+                { valor: "V", etiqueta: "V (Venezolano)" },
+                { valor: "E", etiqueta: "E (Extranjero)" },
+                { valor: "P", etiqueta: "P (Pasaporte)" }
+              ]
+            },
+            {
+              id: "ciNumeros",
+              tipo: "input",
+              label: "Número de Cédula",
+              placeholder: "12345678",
+              requerido: true
+            }
+          ]
+        },
+        {
+          numero: 2,
+          titulo: "Antecedentes Personales",
+          emoji: "📋",
+          campos: [
+            {
+              id: "tipo",
+              tipo: "select",
+              label: "Tipo de Encuentro",
+              requerido: true,
+              grupo: "encuentro",
+              opciones: [
+                { valor: "CONSULTA", etiqueta: "🩺 Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "🚨 Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "🛏️ Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "📋 Otro" }
+              ]
+            },
+            {
+              id: "fecha",
+              tipo: "date",
+              label: "Fecha",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "hora",
+              tipo: "time",
+              label: "Hora",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "antecedentesPersonales",
+              tipo: "textarea",
+              label: "🎯 Antecedentes Personales (últimos 6 meses)",
+              placeholder: "Seleccione los antecedentes que apliquen al paciente. Estos incluyen eventos estresantes y condiciones que afectan su salud mental...",
+              rows: 4,
+              grupo: "examenFisico"
+            }
+          ]
+        },
+        {
+          numero: 3,
+          titulo: "Evaluación Psicológica",
+          emoji: "🧠",
+          campos: [
+            {
+              id: "motivoConsulta",
+              tipo: "textarea",
+              label: "Motivo de Consulta",
+              placeholder: "Principal razón de la consulta psicológica...",
+              requerido: true,
+              rows: 3,
+              grupo: "examenFisico"
+            },
+            {
+              id: "examenMental",
+              tipo: "textarea",
+              label: "Examen Mental",
+              placeholder: "Describa estado general, orientación, atención, memoria, pensamiento, afectividad...",
+              rows: 4,
+              grupo: "examenFisico"
+            },
+            {
+              id: "atencion",
+              tipo: "input",
+              label: "Atención",
+              placeholder: "Normal / Alterada - Describa hallazgos",
+              grupo: "examenFisico"
+            },
+            {
+              id: "orientacion",
+              tipo: "input",
+              label: "Orientación",
+              placeholder: "Tiempo, lugar, persona - Normal/Alterada",
+              grupo: "examenFisico"
+            },
+            {
+              id: "percepciones",
+              tipo: "textarea",
+              label: "Senso-Percepción",
+              placeholder: "Alucinaciones, ilusiones, percepción distorsionada...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "pensamiento",
+              tipo: "textarea",
+              label: "Pensamiento",
+              placeholder: "Forma y contenido del pensamiento, ideas delirantes...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "suenio",
+              tipo: "input",
+              label: "Sueño / Vigilia",
+              placeholder: "Normal / Alterado - Insomnio, hipersomnia, etc...",
+              grupo: "examenFisico"
+            },
+            {
+              id: "lenguaje",
+              tipo: "input",
+              label: "Lenguaje",
+              placeholder: "Fluido, coherente, pressurizado, mutismo...",
+              grupo: "examenFisico"
+            },
+            {
+              id: "memoria",
+              tipo: "textarea",
+              label: "Memoria",
+              placeholder: "Inmediata, corto plazo, largo plazo - Normal/Alterada",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "afectividad",
+              tipo: "textarea",
+              label: "Afectividad",
+              placeholder: "Humor, afecto, labilidad emocional, apropiabilidad...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "juicio",
+              tipo: "textarea",
+              label: "Juicio",
+              placeholder: "Capacidad de discernimiento y evaluación de situaciones...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "voluntad",
+              tipo: "textarea",
+              label: "Voluntad",
+              placeholder: "Motivación, iniciativa, anergia, apergimiento...",
+              rows: 2,
+              grupo: "examenFisico"
+            }
+          ]
+        },
+        {
+          numero: 4,
+          titulo: "Evaluación Laboral y Conclusiones",
+          emoji: "📊",
+          campos: [
+            {
+              id: "arealaboral",
+              tipo: "textarea",
+              label: "📌 Área Laboral - Satisfacción y Factores",
+              placeholder: "Describa el entorno laboral, satisfacción, relaciones con supervisor y compañeros, autonomía, recursos, ambiente...",
+              rows: 4,
+              grupo: "diagnostico"
+            },
+            {
+              id: "fortalezas",
+              tipo: "textarea",
+              label: "Fortalezas",
+              placeholder: "Fortalezas identificadas en la evaluación...",
+              rows: 2,
+              grupo: "diagnostico"
+            },
+            {
+              id: "debilidades",
+              tipo: "textarea",
+              label: "Debilidades",
+              placeholder: "Áreas de mejora identificadas...",
+              rows: 2,
+              grupo: "diagnostico"
+            },
+            {
+              id: "evaluacionNeuropsicologica",
+              tipo: "textarea",
+              label: "Evaluación Neuropsicológica",
+              placeholder: "Resultados de pruebas neuropsicológicas, si aplica...",
+              rows: 3,
+              grupo: "diagnostico"
+            },
+            {
+              id: "impresionDx",
+              tipo: "textarea",
+              label: "Impresión Diagnóstica",
+              placeholder: "Diagnóstico preliminar según DSM-5 o clasificación utilizada...",
+              requerido: true,
+              rows: 3,
+              grupo: "diagnostico"
+            },
+            {
+              id: "codigoCie",
+              tipo: "input",
+              label: "Código CIE-10 (opcional)",
+              placeholder: "Ej: F41.1 (Trastorno de ansiedad)",
+              grupo: "diagnostico"
+            },
+            {
+              id: "referenciaPsicoterapia",
+              tipo: "textarea",
+              label: "Referencia a Psicoterapia",
+              placeholder: "Tipo de terapia recomendada, frecuencia, objetivos...",
+              rows: 3,
+              grupo: "tratamiento"
+            },
+            {
+              id: "observaciones",
+              tipo: "textarea",
+              label: "Observaciones Adicionales",
+              placeholder: "Recomendaciones de seguimiento, interconsultas, medicación, etc...",
+              rows: 2,
+              grupo: "tratamiento"
+            }
+          ]
+        }
+      ]
+    }
   },
 ];
 

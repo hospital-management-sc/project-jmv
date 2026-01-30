@@ -65,9 +65,7 @@ type ViewMode = 'list' | 'add' | 'edit' | 'stats'
 const ROLES_DISPONIBLES = [
   { value: 'SUPER_ADMIN', label: 'Super Administrador', color: '#dc2626' },
   { value: 'ADMIN', label: 'Personal Administrativo', color: '#7c3aed' },
-  { value: 'COORDINADOR', label: 'Coordinador de Área', color: '#2563eb' },
   { value: 'MEDICO', label: 'Médico', color: '#059669' },
-  { value: 'ENFERMERO', label: 'Enfermero/a', color: '#0891b2' },
 ]
 
 const ESTADOS_PERSONAL = [

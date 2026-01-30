@@ -225,8 +225,6 @@ export default function Register() {
           error={errors.role?.message}
           options={[
             { value: 'MEDICO', label: 'Médico' },
-            { value: 'COORDINADOR', label: 'Coordinador de Área' },
-            { value: 'ENFERMERO', label: 'Enfermero/a' },
             { value: 'ADMIN', label: 'Personal Administrativo' },
           ]}
           {...register('role')}

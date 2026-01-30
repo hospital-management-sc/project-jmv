@@ -130,8 +130,8 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     descripcion: 'Cuidado y tratamiento de dientes y encías',
     color: '#FBBF24',
     vistaDashboard: {
-      metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
-      acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
+      metricas: ['citasHoy', 'encuentrosHoy'],
+      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
     },
   },
   {
@@ -154,8 +154,8 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     descripcion: 'Enfermedades de la piel, cabello y uñas',
     color: '#F97316',
     vistaDashboard: {
-      metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
-      acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
+      metricas: ['citasHoy', 'encuentrosHoy'],
+      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
     },
   },
   {
@@ -214,8 +214,8 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     descripcion: 'Evaluación y tratamiento de problemas de salud mental',
     color: '#8B5CF6',
     vistaDashboard: {
-      metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
-      acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
+      metricas: ['citasHoy', 'encuentrosHoy'],
+      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
     },
   },
 ];
