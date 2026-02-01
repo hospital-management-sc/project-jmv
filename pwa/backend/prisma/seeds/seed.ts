@@ -80,54 +80,196 @@ async function main() {
     console.log('\n📋 Paso 2: Creando Personal Autorizado de prueba (whitelist)...');
     
     // Personal autorizado de prueba que AÚN NO se ha registrado
+    // Doctores para TODAS las 15 especialidades del sistema
     const personalAutorizadoPrueba = [
+      // 1. Medicina Interna
       {
         ci: 'V12345678',
         nombreCompleto: 'Dr. Carlos Eduardo García Méndez',
         email: 'carlos.garcia@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Medicina Interna',
+        especialidad: 'Medicina Interna',
         cargo: 'Médico Internista',
         fechaIngreso: new Date('2020-01-15'),
         autorizadoPor: 'RRHH - María González',
       },
+      // 2. Medicina Paliativa
       {
-        ci: 'V87654321',
-        nombreCompleto: 'Lic. María Elena López Rodríguez',
-        email: 'maria.lopez@hospital.com',
-        rolAutorizado: 'ENFERMERO',
-        departamento: 'Emergencia',
-        cargo: 'Enfermera Jefe',
-        fechaIngreso: new Date('2019-06-01'),
+        ci: 'V13579246',
+        nombreCompleto: 'Dra. Francisca del Carmen Henríquez Soto',
+        email: 'francisca.henriquez@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Medicina Paliativa',
+        especialidad: 'Medicina Paliativa',
+        cargo: 'Médica Paliativa',
+        fechaIngreso: new Date('2019-03-20'),
         autorizadoPor: 'RRHH - María González',
       },
+      // 3. Cirugía General
       {
         ci: 'V11223344',
-        nombreCompleto: 'Juan Alberto Pérez Ramírez',
+        nombreCompleto: 'Dr. Juan Alberto Pérez Ramírez',
         email: 'juan.perez@hospital.com',
-        rolAutorizado: 'ADMIN',
-        departamento: 'Admisiones',
-        cargo: 'Coordinador de Admisiones',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Cirugía General',
+        especialidad: 'Cirugía General',
+        cargo: 'Médico Cirujano',
         fechaIngreso: new Date('2021-03-10'),
         autorizadoPor: 'RRHH - María González',
       },
+      // 4. Pediatría
+      {
+        ci: 'V87654321',
+        nombreCompleto: 'Dra. Ana Sofía Martínez García',
+        email: 'ana.martinez@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Pediatría',
+        especialidad: 'Pediatría',
+        cargo: 'Médica Pediatra',
+        fechaIngreso: new Date('2019-06-01'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // 5. Neumología Pediátrica
+      {
+        ci: 'V24681357',
+        nombreCompleto: 'Dr. Andrés Felipe Rodríguez Cortés',
+        email: 'andres.rodriguez@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Pediatría',
+        especialidad: 'Neumología Pediátrica',
+        cargo: 'Neumologo Pediátrico',
+        fechaIngreso: new Date('2020-07-15'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // 6. Traumatología
+      {
+        ci: 'V44332211',
+        nombreCompleto: 'Dr. Luis Fernando Castro Mendoza',
+        email: 'luis.castro@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Traumatología',
+        especialidad: 'Traumatología',
+        cargo: 'Médico Traumatólogo',
+        fechaIngreso: new Date('2017-05-15'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // 7. Cirugía de Manos
+      {
+        ci: 'V35791113',
+        nombreCompleto: 'Dr. Gonzalo Javier Valenzuela Rivas',
+        email: 'gonzalo.valenzuela@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Cirugía General',
+        especialidad: 'Cirugía de Manos',
+        cargo: 'Cirujano de Manos',
+        fechaIngreso: new Date('2018-09-10'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // 8. Odontología
+      {
+        ci: 'V46802468',
+        nombreCompleto: 'Dra. Viviana Catalina Morales Bravo',
+        email: 'viviana.morales@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Odontología',
+        especialidad: 'Odontología',
+        cargo: 'Cirujana Dentista',
+        fechaIngreso: new Date('2021-01-20'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // 9. Otorrinolaringología
+      {
+        ci: 'V66778899',
+        nombreCompleto: 'Dr. Pedro Andrés Flores Reyes',
+        email: 'pedro.flores@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Otorrinolaringología',
+        especialidad: 'Otorrinolaringología',
+        cargo: 'Médico ORL',
+        fechaIngreso: new Date('2019-08-10'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // 10. Dermatología
+      {
+        ci: 'V22334455',
+        nombreCompleto: 'Dra. Vanessa Irina Moreno Díaz',
+        email: 'vanessa.moreno@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Dermatología',
+        especialidad: 'Dermatología',
+        cargo: 'Médica Dermatóloga',
+        fechaIngreso: new Date('2020-11-20'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // 11. Fisiatría
+      {
+        ci: 'V57912346',
+        nombreCompleto: 'Dr. Cristóbal Miguel Sánchez López',
+        email: 'cristobal.sanchez@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Fisiatría',
+        especialidad: 'Fisiatría',
+        cargo: 'Médico Fisiatra',
+        fechaIngreso: new Date('2019-02-10'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // 12. Ginecología
       {
         ci: 'V55667788',
-        nombreCompleto: 'Dra. Ana Sofía Martínez Duarte',
-        email: 'ana.martinez@hospital.com',
-        rolAutorizado: 'COORDINADOR',
-        departamento: 'Cirugía General',
-        cargo: 'Coordinadora del Servicio',
+        nombreCompleto: 'Dra. María Elena López Rodríguez',
+        email: 'maria.elena@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Ginecología y Obstetricia',
+        especialidad: 'Ginecología',
+        cargo: 'Médica Ginecóloga',
         fechaIngreso: new Date('2018-09-20'),
         autorizadoPor: 'RRHH - María González',
       },
+      // 13. Gastroenterología
+      {
+        ci: 'V68024680',
+        nombreCompleto: 'Dr. Roberto Ignacio Vargas Muñoz',
+        email: 'roberto.vargas@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Gastroenterología',
+        especialidad: 'Gastroenterología',
+        cargo: 'Médico Gastroenterólogo',
+        fechaIngreso: new Date('2020-05-15'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // 14. Hematología
+      {
+        ci: 'V79135792',
+        nombreCompleto: 'Dra. Eliana Patricia Reyes Serrano',
+        email: 'eliana.reyes@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Hematología',
+        especialidad: 'Hematología',
+        cargo: 'Médica Hematóloga',
+        fechaIngreso: new Date('2019-11-05'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // 15. Psicología
+      {
+        ci: 'V80246813',
+        nombreCompleto: 'Dr. Enrique Sebastián Díaz Flores',
+        email: 'enrique.diaz@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Psicología',
+        especialidad: 'Psicología',
+        cargo: 'Psicólogo Clínico',
+        fechaIngreso: new Date('2021-08-10'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // Admin de prueba
       {
         ci: 'V99887766',
-        nombreCompleto: 'Roberto José Hernández Blanco',
+        nombreCompleto: 'Dr. Roberto José Hernández Blanco',
         email: 'roberto.hernandez@hospital.com',
         rolAutorizado: 'ADMIN',
         departamento: 'Administración',
-        cargo: 'Asistente Administrativo',
+        cargo: 'Coordinador Administrativo',
         fechaIngreso: new Date('2022-07-01'),
         autorizadoPor: 'RRHH - María González',
       },
@@ -166,11 +308,23 @@ async function main() {
     console.log('   Rol:      SUPER_ADMIN');
     
     console.log('\n📋 PERSONAL AUTORIZADO PARA REGISTRO (whitelist):');
-    console.log('   Estos usuarios pueden registrarse en la app:');
-    console.log('   ─────────────────────────────────────────────');
+    console.log('   ✅ 15 DOCTORES - Una para cada especialidad del sistema');
+    console.log('   ✅ 1 ADMIN de prueba');
+    console.log('   ─────────────────────────────────────────────────────────');
+    
+    let contador = 1;
     for (const personal of personalAutorizadoPrueba) {
-      console.log(`   • ${personal.ci} - ${personal.nombreCompleto}`);
-      console.log(`     Rol: ${personal.rolAutorizado} | Email sugerido: ${personal.email}`);
+      console.log(`\n   ${contador}. ${personal.nombreCompleto}`);
+      console.log(`      CI: ${personal.ci}`);
+      console.log(`      Email: ${personal.email}`);
+      if (personal.especialidad) {
+        console.log(`      Especialidad: ${personal.especialidad}`);
+      } else {
+        console.log(`      Rol: ${personal.rolAutorizado}`);
+      }
+      console.log(`      Departamento: ${personal.departamento}`);
+      console.log(`      Cargo: ${personal.cargo}`);
+      contador++;
     }
 
     console.log('\n⚠️  IMPORTANTE:');

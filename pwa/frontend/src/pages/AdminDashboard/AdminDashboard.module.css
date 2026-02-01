@@ -376,16 +376,22 @@
 .dual-input-group {
   display: flex;
   gap: 0.75rem;
+  width: 100%;
 }
 
 .dual-input-group select {
-  min-width: 85px;
+  min-width: 75px;
+  max-width: 85px;
   flex-shrink: 0;
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dual-input-group input {
   flex: 1;
+  min-width: 0;
+  max-width: calc(100% - 75px);
 }
 
 .error-message {

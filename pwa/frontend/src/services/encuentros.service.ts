@@ -101,6 +101,10 @@ export interface CrearEncuentroDTO {
     descripcion?: string;
     clase?: string;
   };
+  // Examen físico genérico (JSONB) - personalizable por especialidad
+  examenFisico?: {
+    [key: string]: string | number | boolean | undefined;
+  };
 }
 
 export interface AgregarEvolucionDTO {

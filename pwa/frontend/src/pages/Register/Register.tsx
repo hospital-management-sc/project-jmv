@@ -13,7 +13,7 @@ import styles from './Register.module.css'
 const ERROR_MESSAGES: Record<string, { title: string; description: string; icon: string }> = {
   NOT_IN_WHITELIST: {
     title: 'Acceso No Autorizado',
-    description: 'Su cédula no se encuentra en la lista de personal autorizado del hospital. Contacte al departamento de Recursos Humanos para solicitar acceso al sistema.',
+    description: 'Su cédula no se encuentra en la lista de personal autorizado del hospital.',
     icon: '🚫',
   },
   ALREADY_REGISTERED: {
@@ -23,12 +23,12 @@ const ERROR_MESSAGES: Record<string, { title: string; description: string; icon:
   },
   NOT_ACTIVE: {
     title: 'Autorización Inactiva',
-    description: 'Su autorización de acceso no está activa actualmente. Contacte al departamento de Recursos Humanos para verificar su estado.',
+    description: 'Su autorización de acceso no está activa actualmente.',
     icon: '⏸️',
   },
   AUTHORIZATION_EXPIRED: {
     title: 'Autorización Vencida',
-    description: 'Su autorización de acceso ha expirado. Contacte al departamento de Recursos Humanos para renovar su autorización.',
+    description: 'Su autorización de acceso ha expirado.',
     icon: '📅',
   },
   NAME_MISMATCH: {
@@ -225,8 +225,6 @@ export default function Register() {
           error={errors.role?.message}
           options={[
             { value: 'MEDICO', label: 'Médico' },
-            { value: 'COORDINADOR', label: 'Coordinador de Área' },
-            { value: 'ENFERMERO', label: 'Enfermero/a' },
             { value: 'ADMIN', label: 'Personal Administrativo' },
           ]}
           {...register('role')}

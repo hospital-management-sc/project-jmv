@@ -74,9 +74,7 @@ export interface UpdateAuthorizedPersonnelInput {
 export const VALID_ROLES = [
   'SUPER_ADMIN',  // Máximo nivel - gestiona whitelist y sistema
   'ADMIN',        // Administrativo - gestiona admisiones, citas
-  'COORDINADOR',  // Coordinador de área médica
   'MEDICO',       // Personal médico
-  'ENFERMERO',    // Personal de enfermería
 ] as const;
 
 export const ESTADOS_PERSONAL = [

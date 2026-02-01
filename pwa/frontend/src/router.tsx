@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { DashboardEspecializadoProvider } from "@/contexts/DashboardEspecializadoContext";
 import MainLayout from "@layouts/MainLayout";
 import AuthLayout from "@layouts/AuthLayout";
 import Login from "@/pages/Login/Login";
@@ -83,7 +84,9 @@ export default function Router() {
             path="/dashboard/medico"
             element={
               <ProtectedRoute allowedRoles={["MEDICO"]}>
-                <DoctorDashboard />
+                <DashboardEspecializadoProvider>
+                  <DoctorDashboard />
+                </DashboardEspecializadoProvider>
               </ProtectedRoute>
             }
           />

@@ -150,6 +150,7 @@ export default function Login() {
           email: response.data.email,
           role: response.data.role,
           nombre: response.data.nombre,
+          especialidad: response.data.especialidad,
         }
         
         login(userData, response.data.token)

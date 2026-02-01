@@ -12,7 +12,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { getPrismaClient } from '../database/connection';
-import { ValidationError, UnauthorizedError } from '../types/responses';
+import { ValidationError, UnauthorizedError, InvalidCredentialsError } from '../types/responses';
 import { verifyAuthorizedPersonnel, markAsRegistered, VALID_ROLES } from './authorizedPersonnel';
 import config from '../config';
 import logger from '../utils/logger';
@@ -39,6 +39,7 @@ interface TokenResponse {
   nombre: string;
   email: string;
   role: string;
+  especialidad?: string | null;
   token: string;
   refreshToken?: string;
 }
@@ -48,11 +49,14 @@ interface TokenResponse {
  */
 export const generateToken = (
   id: number,
+  nombre: string,
   email: string,
-  role: string
+  role: string,
+  especialidad?: string | null,
+  departamento?: string | null
 ): string => {
   return jwt.sign(
-    { id, email, role },
+    { id, nombre, email, role, especialidad: especialidad || undefined, departamento: departamento || undefined },
     JWT_SECRET as string,
     { expiresIn: JWT_EXPIRY as any }
   );
@@ -94,7 +98,7 @@ export const loginUser = async (payload: LoginPayload): Promise<TokenResponse> =
 
   if (!user) {
     logger.warn(`Login attempt with non-existent email: ${email}`);
-    throw new UnauthorizedError('Credenciales inválidas. Verifique su correo electrónico y contraseña.');
+    throw new InvalidCredentialsError('Credenciales inválidas. Verifique su correo electrónico y contraseña.');
   }
 
   // Compare passwords
@@ -102,11 +106,18 @@ export const loginUser = async (payload: LoginPayload): Promise<TokenResponse> =
 
   if (!isPasswordValid) {
     logger.warn(`Failed login attempt for user: ${email}`);
-    throw new UnauthorizedError('Credenciales inválidas. Verifique su correo electrónico y contraseña.');
+    throw new InvalidCredentialsError('Credenciales inválidas. Verifique su correo electrónico y contraseña.');
   }
 
   // Generate token
-  const token = generateToken(Number(user.id), user.email || '', user.role || '');
+  const token = generateToken(
+    Number(user.id),
+    user.nombre || '',
+    user.email || '', 
+    user.role || '',
+    user.especialidad,
+    undefined // Departamento no está en Usuario, está en PersonalAutorizado
+  );
 
   logger.info(`User logged in successfully: ${email}`);
 
@@ -115,6 +126,7 @@ export const loginUser = async (payload: LoginPayload): Promise<TokenResponse> =
     nombre: user.nombre,
     email: user.email || '',
     role: user.role || '',
+    especialidad: user.especialidad,
     token,
   };
 };
@@ -219,6 +231,7 @@ export const registerUser = async (payload: RegisterPayload): Promise<TokenRespo
       password: hashedPassword,
       ci: ciNormalized,
       role: personnelRecord?.rolAutorizado || roleToUse, // Usar rol de la whitelist
+      especialidad: personnelRecord?.departamento || undefined, // Usar departamento como especialidad de la whitelist (si aplica)
       cargo: personnelRecord?.cargo || null,
     },
   });
@@ -248,7 +261,14 @@ export const registerUser = async (payload: RegisterPayload): Promise<TokenRespo
   });
 
   // Generate token
-  const token = generateToken(Number(newUser.id), newUser.email || '', newUser.role || '');
+  const token = generateToken(
+    Number(newUser.id),
+    newUser.nombre || '',
+    newUser.email || '', 
+    newUser.role || '',
+    newUser.especialidad,
+    personnelRecord?.departamento
+  );
 
   logger.info(`[AUTH] Nuevo usuario registrado exitosamente: ${email} (CI: ${ciNormalized})`);
 
@@ -257,6 +277,7 @@ export const registerUser = async (payload: RegisterPayload): Promise<TokenRespo
     nombre: newUser.nombre,
     email: newUser.email || '',
     role: newUser.role || '',
+    especialidad: newUser.especialidad,
     token,
   };
 };

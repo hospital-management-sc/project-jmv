@@ -10,29 +10,23 @@ import logger from '../utils/logger';
 
 const prisma = new PrismaClient();
 
-// Especialidades disponibles para interconsultas
+// Especialidades disponibles para interconsultas (CENTRALIZADO - ver config/especialidades.config.ts)
 export const ESPECIALIDADES = [
-  'MEDICINA_INTERNA',
-  'CIRUGIA_GENERAL',
-  'TRAUMATOLOGIA',
-  'CARDIOLOGIA',
-  'NEUROLOGIA',
-  'GINECO_OBSTETRICIA',
-  'PEDIATRIA',
-  'DERMATOLOGIA',
-  'OFTALMOLOGIA',
-  'OTORRINOLARINGOLOGIA',
-  'UROLOGIA',
-  'NEFROLOGIA',
-  'GASTROENTEROLOGIA',
-  'NEUMOLOGIA',
-  'ENDOCRINOLOGIA',
-  'PSIQUIATRIA',
-  'ONCOLOGIA',
-  'HEMATOLOGIA',
-  'REUMATOLOGIA',
-  'MEDICINA_FISICA',
-  'UCI',
+  'Medicina Interna',
+  'Medicina Paliativa',
+  'Cirugía General',
+  'Pediatría',
+  'Neumología Pediátrica',
+  'Traumatología',
+  'Cirugía de Manos',
+  'Odontología',
+  'Otorrinolaringología',
+  'Dermatología',
+  'Fisiatría',
+  'Ginecología',
+  'Gastroenterología',
+  'Hematología',
+  'Psicología',
 ];
 
 /**

@@ -58,6 +58,13 @@ export class UnauthorizedError extends AppError {
   }
 }
 
+export class InvalidCredentialsError extends AppError {
+  constructor(message = 'Invalid credentials') {
+    super(400, message);
+    Object.setPrototypeOf(this, InvalidCredentialsError.prototype);
+  }
+}
+
 export class ForbiddenError extends AppError {
   constructor(message = 'Forbidden') {
     super(403, message);

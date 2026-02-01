@@ -52,6 +52,8 @@ export interface JWTPayload {
   email: string
   nombre: string
   role: string
+  especialidad?: string // Especialidad médica del usuario (si aplica)
+  departamento?: string // Departamento del usuario
   iat?: number
   exp?: number
 }

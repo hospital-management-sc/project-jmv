@@ -30,10 +30,10 @@ async function request<T>(
     timestamp: new Date().toISOString(),
   }
 
-  console.log('[API] Starting request:', requestInfo)
+  // console.log('[API] Starting request:', requestInfo)
 
   try {
-    console.log('[API] Sending fetch to:', url)
+    // console.log('[API] Sending fetch to:', url)
     const response = await fetch(url, {
       ...options,
       headers,
@@ -41,11 +41,11 @@ async function request<T>(
       credentials: 'include',
     })
 
-    console.log('[API] Response received', {
-      status: response.status,
-      statusText: response.statusText,
-      contentType: response.headers.get('content-type'),
-    })
+    // console.log('[API] Response received', {
+    //   status: response.status,
+    //   statusText: response.statusText,
+    //   contentType: response.headers.get('content-type'),
+    // })
 
     if (!response.ok) {
       let errorData
@@ -56,14 +56,20 @@ async function request<T>(
       }
       console.error('[API] Error response:', { status: response.status, errorData })
       
-      // Si es error de autenticación (401), limpiar token y redirigir a login
+      // Si es error de autenticación (401), solo limpiar si es un endpoint protegido
+      // NO redirigir aquí para permitir que el componente maneje el error (ej: login)
       if (response.status === 401) {
-        console.warn('[API] Token inválido o expirado, limpiando sesión')
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        // Redirigir al login
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login'
+        // Solo limpiar tokens si NO es un endpoint de autenticación
+        const isAuthEndpoint = url.includes('/auth/login') || url.includes('/auth/register') || url.includes('/auth/forgot-password')
+        
+        if (!isAuthEndpoint) {
+          // console.warn('[API] Token inválido o expirado, limpiando sesión')
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          // Redirigir al login solo para endpoints protegidos
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login'
+          }
         }
       }
       
@@ -71,16 +77,16 @@ async function request<T>(
     }
 
     const data = await response.json()
-    console.log('[API] Response parsed successfully:', data)
+    // console.log('[API] Response parsed successfully:', data)
     return data
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error('[API] Fetch failed:', {
-      error: errorMessage,
-      url,
-      method: options.method || 'GET',
-      timestamp: new Date().toISOString(),
-    })
+    // console.error('[API] Fetch failed:', {
+    //   error: errorMessage,
+    //   url,
+    //   method: options.method || 'GET',
+    //   timestamp: new Date().toISOString(),
+    // })
     throw error
   }
 }
