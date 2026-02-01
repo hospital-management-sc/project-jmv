@@ -11,18 +11,18 @@ router.get('/especialidad/:especialidad', async (req: Request, res: Response) =>
     where: {
       especialidad,
       role: 'MEDICO',
-      horarioMedico: { some: { activo: true } },
+      horariosDisponibilidad: { some: { activo: true } },
     },
     include: {
-      horarioMedico: true,
+      horariosDisponibilidad: true,
     },
   });
   const result = medicos.map(medico => ({
     id: medico.id,
     nombre: medico.nombre,
     especialidad: medico.especialidad,
-    dias: medico.horarioMedico.map(h => h.diaSemana),
-    horarios: medico.horarioMedico.map(h => ({
+    dias: medico.horariosDisponibilidad.map(h => h.diaSemana),
+    horarios: medico.horariosDisponibilidad.map(h => ({
       diaSemana: h.diaSemana,
       horaInicio: h.horaInicio,
       horaFin: h.horaFin,
@@ -36,7 +36,9 @@ router.get('/:medicoId/disponibilidad', async (req: Request, res: Response) => {
   const medicoId = Number(req.params.medicoId);
   const fecha = new Date(req.query.fecha as string);
   const especialidad = req.query.especialidad as string;
-  const disponibles = await obtenerHorariosDisponibles(medicoId, especialidad, fecha);
+  const hora = req.query.hora as string | undefined;
+
+  const disponibles = await obtenerHorariosDisponibles(medicoId, especialidad, fecha, hora);
   res.json({ medicoId, fecha: fecha.toISOString().slice(0, 10), disponibles });
 });
 
