@@ -23,6 +23,7 @@ import authorizedPersonnelRoutes from './routes/authorizedPersonnel';
 import interconsultasRoutes from './routes/interconsultas';
 import formatoHospitalizacionRoutes from './routes/formatoHospitalizacion';
 import formatoEmergenciaRoutes from './routes/formatoEmergencia';
+import medicoRoutes from './api/medicos';
 
 // Load environment variables
 dotenv.config();
@@ -137,6 +138,9 @@ app.use('/api/formato-hospitalizacion', formatoHospitalizacionRoutes);
 
 // Formato de Emergencia routes
 app.use('/api/formato-emergencia', formatoEmergenciaRoutes);
+
+// Medicos routes
+app.use('/api/medicos', medicoRoutes);
 
 // ============================================
 // ERROR HANDLING MIDDLEWARE

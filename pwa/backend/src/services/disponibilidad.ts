@@ -59,13 +59,14 @@ export async function validarDisponibilidadMedico(medicoId: number, especialidad
 }
 
 /**
- * Obtiene los horarios disponibles de un médico por especialidad y fecha.
+ * Obtiene los horarios disponibles de un médico por especialidad, fecha y hora opcional.
  * @param medicoId - ID del médico
  * @param especialidad - Especialidad
  * @param fecha - Fecha (Date)
+ * @param hora - Hora (string, formato HH:MM)
  * @returns Array de rangos horarios disponibles
  */
-export async function obtenerHorariosDisponibles(medicoId: number, especialidad: string, fecha: Date) {
+export async function obtenerHorariosDisponibles(medicoId: number, especialidad: string, fecha: Date, hora?: string) {
   const diaSemana = fecha.getDay();
   const horario = await prisma.horarioMedico.findFirst({
     where: {
@@ -76,6 +77,12 @@ export async function obtenerHorariosDisponibles(medicoId: number, especialidad:
     },
   });
   if (!horario) return [];
+
+  if (hora && hora.trim() !== '') {
+    if (hora < horario.horaInicio || hora > horario.horaFin) {
+      return [];
+    }
+  }
 
   // Buscar horas ocupadas
   const citas = await prisma.cita.findMany({
@@ -88,6 +95,10 @@ export async function obtenerHorariosDisponibles(medicoId: number, especialidad:
     select: { horaCita: true },
   });
   const horasOcupadas = citas.map((c: { horaCita: string | null }) => c.horaCita);
+
+  if (hora && hora.trim() !== '') {
+    return horasOcupadas.includes(hora) ? [] : [hora];
+  }
 
   // Generar rango de horas disponibles
   const disponibles: string[] = [];
