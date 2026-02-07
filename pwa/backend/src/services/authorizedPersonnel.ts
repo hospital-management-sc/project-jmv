@@ -95,12 +95,14 @@ export const ESTADOS_PERSONAL = [
  * @param ci - Cédula de identidad del usuario
  * @param nombreCompleto - Nombre proporcionado en el registro
  * @param rolSolicitado - Rol que el usuario solicita
+ * @param email - Email proporcionado en el registro (debe coincidir con whitelist)
  * @returns VerificationResult con el estado de autorización
  */
 export const verifyAuthorizedPersonnel = async (
   ci: string,
   nombreCompleto: string,
-  rolSolicitado: string
+  rolSolicitado: string,
+  email: string
 ): Promise<VerificationResult> => {
   try {
     // Buscar en la whitelist por CI
@@ -174,7 +176,31 @@ export const verifyAuthorizedPersonnel = async (
       };
     }
 
-    // VALIDACIÓN 6: Verificar que el rol solicitado coincida con el autorizado
+    // VALIDACIÓN 6: Verificar que el email coincida EXACTAMENTE con la whitelist (CRÍTICA)
+    if (!personnelRecord.email) {
+      logger.security(`[WHITELIST] Intento de registro RECHAZADO - Email no registrado en whitelist: ${ci}`);
+      return {
+        isAuthorized: false,
+        personnelRecord: personnelRecord as AuthorizedPersonnelRecord,
+        errorCode: 'EMAIL_NOT_IN_WHITELIST',
+        errorMessage: 'No hay un email registrado para esta cédula en nuestros registros. Contacte al departamento de Recursos Humanos.',
+      };
+    }
+
+    const normalizedDbEmail = personnelRecord.email.toLowerCase().trim();
+    const normalizedInputEmail = email.toLowerCase().trim();
+    
+    if (normalizedDbEmail !== normalizedInputEmail) {
+      logger.security(`[WHITELIST] Intento de registro RECHAZADO - Email no coincide: ${ci} (DB: ${personnelRecord.email}, Input: ${email})`);
+      return {
+        isAuthorized: false,
+        personnelRecord: personnelRecord as AuthorizedPersonnelRecord,
+        errorCode: 'EMAIL_MISMATCH',
+        errorMessage: 'El correo electrónico proporcionado no coincide con nuestros registros. Verifique que sea exactamente como aparece en la documentación de autorización del hospital.',
+      };
+    }
+
+    // VALIDACIÓN 7: Verificar que el rol solicitado coincida con el autorizado
     if (personnelRecord.rolAutorizado !== rolSolicitado) {
       logger.security(`[WHITELIST] Intento de registro RECHAZADO - Rol no autorizado: ${ci} (autorizado: ${personnelRecord.rolAutorizado}, solicitado: ${rolSolicitado})`);
       return {

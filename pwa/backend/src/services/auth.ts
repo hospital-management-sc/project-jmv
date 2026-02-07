@@ -178,7 +178,8 @@ export const registerUser = async (payload: RegisterPayload): Promise<TokenRespo
   const verificationResult = await verifyAuthorizedPersonnel(
     ciNormalized,
     nombre,
-    roleToUse
+    roleToUse,
+    email
   );
 
   // Si no está autorizado, RECHAZAR el registro
