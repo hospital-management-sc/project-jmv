@@ -1085,9 +1085,208 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     descripcion: 'Salud reproductiva femenina y obstetricia',
     color: '#D946EF',
     vistaDashboard: {
-      metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
-      acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
+      metricas: ['citasHoy', 'encuentrosHoy'],
+      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
     },
+    formularioEspecializado: {
+      pasos: [
+        {
+          numero: 1,
+          titulo: "Buscar Paciente",
+          emoji: "🔍",
+          campos: [
+            {
+              id: "ciTipo",
+              tipo: "select",
+              label: "Tipo de Cédula",
+              requerido: true,
+              opciones: [
+                { valor: "V", etiqueta: "V (Venezolano)" },
+                { valor: "E", etiqueta: "E (Extranjero)" },
+                { valor: "P", etiqueta: "P (Pasaporte)" }
+              ]
+            },
+            {
+              id: "ciNumeros",
+              tipo: "input",
+              label: "Número de Cédula",
+              placeholder: "12345678",
+              requerido: true
+            }
+          ]
+        },
+        {
+          numero: 2,
+          titulo: "Datos del Encuentro e Historia",
+          emoji: "📋",
+          campos: [
+            {
+              id: "tipo",
+              tipo: "select",
+              label: "Tipo de Encuentro",
+              requerido: true,
+              grupo: "encuentro",
+              opciones: [
+                { valor: "CONSULTA", etiqueta: "🩺 Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "🚨 Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "🛏️ Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "📋 Otro" }
+              ]
+            },
+            {
+              id: "fecha",
+              tipo: "date",
+              label: "Fecha",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "hora",
+              tipo: "time",
+              label: "Hora",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "procedencia",
+              tipo: "input",
+              label: "Procedencia",
+              placeholder: "Ej: Consulta externa, Referido de...",
+              grupo: "encuentro"
+            },
+            {
+              id: "motivoConsulta",
+              tipo: "textarea",
+              label: "Motivo de Consulta",
+              placeholder: "Describa el motivo de la consulta ginecológica...",
+              requerido: true,
+              rows: 3,
+              grupo: "principal"
+            }
+          ]
+        },
+        {
+          numero: 3,
+          titulo: "Antecedentes Obstétricos y Examen Físico",
+          emoji: "👩‍⚕️",
+          campos: [
+            {
+              id: "partos",
+              tipo: "number",
+              label: "👶 Partos",
+              placeholder: "0",
+              grupo: "antecedentesObstetricos"
+            },
+            {
+              id: "cesareas",
+              tipo: "number",
+              label: "🏥 Cesáreas",
+              placeholder: "0",
+              grupo: "antecedentesObstetricos"
+            },
+            {
+              id: "abortos",
+              tipo: "number",
+              label: "⚠️ Abortos",
+              placeholder: "0",
+              grupo: "antecedentesObstetricos"
+            },
+            {
+              id: "fur",
+              tipo: "date",
+              label: "📅 FUR (Fecha Última Regla)",
+              grupo: "antecedentesObstetricos"
+            },
+            {
+              id: "primerasRelaciones",
+              tipo: "number",
+              label: "💑 Edad de Primeras Relaciones Sexuales",
+              placeholder: "Ej: 18",
+              grupo: "antecedentesObstetricos"
+            },
+            {
+              id: "parejasSexuales",
+              tipo: "number",
+              label: "👥 Número de Parejas Sexuales",
+              placeholder: "0",
+              grupo: "antecedentesObstetricos"
+            },
+            {
+              id: "metodosAnticonceptivos",
+              tipo: "textarea",
+              label: "💊 Métodos Anticonceptivos (Actuales/Previos)",
+              placeholder: "Ej: Píldora anticonceptiva, DIU, condón, etc...",
+              rows: 2,
+              grupo: "antecedentesObstetricos"
+            },
+            {
+              id: "condicionesGenerales",
+              tipo: "textarea",
+              label: "Condiciones Generales",
+              placeholder: "Estado general de la paciente, hidratación, nutrición, palidez, etc...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "mamas",
+              tipo: "textarea",
+              label: "🫀 Mamas",
+              placeholder: "Simetría, masas, secreciones, dolor a la palpación, hallazgos relevantes...",
+              rows: 3,
+              grupo: "examenFisico"
+            },
+            {
+              id: "abdomen",
+              tipo: "textarea",
+              label: "🫂 Abdomen",
+              placeholder: "Forma, distensión, cicatrices, masas, sensibilidad, sonidos intestinales...",
+              rows: 3,
+              grupo: "examenFisico"
+            },
+            {
+              id: "genitales",
+              tipo: "textarea",
+              label: "🔍 Genitales",
+              placeholder: "Inspección externa, especuloscopía, tacto vaginal, cervicitis, flujo, masas...",
+              rows: 4,
+              grupo: "examenFisico"
+            }
+          ]
+        },
+        {
+          numero: 4,
+          titulo: "Diagnóstico",
+          emoji: "📊",
+          campos: [
+            {
+              id: "diagnostico",
+              tipo: "textarea",
+              label: "Diagnóstico Ginecológico",
+              placeholder: "Describa el diagnóstico ginecológico...",
+              requerido: true,
+              rows: 4,
+              grupo: "diagnostico"
+            },
+            {
+              id: "plan",
+              tipo: "textarea",
+              label: "Plan de Tratamiento",
+              placeholder: "Tratamientos propuestos, procedimientos, medicamentos, seguimiento...",
+              rows: 4,
+              grupo: "tratamiento"
+            },
+            {
+              id: "observaciones",
+              tipo: "textarea",
+              label: "Observaciones Adicionales",
+              placeholder: "Interconsultas si requiere, estudios complementarios, seguimiento...",
+              rows: 2,
+              grupo: "tratamiento"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     id: 'gastroenterologia',
@@ -1097,9 +1296,151 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     descripcion: 'Enfermedades del tracto gastrointestinal',
     color: '#6366F1',
     vistaDashboard: {
-      metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
-      acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
+      metricas: ['citasHoy', 'encuentrosHoy'],
+      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
     },
+    formularioEspecializado: {
+      pasos: [
+        {
+          numero: 1,
+          titulo: "Buscar Paciente",
+          emoji: "🔍",
+          campos: [
+            {
+              id: "ciTipo",
+              tipo: "select",
+              label: "Tipo de Cédula",
+              requerido: true,
+              opciones: [
+                { valor: "V", etiqueta: "V (Venezolano)" },
+                { valor: "E", etiqueta: "E (Extranjero)" },
+                { valor: "P", etiqueta: "P (Pasaporte)" }
+              ]
+            },
+            {
+              id: "ciNumeros",
+              tipo: "input",
+              label: "Número de Cédula",
+              placeholder: "12345678",
+              requerido: true
+            }
+          ]
+        },
+        {
+          numero: 2,
+          titulo: "Datos del Encuentro e Historia",
+          emoji: "📋",
+          campos: [
+            {
+              id: "tipo",
+              tipo: "select",
+              label: "Tipo de Encuentro",
+              requerido: true,
+              grupo: "encuentro",
+              opciones: [
+                { valor: "CONSULTA", etiqueta: "🩺 Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "🚨 Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "🛏️ Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "📋 Otro" }
+              ]
+            },
+            {
+              id: "fecha",
+              tipo: "date",
+              label: "Fecha",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "hora",
+              tipo: "time",
+              label: "Hora",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "procedencia",
+              tipo: "input",
+              label: "Procedencia",
+              placeholder: "Ej: Consulta externa, Referido de...",
+              grupo: "encuentro"
+            },
+            {
+              id: "motivoConsulta",
+              tipo: "textarea",
+              label: "Motivo de Consulta",
+              placeholder: "Describa el motivo de la consulta gastroenterológica...",
+              requerido: true,
+              rows: 3,
+              grupo: "principal"
+            },
+            {
+              id: "enfermedadActual",
+              tipo: "textarea",
+              label: "Enfermedad Actual",
+              placeholder: "Historia de la enfermedad actual...",
+              rows: 4,
+              grupo: "principal"
+            }
+          ]
+        },
+        {
+          numero: 3,
+          titulo: "Examen Físico",
+          emoji: "🔬",
+          campos: [
+            {
+              id: "examenAbdominal",
+              tipo: "textarea",
+              label: "🫂 Examen Abdominal",
+              placeholder: "Inspección, palpación, percusión, auscultación. Hallazgos de dolor, masas, visceromegalias, soplos...",
+              rows: 4,
+              grupo: "examenFisico"
+            },
+            {
+              id: "examenEcografico",
+              tipo: "textarea",
+              label: "🔊 Examen Ecográfico",
+              placeholder: "Hallazgos ecográficos: estado del hígado, vesícula, páncreas, riñones, aorta, evaluación de la pared abdominal...",
+              rows: 4,
+              grupo: "examenFisico"
+            }
+          ]
+        },
+        {
+          numero: 4,
+          titulo: "Diagnóstico",
+          emoji: "📊",
+          campos: [
+            {
+              id: "diagnostico",
+              tipo: "textarea",
+              label: "Diagnóstico Gastroenterológico",
+              placeholder: "Describa el diagnóstico gastroenterológico...",
+              requerido: true,
+              rows: 4,
+              grupo: "diagnostico"
+            },
+            {
+              id: "plan",
+              tipo: "textarea",
+              label: "Plan de Tratamiento",
+              placeholder: "Tratamientos propuestos, medicamentos, dieta, endoscopias, estudios complementarios, seguimiento...",
+              rows: 4,
+              grupo: "tratamiento"
+            },
+            {
+              id: "observaciones",
+              tipo: "textarea",
+              label: "Observaciones Adicionales",
+              placeholder: "Interconsultas si requiere, estudios complementarios, seguimiento...",
+              rows: 2,
+              grupo: "tratamiento"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     id: 'hematologia',

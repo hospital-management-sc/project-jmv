@@ -86,7 +86,7 @@ async function main() {
       {
         ci: 'V12345678',
         nombreCompleto: 'Dr. Carlos Eduardo García Méndez',
-        email: 'carlos.garcia@hospital.com',
+        email: 'medicina-interna@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Medicina Interna',
         especialidad: 'Medicina Interna',
@@ -98,7 +98,7 @@ async function main() {
       {
         ci: 'V13579246',
         nombreCompleto: 'Dra. Francisca del Carmen Henríquez Soto',
-        email: 'francisca.henriquez@hospital.com',
+        email: 'medicina-paliativa@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Medicina Paliativa',
         especialidad: 'Medicina Paliativa',
@@ -110,7 +110,7 @@ async function main() {
       {
         ci: 'V11223344',
         nombreCompleto: 'Dr. Juan Alberto Pérez Ramírez',
-        email: 'juan.perez@hospital.com',
+        email: 'cirugia-general@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Cirugía General',
         especialidad: 'Cirugía General',
@@ -122,7 +122,7 @@ async function main() {
       {
         ci: 'V87654321',
         nombreCompleto: 'Dra. Ana Sofía Martínez García',
-        email: 'ana.martinez@hospital.com',
+        email: 'pediatria@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Pediatría',
         especialidad: 'Pediatría',
@@ -134,7 +134,7 @@ async function main() {
       {
         ci: 'V24681357',
         nombreCompleto: 'Dr. Andrés Felipe Rodríguez Cortés',
-        email: 'andres.rodriguez@hospital.com',
+        email: 'neumologia-pediatrica@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Pediatría',
         especialidad: 'Neumología Pediátrica',
@@ -146,7 +146,7 @@ async function main() {
       {
         ci: 'V44332211',
         nombreCompleto: 'Dr. Luis Fernando Castro Mendoza',
-        email: 'luis.castro@hospital.com',
+        email: 'traumatologia@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Traumatología',
         especialidad: 'Traumatología',
@@ -158,7 +158,7 @@ async function main() {
       {
         ci: 'V35791113',
         nombreCompleto: 'Dr. Gonzalo Javier Valenzuela Rivas',
-        email: 'gonzalo.valenzuela@hospital.com',
+        email: 'cirugia-manos@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Cirugía General',
         especialidad: 'Cirugía de Manos',
@@ -166,11 +166,23 @@ async function main() {
         fechaIngreso: new Date('2018-09-10'),
         autorizadoPor: 'RRHH - María González',
       },
-      // 8. Odontología
+      // 8. Cirugía Pediátrica
+      {
+        ci: 'V57913579',
+        nombreCompleto: 'Dr. Claudio Andrés Sepúlveda Torres',
+        email: 'cirugia-pediatrica@hospital.com',
+        rolAutorizado: 'MEDICO',
+        departamento: 'Cirugía General',
+        especialidad: 'Cirugía Pediátrica',
+        cargo: 'Cirujano Pediátrico',
+        fechaIngreso: new Date('2022-02-15'),
+        autorizadoPor: 'RRHH - María González',
+      },
+      // 9. Odontología
       {
         ci: 'V46802468',
         nombreCompleto: 'Dra. Viviana Catalina Morales Bravo',
-        email: 'viviana.morales@hospital.com',
+        email: 'odontologia@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Odontología',
         especialidad: 'Odontología',
@@ -178,11 +190,11 @@ async function main() {
         fechaIngreso: new Date('2021-01-20'),
         autorizadoPor: 'RRHH - María González',
       },
-      // 9. Otorrinolaringología
+      // 10. Otorrinolaringología
       {
         ci: 'V66778899',
         nombreCompleto: 'Dr. Pedro Andrés Flores Reyes',
-        email: 'pedro.flores@hospital.com',
+        email: 'otorrinolaringologia@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Otorrinolaringología',
         especialidad: 'Otorrinolaringología',
@@ -190,11 +202,11 @@ async function main() {
         fechaIngreso: new Date('2019-08-10'),
         autorizadoPor: 'RRHH - María González',
       },
-      // 10. Dermatología
+      // 11. Dermatología
       {
         ci: 'V22334455',
         nombreCompleto: 'Dra. Vanessa Irina Moreno Díaz',
-        email: 'vanessa.moreno@hospital.com',
+        email: 'dermatologia@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Dermatología',
         especialidad: 'Dermatología',
@@ -202,11 +214,11 @@ async function main() {
         fechaIngreso: new Date('2020-11-20'),
         autorizadoPor: 'RRHH - María González',
       },
-      // 11. Fisiatría
+      // 12. Fisiatría
       {
         ci: 'V57912346',
         nombreCompleto: 'Dr. Cristóbal Miguel Sánchez López',
-        email: 'cristobal.sanchez@hospital.com',
+        email: 'fisiatra@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Fisiatría',
         especialidad: 'Fisiatría',
@@ -214,11 +226,11 @@ async function main() {
         fechaIngreso: new Date('2019-02-10'),
         autorizadoPor: 'RRHH - María González',
       },
-      // 12. Ginecología
+      // 13. Ginecología
       {
         ci: 'V55667788',
         nombreCompleto: 'Dra. María Elena López Rodríguez',
-        email: 'maria.elena@hospital.com',
+        email: 'ginecologia@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Ginecología y Obstetricia',
         especialidad: 'Ginecología',
@@ -226,11 +238,11 @@ async function main() {
         fechaIngreso: new Date('2018-09-20'),
         autorizadoPor: 'RRHH - María González',
       },
-      // 13. Gastroenterología
+      // 14. Gastroenterología
       {
         ci: 'V68024680',
         nombreCompleto: 'Dr. Roberto Ignacio Vargas Muñoz',
-        email: 'roberto.vargas@hospital.com',
+        email: 'gastroenterologia@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Gastroenterología',
         especialidad: 'Gastroenterología',
@@ -238,11 +250,11 @@ async function main() {
         fechaIngreso: new Date('2020-05-15'),
         autorizadoPor: 'RRHH - María González',
       },
-      // 14. Hematología
+      // 15. Hematología
       {
         ci: 'V79135792',
         nombreCompleto: 'Dra. Eliana Patricia Reyes Serrano',
-        email: 'eliana.reyes@hospital.com',
+        email: 'hematologia@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Hematología',
         especialidad: 'Hematología',
@@ -250,11 +262,11 @@ async function main() {
         fechaIngreso: new Date('2019-11-05'),
         autorizadoPor: 'RRHH - María González',
       },
-      // 15. Psicología
+      // 16. Psicología
       {
         ci: 'V80246813',
         nombreCompleto: 'Dr. Enrique Sebastián Díaz Flores',
-        email: 'enrique.diaz@hospital.com',
+        email: 'psicologia@hospital.com',
         rolAutorizado: 'MEDICO',
         departamento: 'Psicología',
         especialidad: 'Psicología',
@@ -262,11 +274,11 @@ async function main() {
         fechaIngreso: new Date('2021-08-10'),
         autorizadoPor: 'RRHH - María González',
       },
-      // Admin de prueba
+      // 17. Admin de prueba
       {
         ci: 'V99887766',
         nombreCompleto: 'Dr. Roberto José Hernández Blanco',
-        email: 'roberto.hernandez@hospital.com',
+        email: 'administracion@hospital.com',
         rolAutorizado: 'ADMIN',
         departamento: 'Administración',
         cargo: 'Coordinador Administrativo',
