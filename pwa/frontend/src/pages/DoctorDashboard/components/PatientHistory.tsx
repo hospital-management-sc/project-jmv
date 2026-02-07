@@ -67,38 +67,46 @@ export default function PatientHistory({ patient, onBack }: Props) {
     const eventos: any[] = [];
 
     // Evento: Registro inicial
+    // Obtener información del usuario que registró el paciente
+    const admisionInicial = historiaCompleta.admisiones?.find((a: any) => !a.tipo && !a.servicio);
+    const usuarioRegistrador = admisionInicial?.createdBy;
+    
     if (historiaCompleta.createdAt) {
+      // Para REGISTRO, usar solo la fecha sin hora (es un evento del sistema del día completo)
+      const fechaRegistro = typeof historiaCompleta.createdAt === 'string'
+        ? historiaCompleta.createdAt.split('T')[0]
+        : new Date(historiaCompleta.createdAt).toISOString().split('T')[0]
+      
       eventos.push({
         tipo: "REGISTRO",
-        fecha: historiaCompleta.createdAt,
-        hora: historiaCompleta.createdAt,
+        fecha: fechaRegistro,
+        hora: null,
         icono: "📋",
         titulo: "Registro en el Sistema",
-        descripcion: `Paciente registrado en el sistema hospitalario. Nro. Historia: ${historiaCompleta.nroHistoria}`,
+        descripcion: `Paciente registrado en el sistema hospitalario.`,
         color: "#10b981",
+        // Auditoría - Quién registró
+        registradoPor: usuarioRegistrador
+          ? {
+              nombre: usuarioRegistrador.nombre || "Administrativo",
+              cargo: usuarioRegistrador.cargo || "Administrativo",
+              especialidad: usuarioRegistrador.especialidad,
+              role: usuarioRegistrador.role,
+            }
+          : null,
       });
     }
 
     // Eventos: Admisiones
+    // Nota: Las admisiones iniciales (tipo: null, servicio: null) NO se muestran como eventos separados
+    // porque forman parte del evento 'Registro en el Sistema'.
+    // Solo se muestran admisiones específicas (EMERGENCIA, HOSPITALIZACION, etc.)
     if (historiaCompleta.admisiones && historiaCompleta.admisiones.length > 0) {
       historiaCompleta.admisiones.forEach((admision: any) => {
         const esAdmisionInicial = !admision.tipo && !admision.servicio;
 
-        if (esAdmisionInicial) {
-          const formaIngreso = admision.formaIngreso || "No especificado";
-          const diagnostico = admision.diagnosticoIngreso || "Sin diagnóstico";
-
-          eventos.push({
-            tipo: "ADMISION_INICIAL",
-            fecha: admision.fechaAdmision || admision.createdAt,
-            hora: admision.horaAdmision || admision.createdAt,
-            icono: "🏥",
-            titulo: "Admisión Inicial",
-            descripcion: `Forma de ingreso: ${formaIngreso}. Diagnóstico: ${diagnostico}`,
-            detalles: admision,
-            color: "#10b981",
-          });
-        } else {
+        // Solo mostrar admisiones específicas (no iniciales)
+        if (!esAdmisionInicial) {
           const tipoAdmision = admision.tipo || "HOSPITALIZACIÓN";
           const servicioAdmision = admision.servicio || "No especificado";
           const estadoAdmision = admision.estado || "ACTIVA";
@@ -112,6 +120,15 @@ export default function PatientHistory({ patient, onBack }: Props) {
             descripcion: `Servicio: ${servicioAdmision}. Estado: ${estadoAdmision}`,
             detalles: admision,
             color: tipoAdmision === "EMERGENCIA" ? "#ef4444" : "#3b82f6",
+            // Auditoría - Quién creó la admisión
+            registradoPor: admision.createdBy
+              ? {
+                  nombre: admision.createdBy.nombre || "Usuario desconocido",
+                  cargo: admision.createdBy.cargo || "No especificado",
+                  especialidad: admision.createdBy.especialidad,
+                  role: admision.createdBy.role,
+                }
+              : null,
           });
 
           // Eventos: Información completada en Formato de Emergencia
@@ -202,10 +219,19 @@ export default function PatientHistory({ patient, onBack }: Props) {
           hora: encuentro.hora || encuentro.createdAt,
           icono: icono,
           titulo: `Encuentro Médico: ${encuentro.tipo}`,
-          descripcion: `Médico: ${medicoNombre}${motivoTexto}`,
+          descripcion: `${motivoTexto}`,
           detalles: encuentro,
           color: color,
           diagnostico: diagnostico,
+          // Auditoría - Médico que realizó el encuentro
+          registradoPor: encuentro.createdBy
+            ? {
+                nombre: encuentro.createdBy.nombre || "Médico no registrado",
+                cargo: encuentro.createdBy.cargo || "Médico",
+                especialidad: encuentro.createdBy.especialidad,
+                role: encuentro.createdBy.role,
+              }
+            : null,
         });
       });
     }
@@ -742,7 +768,10 @@ export default function PatientHistory({ patient, onBack }: Props) {
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {formatDateVenezuela(evento.fecha)}
+                        {evento.tipo === 'CITA' || evento.tipo === 'ADMISION' || evento.tipo === 'ADMISION_INICIAL' || evento.tipo === 'ENCUENTRO' || evento.tipo === 'REGISTRO'
+                          ? formatDateLocal(evento.fecha)
+                          : formatDateVenezuela(evento.fecha)
+                        }
                       </span>
                       <span
                         style={{
@@ -760,15 +789,17 @@ export default function PatientHistory({ patient, onBack }: Props) {
                       </span>
                     </div>
                   </div>
-                  <p
-                    style={{
-                      margin: "0 0 0.5rem 0",
-                      color: "var(--text-secondary)",
-                      fontSize: "0.95rem",
-                    }}
-                  >
-                    {evento.descripcion}
-                  </p>
+                  {evento.tipo !== "ENCUENTRO" && (
+                    <p
+                      style={{
+                        margin: "0 0 0.5rem 0",
+                        color: "var(--text-secondary)",
+                        fontSize: "0.95rem",
+                      }}
+                    >
+                      {evento.descripcion}
+                    </p>
+                  )}
 
                   {/* Detalles adicionales según tipo de evento */}
                   {evento.detalles && evento.tipo === "ENCUENTRO" && (
@@ -777,22 +808,8 @@ export default function PatientHistory({ patient, onBack }: Props) {
                         marginTop: "1rem",
                         paddingTop: "1rem",
                         borderTop: "1px solid var(--border-color)",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.75rem",
-                        fontSize: "0.85rem",
                       }}
                     >
-                      {evento.diagnostico && (
-                        <div>
-                          <strong style={{ color: "var(--text-secondary)" }}>
-                            Diagnóstico:
-                          </strong>
-                          <span style={{ marginLeft: "0.5rem" }}>
-                            {evento.diagnostico}
-                          </span>
-                        </div>
-                      )}
                       <button
                         onClick={() =>
                           handleVerDetalleEncuentro(evento.detalles)
@@ -806,7 +823,6 @@ export default function PatientHistory({ patient, onBack }: Props) {
                           cursor: "pointer",
                           fontSize: "0.875rem",
                           fontWeight: "500",
-                          alignSelf: "flex-start",
                         }}
                       >
                         Ver detalle completo del encuentro →
@@ -857,6 +873,35 @@ export default function PatientHistory({ patient, onBack }: Props) {
                         )}
                       </div>
                     )}
+
+                  {/* Información de auditoría - Quién registró el evento (aparece al final) */}
+                  {evento.registradoPor && (
+                    <div
+                      style={{
+                        marginTop: "1rem",
+                        paddingTop: "1rem",
+                        borderTop: "1px solid var(--border-color)",
+                        fontSize: "0.85rem",
+                        color: "var(--text-secondary)",
+                        display: "flex",
+                        gap: "0.5rem",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span style={{ fontStyle: "italic" }}>Registrado por:</span>
+                      <strong style={{ color: "var(--text-primary)" }}>
+                        {evento.registradoPor.nombre}
+                      </strong>
+                      {evento.registradoPor.cargo && (
+                        <span>
+                          • {evento.registradoPor.cargo}
+                          {evento.registradoPor.especialidad &&
+                            ` (${evento.registradoPor.especialidad})`}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

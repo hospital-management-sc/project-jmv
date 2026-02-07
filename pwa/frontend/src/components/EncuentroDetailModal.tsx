@@ -1,11 +1,13 @@
 /**
  * Modal para mostrar el detalle completo de un encuentro médico
  * Solo lectura - Vista administrativa
+ * Renderiza dinámicamente todos los datos según el formularioEspecializado
  */
 
 import type { Encuentro } from '@/services/encuentros.service';
+import { ESPECIALIDADES_MEDICAS } from '@/config/especialidades.config';
+import { formatDateLocal, formatTimeMilitaryVenezuela } from '@/utils/dateUtils';
 import styles from './EncuentroDetailModal.module.css';
-import { VENEZUELA_TIMEZONE, VENEZUELA_LOCALE } from '@/utils/dateUtils';
 
 interface EncuentroDetailModalProps {
   encuentro: Encuentro | null;
@@ -15,6 +17,82 @@ interface EncuentroDetailModalProps {
 const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps) => {
   if (!encuentro) return null;
 
+  // Función para buscar la especialidad del médico - OPTIMIZADA PARA NUEVA ESTRUCTURA
+  const obtenerEspecialidad = () => {
+    if (!encuentro.createdBy) return null;
+    
+    // Estrategia 1: Buscar usando metadata guardada en examenFisico (para encuentros antiguos)
+    if (encuentro.examenFisico?.['__especialidadId']) {
+      const porMetadata = ESPECIALIDADES_MEDICAS.find(
+        e => e.id === encuentro.examenFisico?.['__especialidadId']
+      );
+      if (porMetadata) {
+        console.log('[EncuentroDetailModal] ✅ Especialidad encontrada por metadata:', porMetadata.nombre);
+        return porMetadata;
+      }
+    }
+    
+    // Estrategia 2: Buscar por ID exacto en createdBy.especialidad (NUEVO - desde backend)
+    if (encuentro.createdBy.especialidad) {
+      const porId = ESPECIALIDADES_MEDICAS.find(e => e.id === encuentro.createdBy?.especialidad);
+      if (porId) {
+        console.log('[EncuentroDetailModal] ✅ Especialidad encontrada por ID directo:', porId.nombre);
+        return porId;
+      }
+      
+      // Estrategia 3: Buscar por nombre exacto (si el backend envió el nombre completo)
+      const porNombre = ESPECIALIDADES_MEDICAS.find(e => e.nombre === encuentro.createdBy?.especialidad);
+      if (porNombre) {
+        console.log('[EncuentroDetailModal] ✅ Especialidad encontrada por nombre:', porNombre.nombre);
+        return porNombre;
+      }
+      
+      // Estrategia 4: Búsqueda parcial (si el backend envió algo similar)
+      const porBusquedaParcial = ESPECIALIDADES_MEDICAS.find(e => 
+        encuentro.createdBy?.especialidad?.toLowerCase().includes(e.id.toLowerCase()) ||
+        e.id.toLowerCase().includes(encuentro.createdBy?.especialidad?.toLowerCase())
+      );
+      if (porBusquedaParcial) {
+        console.log('[EncuentroDetailModal] ✅ Especialidad encontrada por búsqueda parcial:', porBusquedaParcial.nombre);
+        return porBusquedaParcial;
+      }
+    }
+    
+    // Estrategia 5: Buscar por cargo/nombre en la lista de especialidades (fallback final)
+    if (encuentro.createdBy.cargo) {
+      const cargoLower = encuentro.createdBy.cargo.toLowerCase();
+      const porCargo = ESPECIALIDADES_MEDICAS.find(e => 
+        cargoLower.includes(e.id.toLowerCase()) || 
+        cargoLower.includes(e.nombre.toLowerCase()) ||
+        e.nombre.toLowerCase().includes(cargoLower)
+      );
+      if (porCargo) {
+        console.log('[EncuentroDetailModal] ✅ Especialidad encontrada por cargo:', porCargo.nombre);
+        return porCargo;
+      }
+    }
+    
+    // Si no encuentra especialidad
+    console.warn('[EncuentroDetailModal] ⚠️ No se encontró especialidad para:', {
+      especialidadId: encuentro.createdBy?.especialidad,
+      cargo: encuentro.createdBy?.cargo,
+      metadataId: encuentro.examenFisico?.['__especialidadId'],
+      medicoNombre: encuentro.createdBy?.nombre,
+    });
+    return null;
+  };
+
+  const especialidad = obtenerEspecialidad();
+  const formularioEspecializado = especialidad?.formularioEspecializado;
+
+  // Función para renderizar un valor según su tipo
+  const renderizarValor = (valor: any) => {
+    if (valor === null || valor === undefined || valor === '') return '—';
+    if (typeof valor === 'boolean') return valor ? 'Sí' : 'No';
+    if (typeof valor === 'object') return JSON.stringify(valor);
+    return String(valor);
+  };
+
   const getTipoLabel = (tipo: string) => {
     const labels: Record<string, string> = {
       EMERGENCIA: '🚨 Emergencia',
@@ -23,22 +101,6 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
       OTRO: '📋 Otro',
     };
     return labels[tipo] || tipo;
-  };
-
-  const formatFecha = (fecha: string) => {
-    const date = new Date(fecha);
-    return date.toLocaleDateString(VENEZUELA_LOCALE, {
-      timeZone: VENEZUELA_TIMEZONE,
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const formatHora = (hora?: string) => {
-    if (!hora) return '--:--';
-    return hora.substring(0, 5);
   };
 
   return (
@@ -62,11 +124,11 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
               </div>
               <div className={styles.infoItem}>
                 <span className={styles.label}>Fecha:</span>
-                <span className={styles.value}>{formatFecha(encuentro.fecha)}</span>
+                <span className={styles.value}>{formatDateLocal(encuentro.fecha)}</span>
               </div>
               <div className={styles.infoItem}>
                 <span className={styles.label}>Hora:</span>
-                <span className={styles.value}>{formatHora(encuentro.hora)}</span>
+                <span className={styles.value}>{encuentro.hora && formatTimeMilitaryVenezuela(encuentro.hora)}</span>
               </div>
               {encuentro.nroCama && (
                 <div className={styles.infoItem}>
@@ -92,9 +154,6 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
                   <strong>{encuentro.createdBy.nombre}</strong>
                   {encuentro.createdBy.cargo && (
                     <span className={styles.cargo}>{encuentro.createdBy.cargo}</span>
-                  )}
-                  {encuentro.createdBy.role && (
-                    <span className={styles.role}>Rol: {encuentro.createdBy.role}</span>
                   )}
                 </div>
               </div>
@@ -195,6 +254,116 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
             </section>
           )}
 
+          {/* Datos Especializados del Formulario */}
+          {encuentro.examenFisico && Object.keys(encuentro.examenFisico).length > 0 && (
+            <>
+              {formularioEspecializado ? (
+                // Renderizar dinámicamente según el formularioEspecializado
+                formularioEspecializado.pasos.map((paso) => {
+                  // Filtrar campos que tengan datos en examenFisico (excluir metadata)
+                  const camposConDatos = paso.campos.filter(
+                    campo => encuentro.examenFisico?.[campo.id] !== undefined && 
+                             encuentro.examenFisico[campo.id] !== null &&
+                             encuentro.examenFisico[campo.id] !== '' &&
+                             !campo.id.startsWith('__') // Excluir metadata
+                  );
+
+                  // Solo mostrar el paso si tiene campos con datos
+                  if (camposConDatos.length === 0) return null;
+
+                  return (
+                    <section key={paso.numero} className={styles.section}>
+                      <h3 className={styles.sectionTitle}>
+                        {paso.emoji && <span>{paso.emoji} </span>}
+                        {paso.titulo}
+                      </h3>
+                      
+                      {/* Agrupar campos por grupo */}
+                      {(() => {
+                        const grupos = new Map<string, typeof camposConDatos>();
+                        camposConDatos.forEach(campo => {
+                          const grupo = campo.grupo || 'general';
+                          if (!grupos.has(grupo)) {
+                            grupos.set(grupo, []);
+                          }
+                          grupos.get(grupo)!.push(campo);
+                        });
+
+                        return Array.from(grupos.entries()).map(([grupo, campos]) => (
+                          <div key={grupo} className={styles.campoGrupo}>
+                            {/* Solo mostrar titulo del subgrupo si hay múltiples grupos */}
+                            {grupos.size > 1 && grupo !== 'general' && (
+                              <h4 className={styles.subgrupoTitle}>
+                                {grupo.replace(/([A-Z])/g, ' $1').trim()}
+                              </h4>
+                            )}
+                            <div className={styles.infoGrid}>
+                              {campos.map(campo => (
+                                <div key={campo.id} className={styles.infoItem}>
+                                  <span className={styles.label}>
+                                    {campo.emoji && <span>{campo.emoji} </span>}
+                                    {campo.label}:
+                                  </span>
+                                  <span className={styles.value}>
+                                    {campo.tipo === 'textarea' ? (
+                                      <div className={styles.textContent}>
+                                        {renderizarValor(encuentro.examenFisico?.[campo.id])}
+                                      </div>
+                                    ) : (
+                                      renderizarValor(encuentro.examenFisico?.[campo.id])
+                                    )}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </section>
+                  );
+                })
+              ) : (
+                // FALLBACK: Si NO hay formularioEspecializado, mostrar TODOS los datos de examenFisico
+                // Esto asegura que NUNCA se pierda información
+                <section className={styles.section}>
+                  <h3 className={styles.sectionTitle}>⚕️ Datos Especializados del Encuentro</h3>
+                  <div className={styles.infoGrid}>
+                    {Object.entries(encuentro.examenFisico)
+                      .filter(([key]) => !key.startsWith('__')) // Excluir metadata
+                      .map(([key, value]) => (
+                        <div key={key} className={styles.infoItem}>
+                          <span className={styles.label}>
+                            {/* Convertir camelCase a palabras legibles */}
+                            {key.replace(/([A-Z])/g, ' $1')
+                               .replace(/^./, str => str.toUpperCase())
+                               .trim()}:
+                          </span>
+                          <span className={styles.value}>
+                            {typeof value === 'object' ? (
+                              <div className={styles.textContent}>
+                                {JSON.stringify(value, null, 2)}
+                              </div>
+                            ) : typeof value === 'string' && value.length > 100 ? (
+                              <div className={styles.textContent}>
+                                {renderizarValor(value)}
+                              </div>
+                            ) : (
+                              renderizarValor(value)
+                            )}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                  {!especialidad && (
+                    <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(255, 193, 7, 0.1)', borderRadius: '0.375rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                      ℹ️ Nota: Especialidad no identificada. Se muestran todos los datos registrados.
+                    </div>
+                  )}
+                </section>
+              )}
+            </>
+          )}
+
           {/* Admisión Relacionada */}
           {encuentro.admision && (
             <section className={styles.section}>
@@ -213,7 +382,7 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
                     <div className={styles.infoItem}>
                       <span className={styles.label}>Fecha Ingreso:</span>
                       <span className={styles.value}>
-                        {formatFecha(encuentro.admision.fechaAdmision)}
+                        {formatDateLocal(encuentro.admision.fechaAdmision)}
                       </span>
                     </div>
                   )}

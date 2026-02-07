@@ -188,6 +188,8 @@ export const listarAdmisionesPaciente = async (req: Request, res: Response) => {
             id: true,
             nombre: true,
             cargo: true,
+            especialidad: true,
+            role: true,
           },
         },
         estanciaHospitalaria: {

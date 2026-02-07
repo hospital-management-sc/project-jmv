@@ -61,6 +61,9 @@ export const crearPaciente = async (
       tipoAdmision, // NUEVO: Tipo de admisión (EMERGENCIA, HOSPITALIZACION, etc.) o null
       servicioAdmision, // NUEVO: Servicio de la admisión
       
+      // Auditoría - Quién registra el paciente
+      createdById, // ID del usuario administrativo que registra el paciente
+      
       // Datos personales
       apellidosNombres,
       ci,
@@ -196,6 +199,18 @@ export const crearPaciente = async (
           tipo: tipoAdmision || null, // EMERGENCIA, HOSPITALIZACION, o null
           servicio: servicioAdmision || null,
           estado: 'ACTIVA',
+          createdById: createdById ? Number(createdById) : null, // Quién registró esta admisión
+        },
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              nombre: true,
+              cargo: true,
+              especialidad: true,
+              role: true,
+            },
+          },
         },
       });
 
@@ -246,6 +261,16 @@ export const crearPaciente = async (
         ci: resultado.paciente.ci,
         apellidosNombres: resultado.paciente.apellidosNombres,
         admisionId: resultado.admision.id.toString(),
+        // Información de auditoría
+        registradoPor: resultado.admision.createdBy
+          ? {
+              id: resultado.admision.createdBy.id?.toString() || null,
+              nombre: resultado.admision.createdBy.nombre || null,
+              cargo: resultado.admision.createdBy.cargo || 'Administrativo',
+              especialidad: resultado.admision.createdBy.especialidad || null,
+              role: resultado.admision.createdBy.role || 'ADMIN',
+            }
+          : null,
       },
     });
   } catch (error: any) {
@@ -294,6 +319,15 @@ export const obtenerPaciente = async (
         afiliado: true,
         admisiones: {
           include: {
+            createdBy: {
+              select: {
+                id: true,
+                nombre: true,
+                cargo: true,
+                especialidad: true,
+                role: true,
+              },
+            },
             formatoEmergencia: true,
             formatoHospitalizacion: {
               include: {
@@ -311,7 +345,19 @@ export const obtenerPaciente = async (
             },
           },
         },
-        encuentros: true,
+        encuentros: {
+          include: {
+            createdBy: {
+              select: {
+                id: true,
+                nombre: true,
+                cargo: true,
+                especialidad: true,
+                role: true,
+              },
+            },
+          },
+        },
         citas: {
           orderBy: {
             fechaCita: 'desc',

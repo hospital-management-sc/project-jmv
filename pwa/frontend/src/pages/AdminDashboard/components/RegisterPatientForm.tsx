@@ -7,12 +7,16 @@ import { useState, useEffect } from 'react'
 import { SearchableSelect } from '@/components/SearchableSelect/SearchableSelect'
 import { PatientTypeSelector } from '@/components/PatientTypeSelector'
 import { AfiliadoDataSection, type AfiliadoData } from '@/components/AfiliadoDataSection'
+import { useAuth } from '@/contexts/AuthContext'
 import { API_BASE_URL } from '@/utils/constants'
 import { getTodayVenezuelaISO, getCurrentTimeVenezuela } from '@/utils/dateUtils'
 import { ESTADOS_VENEZUELA, NACIONALIDADES, RELIGIONES, GRADOS_MILITARES, COMPONENTES_MILITARES } from '@/constants/venezuela'
 import styles from '../AdminDashboard.module.css'
 
 export function RegisterPatientForm() {
+  // Obtener usuario autenticado
+  const { user } = useAuth()
+  
   // Estado para tipo de paciente seleccionado
   const [selectedPatientType, setSelectedPatientType] = useState<'MILITAR' | 'AFILIADO' | 'PNA' | null>(null)
 
@@ -222,8 +226,10 @@ export function RegisterPatientForm() {
       horaAdmision: formData.horaAdmision,
       firmaFacultativo: formData.firmaFacultativo,
       habitacion: formData.habitacion,
-      tipoAdmision: 'HOSPITALIZACION', // Especificar tipo de admisión
-      servicioAdmision: 'HOSPITALIZACION', // Servicio de la admisión
+      // NO especificar tipoAdmision ni servicioAdmision aquí
+      // La admisión será una admisión INICIAL (tipo: null, servicio: null)
+      // Las admisiones específicas (HOSPITALIZACION, EMERGENCIA, etc.) se crean después
+      createdById: user?.id, // Quién registra el paciente
       apellidosNombres: formData.apellidosNombres,
       ci: ciCompleta,
       ciTipo: formData.ciTipo,

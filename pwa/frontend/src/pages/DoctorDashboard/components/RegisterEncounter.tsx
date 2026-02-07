@@ -17,6 +17,13 @@ interface Props {
 }
 
 export default function RegisterEncounter({ patient = null, doctorId, especialidadId }: Props) {
+  // ⚠️ VALIDACIÓN CRÍTICA - doctorId es requerido para createdById
+  if (!doctorId) {
+    console.error('[RegisterEncounter] ⚠️ CRITICAL: doctorId is missing!', { doctorId });
+  } else {
+    console.log('[RegisterEncounter] ✅ doctorId available:', doctorId);
+  }
+  
   // Obtener configuración de especialidad por ID
   const especialidad = useMemo(() => obtenerEspecialidadPorId(especialidadId), [especialidadId]);
   const formularioConfig = especialidad?.formularioEspecializado;
@@ -164,25 +171,46 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
             }
           : undefined;
 
-      // Construir objeto de impresión diagnóstica solo si hay datos
-      const impresionDiagnostica = formData.diagnostico
+      // Construir objeto de impresión diagnóstica
+      // Buscar campos de diagnóstico: puede ser "diagnostico", "impresionDx", u otros nombres
+      const diagnosticoFields = ['diagnostico', 'impresionDx', 'impresionDiagnostica'];
+      const fieldDiagnostico = diagnosticoFields.find(field => formData[field]);
+      const fieldCodigoCie = 'codigoCie';
+      
+      const impresionDiagnostica = fieldDiagnostico || formData[fieldCodigoCie]
         ? {
-            descripcion: String(formData.diagnostico),
-            codigoCie: formData.codigoCie ? String(formData.codigoCie) : undefined,
+            descripcion: fieldDiagnostico ? String(formData[fieldDiagnostico]) : undefined,
+            codigoCie: formData[fieldCodigoCie] ? String(formData[fieldCodigoCie]) : undefined,
           }
         : undefined;
 
       // Construir objeto de examen físico (JSONB) desde campos dinámicos
+      // ⚠️ CAPTURAR TODOS LOS PASOS (excepto paso 1 que es búsqueda y pasos que contengan tipo/fecha/hora)
       const examenFisico: {[key: string]: string | undefined} = {};
+      const camposExcluidos = new Set([
+        'ciTipo', 'ciNumeros', // Paso 1 - búsqueda
+        'tipo', 'fecha', 'hora', 'procedencia', 'nroCama', // Campos que ya están mapeados en encuentroData
+        'motivoConsulta', 'enfermedadActual', // Campos que ya están mapeados en encuentroData
+        'taSistolica', 'taDiastolica', 'pulso', 'temperatura', 'fr', 'observaciones', // Signos vitales
+        fieldDiagnostico, fieldCodigoCie, // Campos de diagnóstico (ya mapeados)
+      ]);
+
       if (formularioConfig) {
-        const pasoExamen = formularioConfig.pasos.find(p => p.numero === 3);
-        if (pasoExamen) {
-          pasoExamen.campos.forEach(campo => {
-            if (formData[campo.id]) {
+        // Iterar sobre TODOS los pasos
+        formularioConfig.pasos.forEach(paso => {
+          paso.campos.forEach(campo => {
+            // Solo incluir si el campo tiene dato y no está en la lista de excluidos
+            if (formData[campo.id] && !camposExcluidos.has(campo.id)) {
               examenFisico[campo.id] = String(formData[campo.id]);
             }
           });
-        }
+        });
+      }
+
+      // ✅ IMPORTANTE: Incluir especialidadId como metadata para ayudar a identificar la especialidad
+      if (especialidadId && especialidad) {
+        examenFisico['__especialidadId'] = especialidadId;
+        examenFisico['__especialidadNombre'] = especialidad.nombre;
       }
 
       const encuentroData = {
@@ -199,6 +227,14 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
         impresionDiagnostica,
         examenFisico: Object.keys(examenFisico).length > 0 ? examenFisico : undefined,
       };
+
+      // ⚠️ VALIDACIÓN ANTES DE ENVIAR
+      if (!encuentroData.createdById) {
+        console.error('[RegisterEncounter] ❌ createdById is missing before sending to API!', { encuentroData, doctorId });
+        throw new Error('Error crítico: No se puede identificar al médico. Por favor, recarga la página.');
+      }
+
+      console.log('[RegisterEncounter] ✅ Sending encuentroData:', encuentroData);
 
       await encuentrosService.crearEncuentro(encuentroData);
 

@@ -25,6 +25,12 @@ import PacientesEnEmergencia from "@/components/PacientesEnEmergencia";
 export default function DoctorDashboard() {
   const { user } = useAuth();
   
+  // DEBUG: Verificar que user tiene id
+  console.log('[DoctorDashboard] User from AuthContext:', user);
+  if (user && !user.id) {
+    console.error('[DoctorDashboard] ⚠️ User does not have id!', { user });
+  }
+  
   // Obtener especialidad del usuario - intenta código primero, luego nombre, luego fallback a ORL
   const especialidad = useMemo(() => {
     if (!user?.especialidad) {
@@ -100,11 +106,21 @@ export default function DoctorDashboard() {
         )}
         {viewMode === "hospitalized-patients" && <HospitalizedPatients />}
         {viewMode === "register-encounter" && (
-          <RegisterEncounter
-            patient={selectedPatient}
-            doctorId={user?.id as number}
-            especialidadId={especialidad?.id || 'otorrinolaringologia'}
-          />
+          <>
+            {!user?.id ? (
+              <div style={{ padding: '2rem', backgroundColor: '#fee2e2', borderRadius: '0.5rem', textAlign: 'center' }}>
+                <p style={{ color: '#dc2626', fontWeight: 'bold' }}>
+                  ⚠️ Error: No se puede obtener tu ID de usuario. Por favor, recarga la página o inicia sesión nuevamente.
+                </p>
+              </div>
+            ) : (
+              <RegisterEncounter
+                patient={selectedPatient}
+                doctorId={user.id}
+                especialidadId={especialidad?.id || 'otorrinolaringologia'}
+              />
+            )}
+          </>
         )}
         {viewMode === "search-patient" && (
           <SearchPatient

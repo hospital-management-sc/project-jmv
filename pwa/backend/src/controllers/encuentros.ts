@@ -71,9 +71,25 @@ export const crearEncuentro = async (
 
     // Validaciones básicas
     if (!pacienteId || !tipo || !createdById) {
+      const missingFields = [];
+      if (!pacienteId) missingFields.push('pacienteId');
+      if (!tipo) missingFields.push('tipo');
+      if (!createdById) missingFields.push('createdById');
+      
+      logger.error(`[crearEncuentro] Missing required fields: ${missingFields.join(', ')}`, { 
+        req: req.body,
+        missingFields 
+      });
+      
       res.status(400).json({
         success: false,
-        error: 'Campos requeridos: pacienteId, tipo, createdById',
+        error: 'Validación fallida',
+        message: `Campos requeridos faltantes: ${missingFields.join(', ')}`,
+        receivedFields: {
+          pacienteId: req.body.pacienteId ? '✓' : '❌',
+          tipo: req.body.tipo ? '✓' : '❌',
+          createdById: req.body.createdById ? '✓' : '❌'
+        }
       });
       return;
     }
@@ -139,6 +155,8 @@ export const crearEncuentro = async (
               id: true,
               nombre: true,
               cargo: true,
+              especialidad: true,
+              role: true,
             },
           },
           impresiones: true,
@@ -267,6 +285,9 @@ export const crearEncuentroDesdeCita = async (
             select: {
               id: true,
               nombre: true,
+              cargo: true,
+              especialidad: true,
+              role: true,
             },
           },
           impresiones: true,
@@ -335,6 +356,7 @@ export const obtenerEncuentrosPorPaciente = async (
             id: true,
             nombre: true,
             cargo: true,
+            especialidad: true,
             role: true,
           },
         },
@@ -412,6 +434,7 @@ export const obtenerEncuentroPorId = async (
             id: true,
             nombre: true,
             cargo: true,
+            especialidad: true,
             role: true,
             email: true,
           },
@@ -498,6 +521,8 @@ export const obtenerEncuentrosHoy = async (
             id: true,
             nombre: true,
             cargo: true,
+            especialidad: true,
+            role: true,
           },
         },
       },
@@ -566,6 +591,8 @@ export const obtenerEncuentrosPorTipo = async (
             id: true,
             nombre: true,
             cargo: true,
+            especialidad: true,
+            role: true,
           },
         },
       },

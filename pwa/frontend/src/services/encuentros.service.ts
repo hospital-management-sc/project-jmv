@@ -50,9 +50,13 @@ export interface Encuentro {
     nombre: string;
     cargo?: string;
     role?: string;
+    especialidad?: string;
   };
   signosVitales: SignosVitales[];
   impresiones: ImpresionDiagnostica[];
+  examenFisico?: {
+    [key: string]: string | number | boolean | undefined;
+  };
   admision?: {
     id: string;
     tipo?: string;
