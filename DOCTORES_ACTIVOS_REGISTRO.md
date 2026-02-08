@@ -24,7 +24,7 @@
 | Ali Tovar | Lunes | 7:00 AM | |
 | Samanta Martínez | Miércoles | 7:00 AM | |
 | Mariana Castillo | Jueves | 7:00 AM | |
-| Richar Ceballos | Cada 15 días | 7:00 AM | Asistencia cada 15 días |
+| Richard Ceballos | Cada 15 días | 7:00 AM | Asistencia cada 15 días |
 
 ---
 
@@ -45,7 +45,7 @@
 ### 6. **DERMATOLOGÍA** (8 doctores)
 | Nombre | Día | Hora |
 |--------|-----|------|
-| Marín Mayerlín | Lunes | 8:00 AM |
+| Mayerlin Marín | Lunes | 8:00 AM |
 | Nubilaska Rojas | Lunes | 1:00 PM |
 | Tanelis Hurtado | Martes | 8:00 AM |
 | Oscarimar Cedeño | Martes | 1:00 PM |
@@ -63,14 +63,14 @@
 | Williams González | Martes | 8:00 AM |
 | Nisorlis Pérdomo | Miércoles | 8:00 AM |
 | Cristal Rodríguez | Jueves | 8:00 AM |
-| Pico | Viernes | 8:00 AM |
+| Dra. Pico | Viernes | 8:00 AM |
 
 ---
 
 ### 8. **TRAUMATOLOGÍA** (3 doctores)
 | Nombre | Día | Hora |
 |--------|-----|------|
-| Erzón Rivera | Miércoles | 8:00 AM |
+| Erzo Rivera | Miércoles | 8:00 AM |
 | Omadelis | Jueves | 8:00 AM |
 | Nelson Castillo | Viernes | 8:00 AM |
 
@@ -86,12 +86,12 @@
 ### 10. **GINECOLOGÍA** (6 doctores)
 | Nombre | Día | Hora |
 |--------|-----|------|
-| Lilibet Armas | Lunes | 1:00 PM |
+| Lilibeth Armas | Lunes | 1:00 PM |
 | Beatriz Martínez | Martes | 8:00 AM |
 | Ana Rodríguez | Miércoles | 7:00 AM |
 | Camalis Sevilla | Miércoles | 1:00 PM |
 | Luciana Itriago | Jueves | 7:00 AM |
-| Yelika Marchán | Viernes | 8:00 AM |
+| Yelika Marchan | Viernes | 8:00 AM |
 
 ---
 
@@ -99,7 +99,7 @@
 | Nombre | Día | Hora |
 |--------|-----|------|
 | Karen Tovar | Lunes | 1:00 PM |
-| Karla Pérez | Miércoles | 7:00 AM |
+| Carla Pérez | Miércoles | 7:00 AM |
 | Karianni Lucena | Jueves | 8:00 AM |
 
 ---
@@ -111,31 +111,35 @@
 
 ---
 
-### 13. **ECOGRAFÍA** (4 doctores)
+### 13. **ECOGRAFÍA** (5 doctores)
 | Nombre | Día | Hora | Observaciones |
 |--------|-----|------|---|
-| Óscar Domínguez | Lunes | 8:00 AM | |
-| Loreto Igual | ? | ? | **FALTA INFORMACIÓN** |
+| Óscar Dominguez | Lunes | 8:00 AM | |
+| Loreto Ifual | Lunes | 1:00 PM | |
 | Ninibeth Mireles | Martes | 1:00 PM | |
 | Reina Gómez | Miércoles | 7:00 AM | |
 | Keila Padrino | Jueves | 1:00 PM | |
 
 ---
 
-### 14. **ODONTOLOGÍA** (11 doctores)
+### 14. **ODONTOLOGÍA** (15 participaciones de doctores)
 | Nombre | Día | Hora | Observaciones |
 |--------|-----|------|---|
-| Génesis Argornoz | Lunes | 8:00 AM | También aparece en Jueves 8:00 AM |
-| Shakira Oropeza | ? | 8:00 AM | **FALTA DÍA** |
-| Agnnei Escalona | ? | 1:00 PM | **FALTA DÍA** (aparece 2 veces) |
-| Fernando Jiménez | ? | 1:00 PM | **FALTA DÍA** |
-| Simón Liendo | Martes | 8:00 AM | También aparece Martes 1:00 PM |
-| Mercedes Ribas | ? | 1:00 PM | **FALTA DÍA** |
-| Yueleidys Hernández | ? | 1:00 PM | **FALTA DÍA** (Juleidys también) |
-| Sol Viera | Miércoles | 8:00 AM | También aparece Viernes 8:00 AM |
-| Bernaldo Liendo | ? | 1:00 PM | **FALTA DÍA** |
+| Génesis Albornoz | Lunes | 8:00 AM | |
+| Shakira Oropeza | Lunes | 8:00 AM | |
+| Agnney Escalona | Lunes | 1:00 PM | |
+| Fernando Jiménez | Lunes | 1:00 PM | |
+| Simón Liendo | Martes | 8:00 AM | |
+| Agnney Escalona | Martes | 1:00 PM | |
+| Mercedes Ribas | Martes | 1:00 PM | |
+| Yueleidys Hernández | Martes | 1:00 PM | |
+| Sol Viera | Miércoles | 8:00 AM | |
+| Simón Liendo | Miércoles | 1:00 PM | |
+| Bernardo Liendo | Miércoles | 1:00 PM | |
+| Génesis Albornoz | Jueves | 8:00 AM | |
 | Mercedes Vivas | Jueves | 8:00 AM | |
 | Juleidys Hernández | Jueves | 1:00 PM | |
+| Sol Viera | Viernes | 8:00 AM | |
 
 ---
 
@@ -157,23 +161,40 @@
 | Fisiatría | 1 |
 | Ecografía | 5 |
 | Odontología | 11 |
-| **TOTAL** | **53 DOCTORES** |
+| **TOTAL** | **54 DOCTORES** |
 
 ---
 
-## ⚠️ PROBLEMAS Y DATOS FALTANTES POR ESPECIALIDAD
+## ✅ CORRECCIONES REALIZADAS
 
 ### **ECOGRAFÍA**
-- **Loreto Igual**: Falta COMPLETAMENTE día y hora
+- ✓ **Loreto Ifual**: Actualizado a Lunes 1:00 PM (antes faltaba información)
+- ✓ Total actualizado a 5 doctores
 
-### **ODONTOLOGÍA** (MÚLTIPLES PROBLEMAS)
-- **Shakira Oropeza**: Falta el día (solo tiene hora 8:00 AM)
-- **Agnnei Escalona**: Falta el día (solo tiene hora 1:00 PM) - *Aparece 2 veces en la nota*
-- **Fernando Jiménez**: Falta el día (solo tiene hora 1:00 PM)
-- **Mercedes Ribas**: Falta el día (solo tiene hora 1:00 PM)
-- **Yueleidys Hernández**: Falta el día (solo tiene hora 1:00 PM)
-- **Bernaldo Liendo**: Falta el día (solo tiene hora 1:00 PM)
-- **Conflicto**: Génesis Argornoz y Simón Liendo aparecen en DOS días diferentes
+### **ODONTOLOGÍA**
+- ✓ **Génesis Argornoz** → **Génesis Albornoz** (correción de apellido)
+- ✓ **Agnnei Escalona** → **Agnney Escalona** (correción de ortografía)
+- ✓ **Bernaldo Liendo** → **Bernardo Liendo** (correción de nombre)
+- ✓ Reorganizado con horarios y días confirmados
+- ✓ Aclarados conflictos de días múltiples (Agnney, Simón, Sol aparecen en varios días)
+
+### **OTRAS CORRECCIONES**
+- ✓ **Dermatología**: Marín Mayerlín → Mayerlin Marín
+- ✓ **Pediatría**: Richar Ceballos → Richard Ceballos
+- ✓ **Cirugía General**: Pico → Dra. Pico
+- ✓ **Traumatología**: Erzón Rivera → Erzo Rivera
+- ✓ **Ginecología**: Lilibet Armas → Lilibeth Armas, Yelika Marchán → Yelika Marchan
+- ✓ **Otorrinolaringología**: Karla Pérez → Carla Pérez
+
+---
+
+## ⚠️ PROBLEMAS Y DATOS RESUELTOS O PENDIENTES
+
+### **ESTADO ACTUAL - DATOS SÍA RESUELTOS**
+- ✓ Todos los doctores tienen día asignado
+- ✓ Todos los doctores tienen hora asignada
+- ✓ Discrepancias de nombres corregidas
+- ✓ Algunos doctores (Agnney, Simón, Sol) tienen más de un día/horario (confirmado)
 
 ---
 
@@ -218,17 +239,19 @@ Para poder ingresar estos doctores al sistema necesitamos:
 
 ---
 
-## 📝 RECOMENDACIONES
+## 📝 PRÓXIMAS ACCIONES PRIORITARIAS
 
 1. **Agrupar por especialidad** y crear un formulario normalizado para cada doctor
 2. **Priorizar la obtención de:**
    - CI (Cédula de Identidad)
    - Correo electrónico
    - Número de teléfono
-3. **Para Odontología:** Aclarar los conflictos de días/horas con esos doctores
-4. **Para Ecografía:** Obtener datos de Loreto Igual
-5. **Para Pediatría:** Confirmar exactamente qué "cada 15 días" significa para Richar Ceballos
-6. **Crear un template standardizado** para recolectar todos los datos faltantes
+3. **Para Pediatría:** Confirmar exactamente qué "cada 15 días" significa para Richard Ceballos
+4. **Para Odontología:** Confirmar con doctores que trabajan múltiples horarios:
+   - Agnney Escalona (Lunes 1pm y Martes 1pm)
+   - Simón Liendo (Martes 8am y Miércoles 1pm)
+   - Sol Viera (Miércoles 8am y Viernes 8am)
+5. **Crear un template standardizado** para recolectar todos los datos faltantes
 
 ---
 

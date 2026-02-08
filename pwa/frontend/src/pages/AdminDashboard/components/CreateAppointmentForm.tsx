@@ -46,6 +46,12 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
     motivo: '',
   })
 
+  // 🆕 Estados para médicos disponibles y disponibilidad
+  const [medicosDisponibles, setMedicosDisponibles] = useState<any[]>([])
+  const [loadingMedicos, setLoadingMedicos] = useState(false)
+  const [disponibilidadMedico, setDisponibilidadMedico] = useState<any>(null)
+  const [loadingDisponibilidad, setLoadingDisponibilidad] = useState(false)
+
   const [errors, setErrors] = useState<{[key: string]: string}>({})
   const [submitLoading, setSubmitLoading] = useState(false)
   const [submitMessage, setSubmitMessage] = useState('')
@@ -80,6 +86,112 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       cargarCitasPaciente()
     }
   }, [preSelectedPatient])
+
+  // 🆕 useEffect: Cargar médicos cuando cambia la especialidad
+  useEffect(() => {
+    if (appointmentData.especialidad) {
+      cargarMedicosEspecialidad(appointmentData.especialidad)
+    } else {
+      setMedicosDisponibles([])
+      setDisponibilidadMedico(null)
+    }
+  }, [appointmentData.especialidad])
+
+  // 🆕 useEffect: Validar disponibilidad cuando cambian médico y fecha
+  useEffect(() => {
+    if (appointmentData.medico && appointmentData.fecha && appointmentData.especialidad) {
+      validarDisponibilidadMedico()
+    } else {
+      setDisponibilidadMedico(null)
+    }
+  }, [appointmentData.fecha, appointmentData.medico])
+
+  // 🆕 Función: Cargar médicos de una especialidad
+  const cargarMedicosEspecialidad = async (especialidad: string) => {
+    setLoadingMedicos(true)
+    setMedicosDisponibles([])
+    setAppointmentData(prev => ({ ...prev, medico: '' }))
+    
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/medicos/especialidad/${encodeURIComponent(especialidad)}`
+      )
+      const result = await response.json()
+
+      if (result.success) {
+        setMedicosDisponibles(result.data || [])
+        console.log(`✅ ${result.data?.length || 0} médicos cargados para ${especialidad}`)
+      } else {
+        console.error('Error al cargar médicos:', result.message)
+        setSearchError('No se pudieron cargar los médicos de esta especialidad')
+      }
+    } catch (err: any) {
+      console.error('Error al cargar médicos:', err)
+      setSearchError('Error al cargar médicos disponibles')
+    } finally {
+      setLoadingMedicos(false)
+    }
+  }
+
+  // 🆕 Función: Validar disponibilidad del médico en la fecha
+  const validarDisponibilidadMedico = async () => {
+    setLoadingDisponibilidad(true)
+    
+    try {
+      // 🆕 Detectar FIN DE SEMANA localmente (sin llamada API)
+      const fechaSeleccionada = new Date(appointmentData.fecha + 'T00:00:00')
+      const diaDelSemana = fechaSeleccionada.getDay() // 0=Domingo, 6=Sábado
+      
+      if (diaDelSemana === 0 || diaDelSemana === 6) {
+        // Es fin de semana - mostrar advertencia clara
+        setDisponibilidadMedico({
+          atiendeSeDia: false,
+          esFinDeSemana: true,
+          diasDisponibles: []
+        })
+        setErrors(prev => ({
+          ...prev,
+          fecha: '❌ Hospital labora solo de lunes a viernes.'
+        }))
+        setLoadingDisponibilidad(false)
+        return
+      }
+
+      // No es fin de semana - llamar API para validar disponibilidad del médico
+      const response = await fetch(
+        `${API_BASE_URL}/medicos/${appointmentData.medico}/disponibilidad?fecha=${appointmentData.fecha}&especialidad=${encodeURIComponent(appointmentData.especialidad)}`
+      )
+      const result = await response.json()
+
+      if (result.success) {
+        setDisponibilidadMedico(result.data)
+        
+        // Validar disponibilidad
+        if (!result.data.atiendeSeDia) {
+          setErrors(prev => ({
+            ...prev,
+            fecha: `El médico no atiende ese día. Días disponibles: ${result.data.diasDisponibles?.map((d: any) => d.dia).join(', ') || 'N/A'}`
+          }))
+        } else if (result.data.espaciosDisponibles <= 0) {
+          setErrors(prev => ({
+            ...prev,
+            fecha: `No hay disponibilidad. Próximas fechas: ${result.data.diasDisponibles?.slice(0, 2).map((d: any) => d.fecha).join(', ') || 'N/A'}`
+          }))
+        } else {
+          // Limpiar errores de fecha si todo está bien
+          setErrors(prev => {
+            const newErrors = { ...prev }
+            delete newErrors.fecha
+            return newErrors
+          })
+        }
+      }
+    } catch (err: any) {
+      console.error('Error al validar disponibilidad:', err)
+    } finally {
+      setLoadingDisponibilidad(false)
+    }
+  }
 
   // Cargar especialidades al montar
   const cargarEspecialidades = async () => {
@@ -157,11 +269,23 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
 
     const newErrors: {[key: string]: string} = {}
     if (!appointmentData.fecha) newErrors.fecha = 'Requerido'
-    if (!appointmentData.hora) newErrors.hora = 'Requerido'
+    // Hora NO es requerida (es solo referencia/sugerencia)
     if (!appointmentData.especialidad) newErrors.especialidad = 'Requerido'
+    if (!appointmentData.medico) newErrors.medico = '🔴 Debe seleccionar un médico' // REQUERIDO
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
+      return
+    }
+
+    // Validar que haya espacios disponibles (validación final)
+    if (disponibilidadMedico && !disponibilidadMedico.atiendeSeDia) {
+      setErrors({ fecha: 'El médico no está disponible ese día' })
+      return
+    }
+
+    if (disponibilidadMedico && disponibilidadMedico.espaciosDisponibles <= 0) {
+      setErrors({ fecha: 'No hay espacios disponibles para esa fecha' })
       return
     }
 
@@ -169,13 +293,15 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
     setSubmitMessage('')
 
     try {
-      // Con fecha y hora en columnas separadas, NO necesitamos conversión de zona horaria
-      // Enviamos los valores directamente como el usuario los ingresó
+      // OPCIÓN A: Hora es solo referencia/sugerencia
+      // Si no ingresa hora, usar una por defecto (ej: 10:00)
+      const horaFinal = appointmentData.hora || '10:00'
+
       const citaData = {
         pacienteId: selectedPatient.id,
-        medicoId: null,
+        medicoId: Number(appointmentData.medico), // REQUERIDO
         fechaCita: appointmentData.fecha, // YYYY-MM-DD
-        horaCita: appointmentData.hora,   // HH:MM
+        horaCita: horaFinal, // HH:MM - Solo referencia
         especialidad: appointmentData.especialidad,
         motivo: appointmentData.motivo || null,
         notas: null,
@@ -197,7 +323,10 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
         throw new Error(result.message || 'Error al crear la cita')
       }
 
-      setSubmitMessage(`✅ Cita programada exitosamente para ${appointmentData.fecha} a las ${appointmentData.hora}`)
+      // Obtener nombre del médico seleccionado
+      const medicoNombre = medicosDisponibles.find(m => String(m.id) === appointmentData.medico)?.nombre || 'Médico'
+
+      setSubmitMessage(`✅ Cita programada exitosamente con ${medicoNombre} para ${formatDateLocal(appointmentData.fecha)}`)
       
       // Limpiar formulario
       setAppointmentData({
@@ -307,6 +436,8 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                   medico: '',
                   motivo: '',
                 })
+                setMedicosDisponibles([])
+                setDisponibilidadMedico(null)
               }}
               style={{
                 padding: '0.75rem 1.5rem',
@@ -376,6 +507,74 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
         <form onSubmit={handleSubmit}>
           <h3 style={{ marginBottom: '1.5rem' }}>2. Datos de la Cita</h3>
           <div className={styles["form-grid"]}>
+            {/* 1️⃣ ESPECIALIDAD - Primer campo */}
+            <div className={styles["form-group"]}>
+              <label>Especialidad * (Total: {especialidades.length})</label>
+              <SearchableSelect
+                options={especialidades}
+                value={appointmentData.especialidad}
+                onChange={(value) => {
+                  setAppointmentData({...appointmentData, especialidad: value})
+                  setErrors({...errors, especialidad: ''})
+                }}
+                placeholder="Seleccione especialidad..."
+              />
+              {errors.especialidad && <span className={styles["error-message"]}>{errors.especialidad}</span>}
+            </div>
+
+            {/* 2️⃣ MÉDICO - Depende de especialidad */}
+            <div className={styles["form-group"]}>
+              <label>Médico * <span className={styles["required"]}>Requerido</span></label>
+              {appointmentData.especialidad ? (
+                <>
+                  {loadingMedicos ? (
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>⏳ Cargando médicos disponibles...</p>
+                  ) : medicosDisponibles.length > 0 ? (
+                    <>
+                      <select
+                        required
+                        value={appointmentData.medico}
+                        onChange={(e) => {
+                          setAppointmentData({...appointmentData, medico: e.target.value})
+                          setErrors({...errors, medico: ''})
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem',
+                          backgroundColor: 'var(--bg-secondary)',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: '0.375rem',
+                          color: 'var(--text-primary)',
+                          fontSize: '0.95rem',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <option value="">-- Seleccione un médico --</option>
+                        {medicosDisponibles.map((medico: any) => (
+                          <option key={medico.id} value={medico.id}>
+                            {medico.nombre}
+                          </option>
+                        ))}
+                      </select>
+                      <small style={{ display: 'block', marginTop: '0.25rem', color: 'var(--text-secondary)' }}>
+                        {medicosDisponibles.length} médico(s) disponible(s) para esta especialidad
+                      </small>
+                    </>
+                  ) : (
+                    <p style={{ color: '#ef4444', fontSize: '0.9rem' }}>
+                      ❌ No hay médicos disponibles para esta especialidad
+                    </p>
+                  )}
+                  {errors.medico && <span className={styles["error-message"]}>{errors.medico}</span>}
+                </>
+              ) : (
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                  👆 Selecciona una especialidad primero
+                </p>
+              )}
+            </div>
+
+            {/* 3️⃣ FECHA - Depende de médico */}
             <div className={styles["form-group"]}>
               <label>Fecha *</label>
               <input
@@ -391,6 +590,72 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
               {errors.fecha && <span className={styles["error-message"]}>{errors.fecha}</span>}
             </div>
 
+            {/* 🆕 FEEDBACK VISUAL DE DISPONIBILIDAD - Después de fecha */}
+            {disponibilidadMedico && appointmentData.medico && (
+              <div className="form-group full-width">
+                <div style={{
+                  padding: '1rem',
+                  backgroundColor: disponibilidadMedico.atiendeSeDia ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                  borderLeft: `4px solid ${disponibilidadMedico.atiendeSeDia ? '#10b981' : '#ef4444'}`,
+                  borderRadius: '0.5rem',
+                  fontSize: '0.9rem',
+                  color: 'var(--text-primary)',
+                }}>
+                  {loadingDisponibilidad ? (
+                    <p style={{ margin: 0 }}>⏳ Validando disponibilidad...</p>
+                  ) : disponibilidadMedico.atiendeSeDia ? (
+                    <>
+                      <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', color: '#10b981' }}>
+                        ✅ Médico disponible
+                      </p>
+                      <p style={{ margin: '0 0 0.5rem 0' }}>
+                        <strong>Horario:</strong> {disponibilidadMedico.horaInicio} - {disponibilidadMedico.horaFin}
+                      </p>
+                      <p style={{ margin: 0 }}>
+                        <strong>Espacios:</strong> {disponibilidadMedico.espaciosDisponibles} / {disponibilidadMedico.capacidadTotal} disponibles
+                      </p>
+                      {disponibilidadMedico.espaciosDisponibles > 0 && disponibilidadMedico.espaciosDisponibles <= 3 && (
+                        <p style={{ margin: '0.5rem 0 0 0', color: '#d97706', fontSize: '0.85rem' }}>
+                          ⚠️ Pocos espacios disponibles
+                        </p>
+                      )}
+                    </>
+                  ) : disponibilidadMedico.esFinDeSemana ? (
+                    <>
+                      <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', color: '#ef4444' }}>
+                        ❌ No disponible
+                      </p>
+                      <p style={{ margin: 0 }}>
+                        Hospital labora solo de lunes a viernes.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', color: '#ef4444' }}>
+                        ❌ No disponible
+                      </p>
+                      <p style={{ margin: '0 0 0.5rem 0' }}>
+                        El médico no atiende ese día
+                      </p>
+                      {disponibilidadMedico.diasDisponibles && disponibilidadMedico.diasDisponibles.length > 0 && (
+                        <>
+                          <p style={{ margin: '0.5rem 0 0 0', fontWeight: 'bold' }}>Próximas fechas disponibles:</p>
+                          <ul style={{ margin: '0.25rem 0 0 1.5rem', paddingLeft: 0 }}>
+                            {disponibilidadMedico.diasDisponibles.slice(0, 3).map((d: any) => (
+                              <li key={d.fecha} style={{ margin: '0.25rem 0', fontSize: '0.85rem' }}>
+                                {d.dia} {formatDateLocal(d.fecha)} ({d.espacios} espacios)
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* 4️⃣ HORA - Después del feedback visual */}
             <div className={styles["form-group"]}>
               <label>Hora *</label>
               <input
@@ -404,31 +669,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
               />
               {errors.hora && <span className={styles["error-message"]}>{errors.hora}</span>}
             </div>
-
-            <div className={styles["form-group"]}>
-              <label>Especialidad * (Total: {especialidades.length})</label>
-              <SearchableSelect
-                options={especialidades}
-                value={appointmentData.especialidad}
-                onChange={(value) => {
-                  setAppointmentData({...appointmentData, especialidad: value})
-                  setErrors({...errors, especialidad: ''})
-                }}
-                placeholder="Seleccione especialidad..."
-              />
-              {errors.especialidad && <span className={styles["error-message"]}>{errors.especialidad}</span>}
-            </div>
-
-            <div className={styles["form-group"]}>
-              <label>Médico (Opcional)</label>
-              <input
-                type="text"
-                value={appointmentData.medico}
-                onChange={(e) => setAppointmentData({...appointmentData, medico: e.target.value})}
-                placeholder="Nombre del médico o especialista"
-              />
-            </div>
-
             <div className="form-group full-width">
               <label>Motivo de la Consulta</label>
               <textarea
@@ -473,6 +713,8 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                 })
                 setErrors({})
                 setSubmitMessage('')
+                setMedicosDisponibles([])
+                setDisponibilidadMedico(null)
               }}
               className="btn-secondary"
             >
