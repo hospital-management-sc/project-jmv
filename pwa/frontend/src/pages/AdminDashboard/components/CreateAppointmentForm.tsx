@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { API_BASE_URL } from '@/utils/constants'
 import { getTodayVenezuelaISO, formatTimeMilitaryVenezuela, formatDateLocal } from '@/utils/dateUtils'
+import { obtenerNombresEspecialidades } from '@/config/especialidades.config'
 import styles from '../AdminDashboard.module.css'
 
 interface CreateAppointmentFormProps {
@@ -19,23 +20,8 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
   const [selectedPatient, setSelectedPatient] = useState<any>(preSelectedPatient || null)
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchError, setSearchError] = useState('')
-  const [especialidades, setEspecialidades] = useState<string[]>([
-    'Medicina Interna',
-    'Medicina Paliativa',
-    'Cirugía General',
-    'Pediatría',
-    'Neumología Pediátrica',
-    'Traumatología',
-    'Cirugía de Manos',
-    'Odontología',
-    'Otorrinolaringología',
-    'Dermatología',
-    'Fisiatría',
-    'Ginecología',
-    'Gastroenterología',
-    'Hematología',
-    'Psicología'
-  ])
+  // 🎯 Especialidades obtenidas desde fuente única (especialidades.config.ts)
+  const especialidades = obtenerNombresEspecialidades()
   const [citasExistentes, setCitasExistentes] = useState<any[]>([])
 
   const [appointmentData, setAppointmentData] = useState({
@@ -63,10 +49,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
     setSearchError('')
   }
 
-  // Cargar especialidades al montar el componente
-  useEffect(() => {
-    cargarEspecialidades()
-  }, [])
+  // ✅ Especialidades se cargan desde la configuración centralizada (especialidades.config.ts)
 
   // Cargar citas si hay paciente pre-seleccionado
   useEffect(() => {
@@ -193,28 +176,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
     }
   }
 
-  // Cargar especialidades al montar
-  const cargarEspecialidades = async () => {
-    // Siempre usar las especialidades por defecto
-    const especialidadesDefecto = [
-      'Medicina Interna',
-      'Medicina Paliativa',
-      'Cirugía General',
-      'Pediatría',
-      'Neumología Pediátrica',
-      'Traumatología',
-      'Cirugía de Manos',
-      'Odontología',
-      'Otorrinolaringología',
-      'Dermatología',
-      'Fisiatría',
-      'Ginecología',
-      'Gastroenterología',
-      'Hematología',
-      'Psicología'
-    ]
-    setEspecialidades(especialidadesDefecto)
-  }
+  // ✅ Función eliminada - especialidades se obtienen directamente desde la configuración centralizada
 
   const handleSearchPatient = async () => {
     if (!searchCINumeros.trim()) {
@@ -278,6 +240,18 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       return
     }
 
+    // 🆕 Validación: No permitir dos citas en la misma especialidad
+    const citaEnMismaEspecialidad = citasExistentes.some(
+      (cita: any) => cita.especialidad === appointmentData.especialidad && cita.estado === 'PROGRAMADA'
+    )
+
+    if (citaEnMismaEspecialidad) {
+      setErrors({
+        especialidad: `⚠️ El paciente ya tiene una cita programada en ${appointmentData.especialidad}. No se pueden agendar dos citas en la misma especialidad.`
+      })
+      return
+    }
+
     // Validar que haya espacios disponibles (validación final)
     if (disponibilidadMedico && !disponibilidadMedico.atiendeSeDia) {
       setErrors({ fecha: 'El médico no está disponible ese día' })
@@ -320,6 +294,14 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       const result = await response.json()
 
       if (!response.ok) {
+        // 🆕 Manejo específico del error de cita duplicada en la misma especialidad
+        if (result.code === 'DUPLICATE_SPECIALTY_APPOINTMENT') {
+          setErrors({
+            especialidad: `⚠️ ${result.message}`
+          })
+          setSubmitLoading(false)
+          return
+        }
         throw new Error(result.message || 'Error al crear la cita')
       }
 
@@ -493,8 +475,20 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
               
               return (
                 <div key={cita.id} style={{ padding: '0.75rem', backgroundColor: 'var(--bg-secondary)', borderRadius: '0.375rem', fontSize: '0.9rem' }}>
-                  <strong>{fechaFormato} a las {horaFormato}</strong> - {cita.especialidad}
-                  <span style={{ float: 'right', color: '#7c3aed', fontSize: '0.8rem' }}>Estado: {cita.estado}</span>
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <strong>{fechaFormato} a las {horaFormato}</strong> - <strong>{cita.especialidad}</strong>
+                  </div>
+                  {cita.medico && (
+                    <div style={{ marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      👨‍⚕️ <strong>Dr(a):</strong> {cita.medico.nombre}
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                      {cita.motivo && `Motivo: ${cita.motivo}`}
+                    </span>
+                    <span style={{ color: '#ffffff', fontSize: '0.8rem', fontWeight: '500' }}>Estado: {cita.estado}</span>
+                  </div>
                 </div>
               )
             })}

@@ -15,6 +15,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { API_BASE_URL } from '@/utils/constants'
 import { VENEZUELA_TIMEZONE, VENEZUELA_LOCALE } from '@/utils/dateUtils'
+import { obtenerNombresEspecialidades } from '@/config/especialidades.config'
 import styles from './SuperAdminDashboard.module.css'
 
 // Tipos
@@ -76,22 +77,7 @@ const ESTADOS_PERSONAL = [
 ]
 
 const DEPARTAMENTOS = [
-  // Especialidades Médicas Clínicas (15)
-  'Medicina Interna',
-  'Medicina Paliativa',
-  'Cirugía General',
-  'Pediatría',
-  'Neumo Pediatría',
-  'Traumatología',
-  'Cirugía de Manos',
-  'Odontología',
-  'Otorrinolaringología',
-  'Dermatología',
-  'Fisiatría',
-  'Ginecología',
-  'Gastroenterología',
-  'Hematología',
-  'Psicología',
+  ...obtenerNombresEspecialidades(), // 🎯 Especialidades médicas desde fuente única
   // Servicios de Apoyo
   'Emergencia',
   'UCI',

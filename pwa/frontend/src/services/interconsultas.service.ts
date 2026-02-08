@@ -4,6 +4,7 @@
  */
 
 import { apiService } from './api';
+import { obtenerNombresEspecialidades } from '@/config/especialidades.config';
 
 // Tipos
 export type PrioridadInterconsulta = 'URGENTE' | 'ALTA' | 'MEDIA' | 'BAJA';
@@ -148,24 +149,8 @@ export async function obtenerInterconsultaPorId(interconsultaId: number): Promis
 }
 
 // Lista de especialidades médicas disponibles para interconsultas
-// CENTRALIZADO - usar config/especialidades.config.ts como fuente única
-export const ESPECIALIDADES_MEDICAS = [
-  'Medicina Interna',
-  'Medicina Paliativa',
-  'Cirugía General',
-  'Pediatría',
-  'Neumología Pediátrica',
-  'Traumatología',
-  'Cirugía de Manos',
-  'Odontología',
-  'Otorrinolaringología',
-  'Dermatología',
-  'Fisiatría',
-  'Ginecología',
-  'Gastroenterología',
-  'Hematología',
-  'Psicología',
-];
+// 🎯 CENTRALIZADO - Obtenidas desde config/especialidades.config.ts como fuente única
+export const ESPECIALIDADES_MEDICAS = obtenerNombresEspecialidades();
 
 export const PRIORIDADES_INTERCONSULTA: { value: PrioridadInterconsulta; label: string; color: string }[] = [
   { value: 'URGENTE', label: 'Urgente', color: '#dc3545' },

@@ -69,6 +69,24 @@ export const crearCita = async (req: Request, res: Response): Promise<void> => {
       }
     }
 
+    // 🆕 Validación: No permitir dos citas en la misma especialidad para el mismo paciente
+    const citaExistenteMismaEspecialidad = await prisma.cita.findFirst({
+      where: {
+        pacienteId: Number(pacienteId),
+        especialidad: especialidad,
+        estado: 'PROGRAMADA', // Solo validar contra citas activas
+      },
+    })
+
+    if (citaExistenteMismaEspecialidad) {
+      res.status(400).json({
+        success: false,
+        message: `El paciente ya tiene una cita programada en la especialidad de ${especialidad}. No se pueden agendar dos citas en la misma especialidad.`,
+        code: 'DUPLICATE_SPECIALTY_APPOINTMENT',
+      })
+      return
+    }
+
     // Crear la cita
     const cita = await prisma.cita.create({
       data: {

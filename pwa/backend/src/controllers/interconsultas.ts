@@ -6,28 +6,13 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { convertBigIntToString } from '../utils/bigIntSerializer';
+import { obtenerNombresEspecialidades } from '../config/especialidades.config';
 import logger from '../utils/logger';
 
 const prisma = new PrismaClient();
 
-// Especialidades disponibles para interconsultas (CENTRALIZADO - ver config/especialidades.config.ts)
-export const ESPECIALIDADES = [
-  'Medicina Interna',
-  'Medicina Paliativa',
-  'Cirugía General',
-  'Pediatría',
-  'Neumología Pediátrica',
-  'Traumatología',
-  'Cirugía de Manos',
-  'Odontología',
-  'Otorrinolaringología',
-  'Dermatología',
-  'Fisiatría',
-  'Ginecología',
-  'Gastroenterología',
-  'Hematología',
-  'Psicología',
-];
+// 🎯 Especialidades disponibles para interconsultas (CENTRALIZADO - desde config/especialidades.config.ts)
+export const ESPECIALIDADES = obtenerNombresEspecialidades();
 
 /**
  * Crear nueva interconsulta
