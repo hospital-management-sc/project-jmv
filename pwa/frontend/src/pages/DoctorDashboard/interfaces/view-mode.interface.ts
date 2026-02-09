@@ -9,3 +9,4 @@ export type ViewMode =
   | 'my-appointments'
   | 'interconsultas'
   | 'pacientes-emergencia'
+  | 'registrar-alta'

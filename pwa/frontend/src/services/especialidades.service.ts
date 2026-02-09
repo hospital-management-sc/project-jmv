@@ -50,11 +50,12 @@ class EspecialidadesService {
   }
 
   /**
-   * Obtener opciones especiales de una especialidad
+   * Obtener opciones especiales (acciones disponibles) de una especialidad
+   * Devuelve las acciones del dashboard configuradas en vistaDashboard.acciones
    */
   obtenerOpcionesEspeciales(nombre: string): string[] {
     const config = this.obtenerConfig(nombre)
-    return config?.opcionesEspeciales || []
+    return config?.vistaDashboard?.acciones || []
   }
 
   /**
@@ -62,15 +63,18 @@ class EspecialidadesService {
    */
   tieneFormularioPersonalizado(nombre: string): boolean {
     const config = this.obtenerConfig(nombre)
-    return config?.formularioPersonalizado || false
+    return config?.formularioEspecializado !== undefined
   }
 
   /**
    * Obtener campos específicos de una especialidad
+   * @deprecated No tiene datos en EspecialidadConfig actualmente
+   * Mantenerlo por retrocompatibilidad en caso de uso futuro
    */
   obtenerCamposEspecificos(nombre: string): string[] {
-    const config = this.obtenerConfig(nombre)
-    return config?.camposEspecificos || []
+    // Actualmente no hay propiedades de campos específicos en EspecialidadConfig
+    // Si en el futuro se agregan, implementar aquí
+    return []
   }
 
   /**

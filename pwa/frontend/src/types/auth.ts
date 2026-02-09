@@ -37,6 +37,7 @@ export interface AuthResponse {
     nombre: string
     email: string
     role: string
+    especialidad?: string
     token: string
     refreshToken?: string
   }
@@ -67,6 +68,7 @@ export interface User {
   email: string
   role: UserRoleType
   ci?: string
+  especialidad?: string
   createdAt?: string
   updatedAt?: string
 }

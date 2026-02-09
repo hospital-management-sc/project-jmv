@@ -48,13 +48,16 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
       }
       
       // Estrategia 4: Búsqueda parcial (si el backend envió algo similar)
-      const porBusquedaParcial = ESPECIALIDADES_MEDICAS.find(e => 
-        encuentro.createdBy?.especialidad?.toLowerCase().includes(e.id.toLowerCase()) ||
-        e.id.toLowerCase().includes(encuentro.createdBy?.especialidad?.toLowerCase())
-      );
-      if (porBusquedaParcial) {
-        console.log('[EncuentroDetailModal] ✅ Especialidad encontrada por búsqueda parcial:', porBusquedaParcial.nombre);
-        return porBusquedaParcial;
+      const especialidadBuscada = encuentro.createdBy?.especialidad;
+      if (especialidadBuscada) {
+        const porBusquedaParcial = ESPECIALIDADES_MEDICAS.find(e => 
+          especialidadBuscada.toLowerCase().includes(e.id.toLowerCase()) ||
+          e.id.toLowerCase().includes(especialidadBuscada.toLowerCase())
+        );
+        if (porBusquedaParcial) {
+          console.log('[EncuentroDetailModal] ✅ Especialidad encontrada por búsqueda parcial:', porBusquedaParcial.nombre);
+          return porBusquedaParcial;
+        }
       }
     }
     

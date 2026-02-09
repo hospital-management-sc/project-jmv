@@ -33,7 +33,11 @@ interface EmergenciaPendiente {
   formatoEmergencia?: FormatoEmergencia;
 }
 
-export default function EmergenciasPendientes() {
+interface EmergenciasPendientesProps {
+  onBack?: () => void;
+}
+
+export default function EmergenciasPendientes({ onBack }: EmergenciasPendientesProps = {}) {
   const [emergencias, setEmergencias] = useState<EmergenciaPendiente[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

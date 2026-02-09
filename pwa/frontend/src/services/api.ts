@@ -23,14 +23,7 @@ async function request<T>(
     headers.Authorization = `Bearer ${token}`
   }
 
-  const requestInfo = {
-    url,
-    method: options.method || 'GET',
-    headers,
-    timestamp: new Date().toISOString(),
-  }
-
-  // console.log('[API] Starting request:', requestInfo)
+  // console.log('[API] Starting request:', { url, method: options.method || 'GET', timestamp: new Date().toISOString() })
 
   try {
     // console.log('[API] Sending fetch to:', url)
@@ -80,9 +73,8 @@ async function request<T>(
     // console.log('[API] Response parsed successfully:', data)
     return data
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
     // console.error('[API] Fetch failed:', {
-    //   error: errorMessage,
+    //   error: error instanceof Error ? error.message : String(error),
     //   url,
     //   method: options.method || 'GET',
     //   timestamp: new Date().toISOString(),

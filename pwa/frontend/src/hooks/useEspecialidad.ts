@@ -6,7 +6,7 @@
 import { useMemo } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import especialidadesService from '@/services/especialidades.service'
-import type { EspecialidadConfig, VistaDashboard, FormularioEncuentro } from '@/config/especialidades.config'
+import type { EspecialidadConfig, VistaDashboard, FormularioEspecializado } from '@/config/especialidades.config'
 
 interface UseEspecialidadReturn {
   especialidad: EspecialidadConfig | undefined
@@ -18,7 +18,7 @@ interface UseEspecialidadReturn {
   descripcion: string
   departamento: string | null
   vistaDashboard: VistaDashboard | null
-  formularioEncuentro: FormularioEncuentro | null
+  formularioEncuentro: FormularioEspecializado | null
 }
 
 export function useEspecialidad(): UseEspecialidadReturn {
@@ -52,7 +52,7 @@ export function useEspecialidad(): UseEspecialidadReturn {
       descripcion: especialidadesService.obtenerDescripcion(user.especialidad),
       departamento: config?.departamento || null,
       vistaDashboard: config?.vistaDashboard || null,
-      formularioEncuentro: config?.formularioEncuentro || null,
+      formularioEncuentro: config?.formularioEspecializado || null,
     }
   }, [user?.especialidad])
 }

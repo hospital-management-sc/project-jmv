@@ -209,7 +209,6 @@ export function PatientHistoryView({ patient, onBack }: PatientHistoryViewProps)
           color = '#10b981'
         }
         
-        const medicoNombre = encuentro.createdBy?.nombre || 'Médico no registrado'
         const motivoTexto = encuentro.motivoConsulta ? ` - ${encuentro.motivoConsulta.substring(0, 50)}...` : ''
         const diagnostico = encuentro.impresiones && encuentro.impresiones.length > 0 
           ? encuentro.impresiones[0].descripcion 

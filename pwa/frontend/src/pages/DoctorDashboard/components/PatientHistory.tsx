@@ -204,7 +204,6 @@ export default function PatientHistory({ patient, onBack }: Props) {
           color = "#10b981";
         }
 
-        const medicoNombre = encuentro.createdBy?.nombre || "Médico no registrado";
         const motivoTexto = encuentro.motivoConsulta
           ? ` - ${encuentro.motivoConsulta.substring(0, 50)}...`
           : "";

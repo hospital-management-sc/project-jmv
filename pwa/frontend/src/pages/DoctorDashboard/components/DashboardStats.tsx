@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import admisionesService from "@/services/admisiones.service";
 import { encuentrosService } from "@/services";
 import * as citasService from "@/services/citas.service";
-import { API_BASE_URL } from "@/utils/constants";
 
 interface Props {}
 
