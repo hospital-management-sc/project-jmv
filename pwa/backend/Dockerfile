@@ -22,6 +22,8 @@ COPY prisma ./prisma
 
 RUN npm ci --omit=dev --ignore-scripts
 
+RUN npx prisma generate
+
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 5000
