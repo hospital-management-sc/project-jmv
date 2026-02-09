@@ -29,7 +29,7 @@ router.post('/', async (req: Request, res: Response) => {
       estado: 'PROGRAMADA',
     },
   });
-  res.json({ ok: true, citaId: cita.id });
+  return res.json({ ok: true, citaId: cita.id });
 });
 
 export default router;
