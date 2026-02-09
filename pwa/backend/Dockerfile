@@ -18,7 +18,7 @@ COPY package*.json ./
 
 COPY prisma ./prisma
 
-RUN npm ci --only=production
+RUN npm ci --omit=dev --ignore-scripts
 
 COPY --from=builder /app/dist ./dist
 

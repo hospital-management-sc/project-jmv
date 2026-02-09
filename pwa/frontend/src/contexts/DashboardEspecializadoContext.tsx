@@ -43,7 +43,7 @@ export function DashboardEspecializadoProvider({ children }: { children: ReactNo
       especialidad: config,
       nombre: user.especialidad,
       opcionesEspeciales: especialidadesService.obtenerOpcionesEspeciales(user.especialidad),
-      camposEspecificos: especialidadesService.obtenerCamposEspecificos(user.especialidad),
+      camposEspecificos: especialidadesService.obtenerCamposEspecificos(),
       descripcion: especialidadesService.obtenerDescripcion(user.especialidad),
       tieneFormularioPersonalizado: especialidadesService.tieneFormularioPersonalizado(
         user.especialidad

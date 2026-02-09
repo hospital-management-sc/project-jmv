@@ -71,7 +71,7 @@ class EspecialidadesService {
    * @deprecated No tiene datos en EspecialidadConfig actualmente
    * Mantenerlo por retrocompatibilidad en caso de uso futuro
    */
-  obtenerCamposEspecificos(nombre: string): string[] {
+  obtenerCamposEspecificos(): string[] {
     // Actualmente no hay propiedades de campos específicos en EspecialidadConfig
     // Si en el futuro se agregan, implementar aquí
     return []

@@ -37,7 +37,7 @@ interface EmergenciasPendientesProps {
   onBack?: () => void;
 }
 
-export default function EmergenciasPendientes({ onBack }: EmergenciasPendientesProps = {}) {
+export default function EmergenciasPendientes({ onBack: _ }: EmergenciasPendientesProps = {}) {
   const [emergencias, setEmergencias] = useState<EmergenciaPendiente[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

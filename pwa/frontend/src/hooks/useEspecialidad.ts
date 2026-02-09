@@ -48,7 +48,7 @@ export function useEspecialidad(): UseEspecialidadReturn {
       esValida: especialidadesService.esValida(user.especialidad),
       tieneFormularioPersonalizado: especialidadesService.tieneFormularioPersonalizado(user.especialidad),
       opcionesEspeciales: especialidadesService.obtenerOpcionesEspeciales(user.especialidad),
-      camposEspecificos: especialidadesService.obtenerCamposEspecificos(user.especialidad),
+      camposEspecificos: especialidadesService.obtenerCamposEspecificos(),
       descripcion: especialidadesService.obtenerDescripcion(user.especialidad),
       departamento: config?.departamento || null,
       vistaDashboard: config?.vistaDashboard || null,
