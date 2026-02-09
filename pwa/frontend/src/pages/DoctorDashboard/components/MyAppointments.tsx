@@ -10,15 +10,20 @@ import * as citasService from '@/services/citas.service'
 import { formatDateLongVenezuela, formatTimeVenezuela } from "@/utils/dateUtils";
 import { toast } from "sonner";
 
+type FilterType = 'TODAS' | 'PASADAS' | 'FUTURAS'
+
 interface Props {
   doctorId: number;
   onRegisterEncounter?: (patient: PatientBasic) => void;
+  onEncounterRegistered?: () => void; // Callback para refresco después de registrar encuentro
+  refreshKey?: number; // Trigger para recargar citas desde el padre
 }
 
-export default function MyAppointments({ doctorId, onRegisterEncounter }: Props) {
+export default function MyAppointments({ doctorId, onRegisterEncounter, onEncounterRegistered, refreshKey = 0 }: Props) {
   const [citas, setCitas] = useState<Cita[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [filterType, setFilterType] = useState<FilterType>('FUTURAS') // Por defecto mostrar futuras
 
   // Validar que doctorId sea un número válido
   const validDoctorId = typeof doctorId === 'number' && doctorId > 0 ? doctorId : null
@@ -33,7 +38,7 @@ export default function MyAppointments({ doctorId, onRegisterEncounter }: Props)
       return
     }
     cargarCitas()
-  }, [validDoctorId])
+  }, [validDoctorId, refreshKey])
 
   const cargarCitas = async () => {
     try {
@@ -51,54 +56,74 @@ export default function MyAppointments({ doctorId, onRegisterEncounter }: Props)
   }
 
   const getEstadoLabel = (estado: string) => {
+    // ✅ Solo 2 estados: PROGRAMADA y COMPLETADA
     const labels: Record<string, string> = {
-      PENDIENTE: '⏳ Pendiente',
-      CONFIRMADA: '✓ Confirmada',
-      EN_CURSO: '🔄 En Curso',
-      COMPLETADA: '✅ Completada',
-      CANCELADA: '❌ Cancelada',
-      NO_ASISTIO: '⚠️ No Asistió',
+      PROGRAMADA: 'Programada',
+      COMPLETADA: 'Completada',
     }
     return labels[estado] || estado
   }
 
   const formatearFecha = (fechaCita: any) => {
     try {
-      if (!fechaCita) return '📅 Sin fecha'
+      if (!fechaCita) return 'Sin fecha'
       const fecha = new Date(fechaCita)
       if (isNaN(fecha.getTime())) {
         console.warn('Fecha inválida:', fechaCita)
-        return '📅 Fecha inválida'
+        return 'Fecha inválida'
       }
-      return '📅 ' + formatDateLongVenezuela(fecha)
+      return formatDateLongVenezuela(fecha)
     } catch (e) {
       console.error('Error al formatear fecha:', e)
-      return '📅 Error en fecha'
+      return 'Error en fecha'
     }
   }
 
   const formatearHoraCita = (horaCita: string | null) => {
     try {
-      if (!horaCita) return '🕐 Sin hora'
+      if (!horaCita) return 'Sin hora'
       // horaCita viene como string HH:MM:SS o HH:MM
       // Lo convertimos a hora legible
       const horas = horaCita.split(':')
-      if (horas.length < 2) return '🕐 ' + horaCita
-      return '🕐 ' + horas[0] + ':' + horas[1]
+      if (horas.length < 2) return horaCita
+      return horas[0] + ':' + horas[1]
     } catch (e) {
       console.error('Error al formatear hora:', e)
-      return '🕐 Error en hora'
+      return 'Error en hora'
     }
   }
 
-  // Mapear estado del backend al estado esperado
   const mapearEstado = (estadoBackend: string): string => {
+    // ✅ Solo 2 estados: PROGRAMADA y COMPLETADA
     const mapeo: Record<string, string> = {
-      'PROGRAMADA': 'CONFIRMADA',
-      'EN_PROCESO': 'EN_CURSO',
-      'REALIZADA': 'COMPLETADA',
+      'PROGRAMADA': 'PROGRAMADA',
+      'COMPLETADA': 'COMPLETADA',
     }
     return mapeo[estadoBackend] || estadoBackend
+  }
+
+  // Filtrar citas según el tipo seleccionado
+  const citasFiltradas = citas.filter(cita => {
+    const fechaCita = new Date(cita.fechaCita || cita.fechaHora || '')
+    const hoy = new Date()
+    hoy.setHours(0, 0, 0, 0)
+    
+    // Comparar solo las fechas (sin horas)
+    fechaCita.setHours(0, 0, 0, 0)
+
+    if (filterType === 'PASADAS') {
+      return fechaCita < hoy
+    } else if (filterType === 'FUTURAS') {
+      return fechaCita >= hoy
+    }
+    return true // TODAS
+  })
+
+  // Contar estadísticas según el filtro actual
+  const estadisticas = {
+    total: citasFiltradas.length,
+    porAtender: citasFiltradas.filter(c => (c as any).estado === 'PROGRAMADA').length, // ✅ Solo PROGRAMADA
+    completadas: citasFiltradas.filter(c => (c as any).estado === 'COMPLETADA').length, // ✅ Solo COMPLETADA
   }
 
   if (loading) {
@@ -114,7 +139,7 @@ export default function MyAppointments({ doctorId, onRegisterEncounter }: Props)
     return (
       <section className={styles['view-section']}>
         <div className={styles['section-header']}>
-          <h2>📅 Mis Citas - Próximos 7 Días</h2>
+          <h2>Mis Citas</h2>
         </div>
         <div className={styles['form-card']}>
           <div style={{ padding: '2rem', backgroundColor: '#fee2e2', borderRadius: '0.5rem', textAlign: 'center' }}>
@@ -130,30 +155,89 @@ export default function MyAppointments({ doctorId, onRegisterEncounter }: Props)
   return (
     <section className={styles['view-section']}>
       <div className={styles['section-header']}>
-        <h2>📅 Mis Citas - Próximos 7 Días</h2>
+        <h2>Mis Citas</h2>
       </div>
 
       <div className={styles['form-card']}>
+        {/* Botones de filtro */}
+        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+          <button
+            className={styles['btn-small']}
+            onClick={() => setFilterType('FUTURAS')}
+            style={{
+              backgroundColor: filterType === 'FUTURAS' ? '#3b82f6' : '#d1d5db',
+              color: filterType === 'FUTURAS' ? 'white' : '#374151',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: filterType === 'FUTURAS' ? 'bold' : 'normal',
+            }}
+          >
+            Citas Futuras ({citas.filter(c => {
+              const f = new Date(c.fechaCita || c.fechaHora || '')
+              const h = new Date()
+              h.setHours(0, 0, 0, 0)
+              f.setHours(0, 0, 0, 0)
+              return f >= h
+            }).length})
+          </button>
+          
+          <button
+            className={styles['btn-small']}
+            onClick={() => setFilterType('PASADAS')}
+            style={{
+              backgroundColor: filterType === 'PASADAS' ? '#ef4444' : '#d1d5db',
+              color: filterType === 'PASADAS' ? 'white' : '#374151',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: filterType === 'PASADAS' ? 'bold' : 'normal',
+            }}
+          >
+            Citas Pasadas ({citas.filter(c => {
+              const f = new Date(c.fechaCita || c.fechaHora || '')
+              const h = new Date()
+              h.setHours(0, 0, 0, 0)
+              f.setHours(0, 0, 0, 0)
+              return f < h
+            }).length})
+          </button>
+          
+          <button
+            className={styles['btn-small']}
+            onClick={() => setFilterType('TODAS')}
+            style={{
+              backgroundColor: filterType === 'TODAS' ? '#8b5cf6' : '#d1d5db',
+              color: filterType === 'TODAS' ? 'white' : '#374151',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: filterType === 'TODAS' ? 'bold' : 'normal',
+            }}
+          >
+            Todas ({citas.length})
+          </button>
+        </div>
+
         <div className={styles['stats-summary']}>
           <div className={styles['stat-box']}>
-            <span className={styles['stat-number']}>{citas.length}</span>
+            <span className={styles['stat-number']}>{estadisticas.total}</span>
             <span className={styles['stat-label']}>Total Citas</span>
           </div>
           <div className={styles['stat-box']}>
-            <span className={styles['stat-number']}>
-              {citas.filter(c => (c as any).estado === 'PROGRAMADA' || (c as any).estado === 'EN_PROCESO').length}
-            </span>
+            <span className={styles['stat-number']}>{estadisticas.porAtender}</span>
             <span className={styles['stat-label']}>Por Atender</span>
           </div>
           <div className={styles['stat-box']}>
-            <span className={styles['stat-number']}>
-              {citas.filter(c => (c as any).estado === 'REALIZADA').length}
-            </span>
+            <span className={styles['stat-number']}>{estadisticas.completadas}</span>
             <span className={styles['stat-label']}>Completadas</span>
           </div>
         </div>
 
-        {citas.length === 0 ? (
+        {citasFiltradas.length === 0 ? (
           <div className={styles['empty-state']}>
             <span className={styles['empty-icon']}>📅</span>
             <h3>No hay citas programadas para los próximos 7 días</h3>
@@ -161,7 +245,7 @@ export default function MyAppointments({ doctorId, onRegisterEncounter }: Props)
           </div>
         ) : (
           <div className={styles['appointments-list']}>
-            {citas.map((cita) => (
+            {citasFiltradas.map((cita) => (
               <div key={cita.id} className={styles['appointment-card']}>
                 <div className={styles['appointment-header']}>
                   <div>
@@ -186,7 +270,7 @@ export default function MyAppointments({ doctorId, onRegisterEncounter }: Props)
                   )}
                 </div>
                 <div className={styles['appointment-actions']}>
-                  {((cita as any).estado === 'PROGRAMADA' || (cita as any).estado === 'EN_PROCESO') && onRegisterEncounter && cita.paciente && (
+                  {(cita as any).estado === 'PROGRAMADA' && onRegisterEncounter && cita.paciente && (
                     <button 
                       className={styles['btn-primary']} 
                       onClick={() => {
@@ -197,14 +281,15 @@ export default function MyAppointments({ doctorId, onRegisterEncounter }: Props)
                           ci: cita.paciente!.ci,
                           fechaNacimiento: cita.paciente!.fechaNacimiento,
                           sexo: cita.paciente!.sexo,
+                          citaId: cita.id, // ✅ NUEVO: Pasar el ID de la cita
                         }
                         onRegisterEncounter(patientData)
                       }}
                     >
-                      📝 Registrar Encuentro
+                      Registrar Encuentro
                     </button>
                   )}
-                  {((cita as any).estado === 'REALIZADA') && (
+                  {(cita as any).estado === 'COMPLETADA' && (
                     <span className={styles['completed-label']}>✅ Encuentro registrado</span>
                   )}
                 </div>
@@ -216,7 +301,7 @@ export default function MyAppointments({ doctorId, onRegisterEncounter }: Props)
 
       <div className={styles['section-footer']}>
         <button className={styles['refresh-btn']} onClick={cargarCitas}>
-          🔄 Actualizar
+          Actualizar
         </button>
       </div>
     </section>

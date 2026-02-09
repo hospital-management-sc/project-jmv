@@ -253,10 +253,6 @@ export function PatientHistoryView({ patient, onBack }: PatientHistoryViewProps)
           icono = '✅'
           color = '#10b981' // Verde
           estadoTexto = 'Completada'
-        } else if (estadoCita === 'CANCELADA') {
-          icono = '❌'
-          color = '#ef4444' // Rojo
-          estadoTexto = 'Cancelada'
         }
         
         eventos.push({

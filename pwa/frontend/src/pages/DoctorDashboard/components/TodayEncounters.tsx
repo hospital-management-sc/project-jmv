@@ -43,10 +43,10 @@ export default function TodayEncounters({}: Props) {
 
   const getTipoLabel = (tipo: string) => {
     const labels: Record<string, string> = {
-      EMERGENCIA: "🚨 Emergencia",
-      HOSPITALIZACION: "🛏️ Hospitalización",
-      CONSULTA: "🩺 Consulta",
-      OTRO: "📋 Otro",
+      EMERGENCIA: "Emergencia",
+      HOSPITALIZACION: "Hospitalización",
+      CONSULTA: "Consulta",
+      OTRO: "Otro",
     };
     return labels[tipo] || tipo;
   };

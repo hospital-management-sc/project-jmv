@@ -18,10 +18,10 @@ const EncuentrosList = ({ encuentros, onVerDetalle }: EncuentrosListProps) => {
 
   const getTipoLabel = (tipo: string) => {
     const labels: Record<string, string> = {
-      EMERGENCIA: "🚨 Emergencia",
-      HOSPITALIZACION: "🛏️ Hospitalización",
-      CONSULTA: "🩺 Consulta",
-      OTRO: "📋 Otro",
+      EMERGENCIA: "Emergencia",
+      HOSPITALIZACION: "Hospitalización",
+      CONSULTA: "Consulta",
+      OTRO: "Otro",
     };
     return labels[tipo] || tipo;
   };
@@ -60,7 +60,7 @@ const EncuentrosList = ({ encuentros, onVerDetalle }: EncuentrosListProps) => {
   if (encuentros.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <p>📋 No se encontraron encuentros médicos para este paciente</p>
+        <p>No se encontraron encuentros médicos para este paciente</p>
         <span className={styles.emptySubtext}>
           Los encuentros son registrados por el personal médico durante las
           consultas, emergencias u hospitalizaciones.
@@ -129,7 +129,7 @@ const EncuentrosList = ({ encuentros, onVerDetalle }: EncuentrosListProps) => {
               <div className={styles.cardBody}>
                 {encuentro.createdBy && (
                   <div className={styles.medico}>
-                    <strong>👨‍⚕️ Médico:</strong>
+                    <strong>Médico:</strong>
                     <span>{encuentro.createdBy.nombre}</span>
                     {encuentro.createdBy.cargo && (
                       <span className={styles.cargo}>
@@ -181,7 +181,7 @@ const EncuentrosList = ({ encuentros, onVerDetalle }: EncuentrosListProps) => {
 
                 {encuentro.nroCama && (
                   <div className={styles.cama}>
-                    <strong>🛏️ Cama:</strong>
+                    <strong>Cama:</strong>
                     <span>{encuentro.nroCama}</span>
                   </div>
                 )}

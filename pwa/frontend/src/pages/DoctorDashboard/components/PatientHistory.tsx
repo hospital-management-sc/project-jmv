@@ -250,10 +250,6 @@ export default function PatientHistory({ patient, onBack }: Props) {
           icono = "✅";
           color = "#10b981";
           estadoTexto = "Completada";
-        } else if (estadoCita === "CANCELADA") {
-          icono = "❌";
-          color = "#ef4444";
-          estadoTexto = "Cancelada";
         }
 
         eventos.push({

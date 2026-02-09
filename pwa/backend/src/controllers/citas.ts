@@ -580,7 +580,7 @@ export const obtenerCitasHoyMedico = async (req: Request, res: Response): Promis
           },
           {
             estado: {
-              in: ['PROGRAMADA', 'EN_PROCESO'],
+              in: ['PROGRAMADA', 'COMPLETADA'],
             },
           },
         ],
@@ -680,7 +680,7 @@ export const obtenerCitasProximosMedico = async (req: Request, res: Response): P
           },
           {
             estado: {
-              in: ['PROGRAMADA', 'EN_PROCESO'],
+              in: ['PROGRAMADA', 'COMPLETADA'], // ✅ Solo 2 estados: PROGRAMADA y COMPLETADA
             },
           },
         ],

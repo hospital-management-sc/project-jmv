@@ -234,6 +234,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
     // Hora NO es requerida (es solo referencia/sugerencia)
     if (!appointmentData.especialidad) newErrors.especialidad = 'Requerido'
     if (!appointmentData.medico) newErrors.medico = '🔴 Debe seleccionar un médico' // REQUERIDO
+    if (!appointmentData.motivo || !appointmentData.motivo.trim()) newErrors.motivo = '🔴 Este campo es obligatorio para una correcta documentación'
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -581,7 +582,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                 }}
                 min={getTodayVenezuelaISO()}
               />
-              {errors.fecha && <span className={styles["error-message"]}>{errors.fecha}</span>}
             </div>
 
             {/* 🆕 FEEDBACK VISUAL DE DISPONIBILIDAD - Después de fecha */}
@@ -664,8 +664,9 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
               {errors.hora && <span className={styles["error-message"]}>{errors.hora}</span>}
             </div>
             <div className="form-group full-width">
-              <label>Motivo de la Consulta</label>
+              <label>Motivo de la Consulta * <span className={styles["required"]}>Requerido</span></label>
               <textarea
+                required
                 value={appointmentData.motivo}
                 onChange={(e) => setAppointmentData({...appointmentData, motivo: e.target.value})}
                 placeholder="Describa brevemente el motivo de la consulta"
@@ -682,6 +683,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                   resize: 'vertical',
                 }}
               />
+              {errors.motivo && <span className={styles["error-message"]}>{errors.motivo}</span>}
             </div>
           </div>
 

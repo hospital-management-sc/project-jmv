@@ -55,6 +55,15 @@ export default function DoctorDashboard() {
   const [selectedPatient, setSelectedPatient] = useState<PatientBasic | null>(
     null
   );
+  const [appointmentRefreshKey, setAppointmentRefreshKey] = useState(0); // Trigger refresco de citas
+
+  const onEncounterRegistered = () => {
+    // Actualizar citas cuando se registra un encuentro
+    setAppointmentRefreshKey(prev => prev + 1);
+    // Volver a MyAppointments (no a main para que vea las citas refrescadas)
+    setViewMode("my-appointments");
+    setSelectedPatient(null);
+  };
 
   const onViewHistory = (patient: PatientBasic) => {
     setSelectedPatient(patient);
@@ -118,6 +127,7 @@ export default function DoctorDashboard() {
                 patient={selectedPatient}
                 doctorId={user.id}
                 especialidadId={especialidad?.id || 'otorrinolaringologia'}
+                onEncounterRegistered={onEncounterRegistered}
               />
             )}
           </>
@@ -147,6 +157,8 @@ export default function DoctorDashboard() {
               <MyAppointments 
                 doctorId={Number(user.id)}
                 onRegisterEncounter={onRegisterPatientEncounter}
+                onEncounterRegistered={onEncounterRegistered}
+                refreshKey={appointmentRefreshKey}
               />
             )}
           </>

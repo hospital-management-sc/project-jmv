@@ -7,6 +7,7 @@ export interface PatientBasic {
   sexo?: string
   telefono?: string
   direccion?: string
+  citaId?: number // ID de la cita si se registra desde MyAppointments
   personalMilitar?: {
     grado?: string
     componente?: string

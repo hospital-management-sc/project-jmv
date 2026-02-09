@@ -5,36 +5,38 @@
 import { apiService } from './api';
 
 // Tipos
-export type EstadoCita = 'PENDIENTE' | 'CONFIRMADA' | 'EN_CURSO' | 'COMPLETADA' | 'CANCELADA' | 'NO_ASISTIO';
+export type EstadoCita = 'PROGRAMADA' | 'COMPLETADA';
 
 export interface Cita {
   id: number;
   pacienteId: number;
   medicoId: number;
-  servicio: string;
+  servicio?: string;
   especialidad: string;
-  fechaHora: string;
+  fechaHora?: string; // Campo alternativo
+  fechaCita?: string | Date; // Campo del backend
+  horaCita?: string; // Campo del backend
   motivo: string;
-  estado: EstadoCita;
+  estado: string; // PROGRAMADA o COMPLETADA
   notas?: string | null;
   horaLlegada?: string | null;
   horaAtencion?: string | null;
   horaFinalizacion?: string | null;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
   paciente?: {
     id: number;
     nroHistoria: string;
     apellidosNombres: string;
     ci: string;
-    fechaNacimiento: string;
-    sexo: string;
+    fechaNacimiento?: string;
+    sexo?: string;
   };
   medico?: {
     id: number;
     nombre: string;
-    apellido: string;
-    especialidad: string | null;
+    apellido?: string;
+    especialidad?: string | null;
   };
   encuentro?: {
     id: number;
@@ -186,12 +188,8 @@ export async function obtenerCitasPorMedico(medicoId: number): Promise<Cita[]> {
 
 // Constantes útiles
 export const ESTADOS_CITA: { value: EstadoCita; label: string; color: string }[] = [
-  { value: 'PENDIENTE', label: 'Pendiente', color: '#6c757d' },
-  { value: 'CONFIRMADA', label: 'Confirmada', color: '#17a2b8' },
-  { value: 'EN_CURSO', label: 'En Curso', color: '#007bff' },
+  { value: 'PROGRAMADA', label: 'Programada', color: '#007bff' },
   { value: 'COMPLETADA', label: 'Completada', color: '#28a745' },
-  { value: 'CANCELADA', label: 'Cancelada', color: '#dc3545' },
-  { value: 'NO_ASISTIO', label: 'No Asistió', color: '#fd7e14' },
 ];
 
 export const SERVICIOS_MEDICOS = [

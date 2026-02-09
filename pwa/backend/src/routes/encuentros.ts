@@ -11,11 +11,11 @@ import {
 
 const router = Router();
 
+// Crear encuentro desde cita (atender cita) - DEBE SER ANTES de POST /
+router.post('/desde-cita', crearEncuentroDesdeCita);
+
 // Crear nuevo encuentro
 router.post('/', crearEncuentro);
-
-// Crear encuentro desde cita (atender cita)
-router.post('/desde-cita', crearEncuentroDesdeCita);
 
 // Obtener encuentros de un médico específico del día actual
 router.get('/medico/:medicoId/hoy', obtenerEncuentrosHoyMedico);

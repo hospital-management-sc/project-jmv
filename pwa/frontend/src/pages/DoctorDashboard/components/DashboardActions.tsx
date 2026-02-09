@@ -58,21 +58,6 @@ const ACCIONES_DISPONIBLES: Record<string, AccionConfig> = {
     icono: <path d="M22 12h-4l-3 9L9 3l-3 9H2" />,
     estilo: { background: 'linear-gradient(135deg, var(--color-warning) 0%, rgba(245, 158, 11, 0.8) 100%)' },
   },
-  'today-encounters': {
-    id: 'today-encounters',
-    titulo: 'Atenciones del Día',
-    descripcion: 'Revise los encuentros registrados hoy',
-    view: 'today-encounters',
-    icono: (
-      <>
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-        <line x1="16" y1="2" x2="16" y2="6" />
-        <line x1="8" y1="2" x2="8" y2="6" />
-        <line x1="3" y1="10" x2="21" y2="10" />
-        <path d="M8 14h.01M12 14h.01M16 14h.01" />
-      </>
-    ),
-  },
   'search-patient': {
     id: 'search-patient',
     titulo: 'Buscar Paciente',
@@ -123,6 +108,21 @@ const ACCIONES_DISPONIBLES: Record<string, AccionConfig> = {
       </>
     ),
   },
+  'today-encounters': {
+    id: 'today-encounters',
+    titulo: 'Atenciones del Día',
+    descripcion: 'Revise los encuentros registrados hoy',
+    view: 'today-encounters',
+    icono: (
+      <>
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+        <line x1="16" y1="2" x2="16" y2="6" />
+        <line x1="8" y1="2" x2="8" y2="6" />
+        <line x1="3" y1="10" x2="21" y2="10" />
+        <path d="M8 14h.01M12 14h.01M16 14h.01" />
+      </>
+    ),
+  }
 };
 
 function AccionButton({
@@ -163,9 +163,13 @@ export default function DashboardActions({ onClick }: Props) {
   const { nombre, vistaDashboard } = useEspecialidad();
 
   // Si no hay configuración de vista, mostrar todas las acciones
-  const accionesAMostrar = vistaDashboard?.acciones || 
+  let accionesAMostrar = vistaDashboard?.acciones || 
     ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 
-     'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'];
+      'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta', 'today-encounters'];
+
+  // Garantizar que 'today-encounters' sea la última acción
+  accionesAMostrar = accionesAMostrar.filter(id => id !== 'today-encounters');
+  accionesAMostrar.push('today-encounters');
 
   return (
     <section className={styles["management-section"]}>

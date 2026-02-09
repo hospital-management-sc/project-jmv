@@ -111,7 +111,7 @@ export default function SearchPatient({
   return (
     <section className={styles["view-section"]}>
       <div className={styles["section-header"]}>
-        <h2>🔍 Buscar Paciente</h2>
+        <h2>Buscar Paciente</h2>
         <p className={styles["section-subtitle"]}>
           Consulte la historia clínica y antecedentes del paciente
         </p>
@@ -175,7 +175,7 @@ export default function SearchPatient({
                 />
               </div>
               <button onClick={buscarPaciente} disabled={searching}>
-                {searching ? "🔄 Buscando..." : "🔍 Buscar"}
+                {searching ? "Buscando..." : "Buscar"}
               </button>
             </>
           ) : (
@@ -188,7 +188,7 @@ export default function SearchPatient({
                 onKeyPress={(e) => e.key === "Enter" && buscarPaciente()}
               />
               <button onClick={buscarPaciente} disabled={searching}>
-                {searching ? "🔄 Buscando..." : "🔍 Buscar"}
+                {searching ? "Buscando..." : "Buscar"}
               </button>
             </>
           )}
@@ -247,13 +247,13 @@ export default function SearchPatient({
                 className={styles["btn-primary"]}
                 onClick={() => onViewHistory(paciente)}
               >
-                📋 Ver Historia Completa
+                Ver Historia Completa
               </button>
               <button
                 className={styles["btn-secondary"]}
                 onClick={() => onRegisterEncounter(paciente)}
               >
-                📝 Nuevo Encuentro
+                Nuevo Encuentro
               </button>
             </div>
           </div>

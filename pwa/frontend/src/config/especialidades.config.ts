@@ -167,7 +167,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 1,
           titulo: "Buscar Paciente",
-          emoji: "🔍",
           campos: [
             {
               id: "ciTipo",
@@ -192,7 +191,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 2,
           titulo: "Datos del Encuentro y Antecedentes",
-          emoji: "📋",
           campos: [
             {
               id: "tipo",
@@ -201,10 +199,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
               requerido: true,
               grupo: "encuentro",
               opciones: [
-                { valor: "CONSULTA", etiqueta: "🩺 Consulta" },
-                { valor: "EMERGENCIA", etiqueta: "🚨 Emergencia" },
-                { valor: "HOSPITALIZACION", etiqueta: "🛏️ Evolución Hospitalización" },
-                { valor: "OTRO", etiqueta: "📋 Otro" }
+                { valor: "CONSULTA", etiqueta: "Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "Otro" }
               ]
             },
             {
@@ -347,7 +345,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 3,
           titulo: "Exploración Odontológica",
-          emoji: "🦷",
           campos: [
             {
               id: "cuadrante1",
@@ -402,7 +399,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 4,
           titulo: "Diagnóstico y Evolución",
-          emoji: "📊",
           campos: [
             {
               id: "diagnostico",
@@ -465,7 +461,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 1,
           titulo: "Buscar Paciente",
-          emoji: "🔍",
           campos: [
             {
               id: "ciTipo",
@@ -490,7 +485,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 2,
           titulo: "Datos del Encuentro",
-          emoji: "📋",
           campos: [
             {
               id: "tipo",
@@ -498,10 +492,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
               label: "Tipo de Encuentro",
               requerido: true,
               opciones: [
-                { valor: "CONSULTA", etiqueta: "🩺 Consulta" },
-                { valor: "EMERGENCIA", etiqueta: "🚨 Emergencia" },
-                { valor: "HOSPITALIZACION", etiqueta: "🛏️ Evolución Hospitalización" },
-                { valor: "OTRO", etiqueta: "📋 Otro" }
+                { valor: "CONSULTA", etiqueta: "Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "Otro" }
               ]
             },
             {
@@ -544,12 +538,11 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 3,
           titulo: "Examen Físico ORL",
-          emoji: "👂",
           campos: [
             {
               id: "oido",
               tipo: "textarea",
-              label: "👂 Oído",
+              label: "Oído",
               placeholder: "Hallazgos del examen del oído (conducto auditivo, tímpano, audición)...",
               rows: 3,
               grupo: "examenFisico"
@@ -557,7 +550,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             {
               id: "nariz",
               tipo: "textarea",
-              label: "👃 Nariz",
+              label: "Nariz",
               placeholder: "Hallazgos del examen de la nariz (fosas nasales, tabique, mucosa)...",
               rows: 3,
               grupo: "examenFisico"
@@ -565,7 +558,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             {
               id: "bocaGarganta",
               tipo: "textarea",
-              label: "👅 Boca y Garganta",
+              label: "Boca y Garganta",
               placeholder: "Hallazgos del examen de cavidad oral, faringe y laringe...",
               rows: 3,
               grupo: "examenFisico"
@@ -575,7 +568,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 4,
           titulo: "Signos Vitales y Diagnóstico",
-          emoji: "📊",
           campos: [
             {
               id: "taSistolica",
@@ -659,14 +651,13 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     color: '#F97316',
     vistaDashboard: {
       metricas: ['citasHoy', 'encuentrosHoy'],
-      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
+      acciones: ['registrar-encuentro', 'search-patient', 'my-appointments', 'today-encounters'],
     },
     formularioEspecializado: {
       pasos: [
         {
           numero: 1,
           titulo: "Buscar Paciente",
-          emoji: "🔍",
           campos: [
             {
               id: "ciTipo",
@@ -691,7 +682,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 2,
           titulo: "Datos del Encuentro e Historia",
-          emoji: "📋",
           campos: [
             {
               id: "tipo",
@@ -700,10 +690,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
               requerido: true,
               grupo: "encuentro",
               opciones: [
-                { valor: "CONSULTA", etiqueta: "🩺 Consulta" },
-                { valor: "EMERGENCIA", etiqueta: "🚨 Emergencia" },
-                { valor: "HOSPITALIZACION", etiqueta: "🛏️ Evolución Hospitalización" },
-                { valor: "OTRO", etiqueta: "📋 Otro" }
+                { valor: "CONSULTA", etiqueta: "Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "Otro" }
               ]
             },
             {
@@ -765,7 +755,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 3,
           titulo: "Examen Físico y Exploración Dermatológica",
-          emoji: "🔬",
           campos: [
             {
               id: "respiratorioFR",
@@ -816,7 +805,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             {
               id: "fototipoPiel",
               tipo: "select",
-              label: "🌞 Fototipo de Piel (Fitzpatrick)",
+              label: "Fototipo de Piel (Fitzpatrick)",
               grupo: "examenFisico",
               opciones: [
                 { valor: "I", etiqueta: "I - Muy clara (siempre se quema, nunca se broncea)" },
@@ -830,7 +819,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             {
               id: "topografia",
               tipo: "textarea",
-              label: "📍 Topografía (Localización)",
+              label: "Topografía (Localización)",
               placeholder: "Ubicación anatómica de las lesiones (ej: cara, tronco, extremidades)...",
               rows: 2,
               grupo: "examenFisico"
@@ -887,7 +876,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             {
               id: "tipoMorfologico",
               tipo: "select",
-              label: "🔍 Tipo Morfológico",
+              label: "Tipo Morfológico",
               grupo: "examenFisico",
               opciones: [
                 { valor: "elemental", etiqueta: "Elemental (única lesión)" },
@@ -986,7 +975,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             {
               id: "descripcionGeneral",
               tipo: "textarea",
-              label: "📝 Descripción General Dermatológica",
+              label: "Descripción General Dermatológica",
               placeholder: "Resumen descriptivo completo de los hallazgos dermatológicos...",
               rows: 4,
               grupo: "examenFisico"
@@ -996,7 +985,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 4,
           titulo: "Signos Vitales y Diagnóstico",
-          emoji: "📊",
           campos: [
             {
               id: "taSistolica",
@@ -1093,7 +1081,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 1,
           titulo: "Buscar Paciente",
-          emoji: "🔍",
           campos: [
             {
               id: "ciTipo",
@@ -1118,7 +1105,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 2,
           titulo: "Datos del Encuentro e Historia",
-          emoji: "📋",
           campos: [
             {
               id: "tipo",
@@ -1127,10 +1113,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
               requerido: true,
               grupo: "encuentro",
               opciones: [
-                { valor: "CONSULTA", etiqueta: "🩺 Consulta" },
-                { valor: "EMERGENCIA", etiqueta: "🚨 Emergencia" },
-                { valor: "HOSPITALIZACION", etiqueta: "🛏️ Evolución Hospitalización" },
-                { valor: "OTRO", etiqueta: "📋 Otro" }
+                { valor: "CONSULTA", etiqueta: "Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "Otro" }
               ]
             },
             {
@@ -1168,53 +1154,52 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 3,
           titulo: "Antecedentes Obstétricos y Examen Físico",
-          emoji: "👩‍⚕️",
           campos: [
             {
               id: "partos",
               tipo: "number",
-              label: "👶 Partos",
+              label: "Partos",
               placeholder: "0",
               grupo: "antecedentesObstetricos"
             },
             {
               id: "cesareas",
               tipo: "number",
-              label: "🏥 Cesáreas",
+              label: "Cesáreas",
               placeholder: "0",
               grupo: "antecedentesObstetricos"
             },
             {
               id: "abortos",
               tipo: "number",
-              label: "⚠️ Abortos",
+              label: "Abortos",
               placeholder: "0",
               grupo: "antecedentesObstetricos"
             },
             {
               id: "fur",
               tipo: "date",
-              label: "📅 FUR (Fecha Última Regla)",
+              label: "FUR (Fecha Última Regla)",
               grupo: "antecedentesObstetricos"
             },
             {
               id: "primerasRelaciones",
               tipo: "number",
-              label: "💑 Edad de Primeras Relaciones Sexuales",
+              label: "Edad de Primeras Relaciones Sexuales",
               placeholder: "Ej: 18",
               grupo: "antecedentesObstetricos"
             },
             {
               id: "parejasSexuales",
               tipo: "number",
-              label: "👥 Número de Parejas Sexuales",
+              label: "Número de Parejas Sexuales",
               placeholder: "0",
               grupo: "antecedentesObstetricos"
             },
             {
               id: "metodosAnticonceptivos",
               tipo: "textarea",
-              label: "💊 Métodos Anticonceptivos (Actuales/Previos)",
+              label: "Métodos Anticonceptivos (Actuales/Previos)",
               placeholder: "Ej: Píldora anticonceptiva, DIU, condón, etc...",
               rows: 2,
               grupo: "antecedentesObstetricos"
@@ -1230,7 +1215,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             {
               id: "mamas",
               tipo: "textarea",
-              label: "🫀 Mamas",
+              label: "Mamas",
               placeholder: "Simetría, masas, secreciones, dolor a la palpación, hallazgos relevantes...",
               rows: 3,
               grupo: "examenFisico"
@@ -1238,7 +1223,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             {
               id: "abdomen",
               tipo: "textarea",
-              label: "🫂 Abdomen",
+              label: "Abdomen",
               placeholder: "Forma, distensión, cicatrices, masas, sensibilidad, sonidos intestinales...",
               rows: 3,
               grupo: "examenFisico"
@@ -1246,7 +1231,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             {
               id: "genitales",
               tipo: "textarea",
-              label: "🔍 Genitales",
+              label: "Genitales",
               placeholder: "Inspección externa, especuloscopía, tacto vaginal, cervicitis, flujo, masas...",
               rows: 4,
               grupo: "examenFisico"
@@ -1256,7 +1241,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 4,
           titulo: "Diagnóstico",
-          emoji: "📊",
           campos: [
             {
               id: "diagnostico",
@@ -1304,7 +1288,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 1,
           titulo: "Buscar Paciente",
-          emoji: "🔍",
           campos: [
             {
               id: "ciTipo",
@@ -1329,7 +1312,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 2,
           titulo: "Datos del Encuentro e Historia",
-          emoji: "📋",
           campos: [
             {
               id: "tipo",
@@ -1338,10 +1320,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
               requerido: true,
               grupo: "encuentro",
               opciones: [
-                { valor: "CONSULTA", etiqueta: "🩺 Consulta" },
-                { valor: "EMERGENCIA", etiqueta: "🚨 Emergencia" },
-                { valor: "HOSPITALIZACION", etiqueta: "🛏️ Evolución Hospitalización" },
-                { valor: "OTRO", etiqueta: "📋 Otro" }
+                { valor: "CONSULTA", etiqueta: "Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "Otro" }
               ]
             },
             {
@@ -1387,12 +1369,11 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 3,
           titulo: "Examen Físico",
-          emoji: "🔬",
           campos: [
             {
               id: "examenAbdominal",
               tipo: "textarea",
-              label: "🫂 Examen Abdominal",
+              label: "Examen Abdominal",
               placeholder: "Inspección, palpación, percusión, auscultación. Hallazgos de dolor, masas, visceromegalias, soplos...",
               rows: 4,
               grupo: "examenFisico"
@@ -1400,7 +1381,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             {
               id: "examenEcografico",
               tipo: "textarea",
-              label: "🔊 Examen Ecográfico",
+              label: "Examen Ecográfico",
               placeholder: "Hallazgos ecográficos: estado del hígado, vesícula, páncreas, riñones, aorta, evaluación de la pared abdominal...",
               rows: 4,
               grupo: "examenFisico"
@@ -1410,7 +1391,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 4,
           titulo: "Diagnóstico",
-          emoji: "📊",
           campos: [
             {
               id: "diagnostico",
@@ -1470,7 +1450,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 1,
           titulo: "Buscar Paciente",
-          emoji: "🔍",
           campos: [
             {
               id: "ciTipo",
@@ -1495,7 +1474,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 2,
           titulo: "Antecedentes Personales",
-          emoji: "📋",
           campos: [
             {
               id: "tipo",
@@ -1504,10 +1482,10 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
               requerido: true,
               grupo: "encuentro",
               opciones: [
-                { valor: "CONSULTA", etiqueta: "🩺 Consulta" },
-                { valor: "EMERGENCIA", etiqueta: "🚨 Emergencia" },
-                { valor: "HOSPITALIZACION", etiqueta: "🛏️ Evolución Hospitalización" },
-                { valor: "OTRO", etiqueta: "📋 Otro" }
+                { valor: "CONSULTA", etiqueta: "Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "Otro" }
               ]
             },
             {
@@ -1527,7 +1505,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             {
               id: "antecedentesPersonales",
               tipo: "textarea",
-              label: "🎯 Antecedentes Personales (últimos 6 meses)",
+              label: "Antecedentes Personales (últimos 6 meses)",
               placeholder: "Seleccione los antecedentes que apliquen al paciente. Estos incluyen eventos estresantes y condiciones que afectan su salud mental...",
               rows: 4,
               grupo: "examenFisico"
@@ -1537,7 +1515,6 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 3,
           titulo: "Evaluación Psicológica",
-          emoji: "🧠",
           campos: [
             {
               id: "motivoConsulta",
@@ -1637,12 +1614,11 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
         {
           numero: 4,
           titulo: "Evaluación Laboral y Conclusiones",
-          emoji: "📊",
           campos: [
             {
               id: "arealaboral",
               tipo: "textarea",
-              label: "📌 Área Laboral - Satisfacción y Factores",
+              label: "Área Laboral - Satisfacción y Factores",
               placeholder: "Describa el entorno laboral, satisfacción, relaciones con supervisor y compañeros, autonomía, recursos, ambiente...",
               rows: 4,
               grupo: "diagnostico"

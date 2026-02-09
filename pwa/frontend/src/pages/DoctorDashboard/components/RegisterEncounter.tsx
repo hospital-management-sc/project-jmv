@@ -14,9 +14,10 @@ interface Props {
   patient: PatientBasic | null;
   doctorId: number;
   especialidadId: string; // NUEVO: ID de especialidad para personalización
+  onEncounterRegistered?: () => void; // Callback para refresco después de registrar encuentro
 }
 
-export default function RegisterEncounter({ patient = null, doctorId, especialidadId }: Props) {
+export default function RegisterEncounter({ patient = null, doctorId, especialidadId, onEncounterRegistered }: Props) {
   // ⚠️ VALIDACIÓN CRÍTICA - doctorId es requerido para createdById
   if (!doctorId) {
     console.error('[RegisterEncounter] ⚠️ CRITICAL: doctorId is missing!', { doctorId });
@@ -236,10 +237,47 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
 
       console.log('[RegisterEncounter] ✅ Sending encuentroData:', encuentroData);
 
-      await encuentrosService.crearEncuentro(encuentroData);
+      // 🆕 Si viene de una cita (tiene citaId), usar endpoint /desde-cita que actualiza la cita
+      if (paciente.citaId) {
+        console.log('[RegisterEncounter] 📋 Registrando encuentro DESDE CITA ID:', paciente.citaId);
+        
+        // Preparar datos para endpoint /desde-cita
+        const encuentroDesdeCitaData = {
+          citaId: paciente.citaId,
+          medicoId: doctorId,
+          motivoConsulta: String(formData.motivoConsulta),
+          enfermedadActual: formData.enfermedadActual ? String(formData.enfermedadActual) : undefined,
+          impresionDiagnostica: impresionDiagnostica,
+          tratamiento: impresionDiagnostica?.descripcion,
+          observaciones: formData.observaciones ? String(formData.observaciones) : undefined,
+        };
 
-      setSuccessMessage("✅ Encuentro registrado exitosamente");
-      toast.success("✅ Encuentro registrado exitosamente");
+        console.log('[RegisterEncounter] 📤 Enviando a /encuentros/desde-cita:', encuentroDesdeCitaData);
+        
+        // Usar endpoint que actualiza la cita a COMPLETADA
+        const response = await fetch(`${API_BASE_URL}/encuentros/desde-cita`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(encuentroDesdeCitaData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Error al registrar encuentro desde cita');
+        }
+
+        const result = await response.json();
+        console.log('[RegisterEncounter] ✅ Encuentro registrado desde cita:', result);
+      } else {
+        // Si NO viene de una cita, usar endpoint genérico
+        console.log('[RegisterEncounter] 📝 Registrando encuentro GENÉRICO (sin cita)');
+        await encuentrosService.crearEncuentro(encuentroData);
+      }
+
+      setSuccessMessage("Encuentro registrado exitosamente");
+      toast.success("Encuentro registrado exitosamente");
 
       // Limpiar formulario después de éxito
       setTimeout(() => {
@@ -255,6 +293,10 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
         });
         setSuccessMessage("");
         setFieldErrors({});
+        // Llamar callback para refresco de citas
+        if (onEncounterRegistered) {
+          onEncounterRegistered();
+        }
       }, 2000);
     } catch (err: unknown) {
       const errorMessage =
@@ -269,7 +311,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
   return (
     <section className={styles["view-section"]}>
       <div className={styles["section-header"]}>
-        <h2>📝 Registrar Nuevo Encuentro</h2>
+        <h2>Registrar Nuevo Encuentro</h2>
         <p className={styles["section-subtitle"]}>
           {especialidad?.nombre || "Especialidad"} - Documente atenciones médicas
         </p>
@@ -278,7 +320,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
       {!formularioConfig ? (
         <div className={styles["form-card"]}>
           <p style={{ color: 'var(--error-color)' }}>
-            ⚠️ Configuración de formulario no disponible para esta especialidad
+            Configuración de formulario no disponible para esta especialidad
           </p>
         </div>
       ) : (
@@ -301,7 +343,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
           {/* Step 1: Buscar Paciente */}
           {step === 1 && (
             <div className={styles["form-card"]}>
-              <h3>🔍 Buscar Paciente por Cédula</h3>
+              <h3>Buscar Paciente por Cédula</h3>
               <div className={styles["search-box"]}>
                 <div className={styles["dual-input-group"]}>
                   <select
@@ -322,7 +364,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
                   />
                 </div>
                 <button onClick={buscarPaciente} disabled={searching}>
-                  {searching ? "🔄 Buscando..." : "🔍 Buscar"}
+                  {searching ? "Buscando..." : "Buscar"}
                 </button>
               </div>
               {fieldErrors.ciNumeros && <p className={styles["error-text"]}>{fieldErrors.ciNumeros}</p>}
@@ -334,7 +376,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
           {step > 1 && formularioConfig.pasos.map(paso => 
             paso.numero === step && (
               <div key={paso.numero} className={styles["form-card"]}>
-                <h3>{paso.emoji} {paso.titulo}</h3>
+                <h3>{paso.titulo}</h3>
 
                 {/* Mostrar info del paciente en paso 2 */}
                 {paso.numero === 2 && paciente && (
@@ -386,7 +428,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
                         onClick={() => setStep(paso.numero - 1)}
                         disabled={guardando}
                       >
-                        ← Atrás
+                        Atrás
                       </button>
                     )}
                     <button
@@ -395,10 +437,10 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
                       disabled={guardando}
                     >
                       {guardando 
-                        ? "⏳ Guardando..." 
+                        ? "Guardando..." 
                         : paso.numero < formularioConfig.pasos.length 
-                        ? "Continuar →" 
-                        : "💾 Guardar Encuentro"
+                        ? "Continuar" 
+                        : "Guardar Encuentro"
                       }
                     </button>
                   </div>
