@@ -128,6 +128,15 @@ const admisionesService = {
     const params = estado ? `?estado=${estado}` : '';
     return await apiService.get<{ total: number; servicio: string; admisiones: Admision[] }>(`/admisiones/servicio/${servicio}${params}`);
   },
+
+  /**
+   * Listar admisiones activas de un médico específico
+   */
+  listarAdmisionesActivasMedico: async (medicoId: string | number) => {
+    return await apiService.get<{ success: boolean; data: Admision[]; total: number; medicoId: number }>(
+      `/admisiones/medico/${medicoId}/activas`
+    );
+  },
 };
 
 export default admisionesService;

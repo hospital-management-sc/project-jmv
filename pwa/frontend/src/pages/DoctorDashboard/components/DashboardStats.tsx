@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import styles from "../DoctorDashboard.module.css";
 import type { DoctorStats } from "../interfaces";
 import { useEspecialidad } from "@/hooks/useEspecialidad";
+import { useAuth } from "@/contexts/AuthContext";
 import admisionesService from "@/services/admisiones.service";
 import { encuentrosService } from "@/services";
+import * as citasService from "@/services/citas.service";
 import { API_BASE_URL } from "@/utils/constants";
 
 interface Props {}
@@ -49,6 +51,7 @@ const METRICAS_DISPONIBLES: Record<string, MetricaConfig> = {
 };
 
 export default function DashboardStats({}: Props) {
+  const { user } = useAuth();
   const { vistaDashboard } = useEspecialidad();
   const [stats, setStats] = useState<DoctorStats>({
     pacientesHospitalizados: 0,
@@ -60,42 +63,54 @@ export default function DashboardStats({}: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
-    const interval = setInterval(fetchStats, 60000); // Actualizar cada minuto
-    return () => clearInterval(interval);
-  }, []);
+    if (user?.id) {
+      fetchStats();
+      const interval = setInterval(fetchStats, 60000); // Actualizar cada minuto
+      return () => clearInterval(interval);
+    } else {
+      setLoading(false);
+    }
+  }, [user?.id]);
 
   const fetchStats = async () => {
+    if (!user?.id) return;
+
     try {
-      // Obtener stats globales del dashboard
-      let dashboardData = null;
+      // Obtener stats del médico actual
+      
+      // 1. Pacientes hospitalizados del médico
+      let pacientesHospitalizados = 0;
       try {
-        const dashboardResponse = await fetch(`${API_BASE_URL}/dashboard/stats`);
-        const dashboardResult = await dashboardResponse.json();
-        dashboardData = dashboardResult.data;
-      } catch {
-        // Si falla, continuamos con otros stats
+        const admisionesResponse = await admisionesService.listarAdmisionesActivasMedico(user.id);
+        pacientesHospitalizados = (admisionesResponse as any).total || 0;
+      } catch (err) {
+        console.warn("Error obteniendo admisiones del médico:", err);
       }
 
-      // Obtener pacientes hospitalizados activos
-      const admisionesResponse =
-        await admisionesService.listarAdmisionesActivas({});
-
-      // Obtener encuentros de hoy
+      // 2. Encuentros del médico hoy
       let encuentrosHoyCount = 0;
       try {
-        const encuentrosHoy = await encuentrosService.obtenerHoy();
+        const encuentrosHoy = await encuentrosService.obtenerHoyDelMedico(user.id);
         encuentrosHoyCount = encuentrosHoy.length || 0;
-      } catch {
-        // Si falla, dejamos en 0
+      } catch (err) {
+        console.warn("Error obteniendo encuentros del médico:", err);
+      }
+
+      // 3. Citas del médico hoy
+      let citasHoyCount = 0;
+      try {
+        const citasDia = await citasService.obtenerCitasDelDia(Number(user.id));
+        citasHoyCount = citasDia.length || 0;
+      } catch (err) {
+        console.warn("Error obteniendo citas del médico:", err);
       }
 
       setStats({
-        pacientesHospitalizados: dashboardData?.pacientesHospitalizados || admisionesResponse.total || 0,
+        pacientesHospitalizados,
         encuentrosHoy: encuentrosHoyCount,
-        citasHoy: dashboardData?.citasProgramadasHoy || 0,
+        citasHoy: citasHoyCount,
         altasPendientes: 0, // Por implementar
-        pacientesEnEmergencia: dashboardData?.pacientesEnEmergencia || 0,
+        pacientesEnEmergencia: 0, // Por implementar
       });
     } catch (error) {
       console.error("Error fetching doctor stats:", error);

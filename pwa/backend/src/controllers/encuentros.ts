@@ -551,6 +551,99 @@ export const obtenerEncuentrosHoy = async (
 };
 
 /**
+ * Obtener encuentros del día actual para un médico específico
+ * GET /api/encuentros/medico/:medicoId/hoy
+ */
+export const obtenerEncuentrosHoyMedico = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { medicoId } = req.params;
+
+    // Validar que medicoId sea un número válido
+    if (!medicoId || isNaN(Number(medicoId))) {
+      res.status(400).json({
+        error: 'ID de médico inválido',
+      });
+      return;
+    }
+
+    logger.info(`Obteniendo encuentros del día actual para el médico ${medicoId}`);
+
+    // Verificar que el médico existe
+    const medico = await prisma.usuario.findUnique({
+      where: { id: Number(medicoId) },
+    });
+
+    if (!medico) {
+      res.status(404).json({
+        error: 'Médico no encontrado',
+      });
+      return;
+    }
+
+    // Obtener fecha actual (solo fecha, sin hora)
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const mañana = new Date(hoy);
+    mañana.setDate(mañana.getDate() + 1);
+
+    // Obtener encuentros del día para este médico
+    const encuentros = await prisma.encuentro.findMany({
+      where: {
+        fecha: {
+          gte: hoy,
+          lt: mañana,
+        },
+        createdById: Number(medicoId),
+      },
+      include: {
+        paciente: {
+          select: {
+            id: true,
+            nroHistoria: true,
+            apellidosNombres: true,
+            ci: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            nombre: true,
+            cargo: true,
+            especialidad: true,
+            role: true,
+          },
+        },
+      },
+      orderBy: [
+        { hora: 'desc' },
+      ],
+    });
+
+    const encuentrosConvertidos = convertBigIntToString(encuentros);
+
+    logger.info(`Se encontraron ${encuentros.length} encuentros hoy para el médico ${medicoId}`);
+
+    res.status(200).json({
+      success: true,
+      data: encuentrosConvertidos,
+      count: encuentros.length,
+      fecha: hoy.toISOString().split('T')[0],
+      medicoId: Number(medicoId),
+    });
+  } catch (error: any) {
+    logger.error('Error al obtener encuentros de hoy del médico:', error);
+    res.status(500).json({
+      error: 'Error al obtener encuentros',
+      details: error.message,
+    });
+  }
+};
+
+/**
  * Obtener encuentros por tipo
  * GET /api/encuentros/tipo/:tipo
  */

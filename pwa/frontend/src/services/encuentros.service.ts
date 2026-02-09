@@ -139,11 +139,21 @@ class EncuentrosService {
   }
 
   /**
-   * Obtener encuentros del día actual
+   * Obtener encuentros del día actual (todos - uso administrativo)
    */
   async obtenerHoy(): Promise<Encuentro[]> {
     const response = await apiService.get<EncuentrosResponse>(
       `/encuentros/hoy`
+    );
+    return response.data;
+  }
+
+  /**
+   * Obtener encuentros del día actual para un médico específico
+   */
+  async obtenerHoyDelMedico(medicoId: string | number): Promise<Encuentro[]> {
+    const response = await apiService.get<EncuentrosResponse>(
+      `/encuentros/medico/${medicoId}/hoy`
     );
     return response.data;
   }

@@ -1,7 +1,39 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import logger from '../utils/logger';
 
 const prisma = new PrismaClient();
+
+/**
+ * Función helper para convertir BigInt a string
+ */
+function convertBigIntToString(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  
+  if (typeof obj === 'bigint') {
+    return obj.toString();
+  }
+  
+  if (obj instanceof Date) {
+    return obj;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => convertBigIntToString(item));
+  }
+  
+  if (typeof obj === 'object') {
+    const converted: any = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        converted[key] = convertBigIntToString(obj[key]);
+      }
+    }
+    return converted;
+  }
+  
+  return obj;
+}
 
 /**
  * Crear nueva admisión para un paciente existente o nuevo
@@ -943,6 +975,120 @@ export const listarAdmisionesPorServicio = async (req: Request, res: Response) =
     console.error('Error al listar admisiones por servicio:', error);
     return res.status(500).json({
       error: 'Error al listar admisiones por servicio',
+      details: error instanceof Error ? error.message : 'Error desconocido',
+    });
+  }
+};
+
+/**
+ * Obtener admisiones activas de un médico específico
+ * GET /api/admisiones/medico/:medicoId/activas
+ */
+export const obtenerAdmisionesActivasMedico = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { medicoId } = req.params;
+
+    // Validar que medicoId sea un número válido
+    if (!medicoId || isNaN(Number(medicoId))) {
+      res.status(400).json({
+        error: 'ID de médico inválido',
+      });
+      return;
+    }
+
+    logger.info(`Obteniendo admisiones activas del médico ${medicoId}`);
+
+    // Verificar que el médico existe
+    const medico = await prisma.usuario.findUnique({
+      where: { id: Number(medicoId) },
+    });
+
+    if (!medico) {
+      res.status(404).json({
+        error: 'Médico no encontrado',
+      });
+      return;
+    }
+
+    // Obtener admisiones activas creadas por este médico
+    const admisiones = await prisma.admision.findMany({
+      where: {
+        estado: 'ACTIVA',
+        createdById: Number(medicoId),
+        tipo: {
+          in: ['EMERGENCIA', 'HOSPITALIZACION', 'UCI', 'CIRUGIA'],
+        },
+      },
+      include: {
+        paciente: {
+          select: {
+            id: true,
+            nroHistoria: true,
+            apellidosNombres: true,
+            ci: true,
+            fechaNacimiento: true,
+            sexo: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            nombre: true,
+            cargo: true,
+            especialidad: true,
+          },
+        },
+        formatoEmergencia: {
+          select: {
+            requiereHospitalizacion: true,
+          },
+        },
+      },
+      orderBy: {
+        fechaAdmision: 'desc',
+      },
+    });
+
+    // Filtrar admisiones: excluir emergencias que NO requieran hospitalización
+    const admisionesFiltradas = admisiones.filter((admision) => {
+      if (admision.tipo === 'EMERGENCIA') {
+        return admision.formatoEmergencia?.requiereHospitalizacion === true;
+      }
+      return true;
+    });
+
+    // Calcular días de hospitalización para cada admisión
+    const admisionesConDias = admisionesFiltradas.map((admision) => {
+      const fechaAdmision = new Date(admision.fechaAdmision);
+      const hoy = new Date();
+      const diasHospitalizacion = Math.ceil(
+        (hoy.getTime() - fechaAdmision.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      return {
+        ...admision,
+        diasHospitalizacion: diasHospitalizacion > 0 ? diasHospitalizacion : 0,
+      };
+    });
+
+    // Serializar BigInt
+    const admisionesSerializadas = convertBigIntToString(admisionesConDias);
+
+    logger.info(`Se encontraron ${admisionesFiltradas.length} admisiones activas para el médico ${medicoId}`);
+
+    res.status(200).json({
+      success: true,
+      data: admisionesSerializadas,
+      total: admisionesFiltradas.length,
+      medicoId: Number(medicoId),
+    });
+  } catch (error) {
+    logger.error('Error al obtener admisiones activas del médico:', error);
+    res.status(500).json({
+      error: 'Error al obtener admisiones',
       details: error instanceof Error ? error.message : 'Error desconocido',
     });
   }

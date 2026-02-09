@@ -7,6 +7,7 @@ import {
   registrarAlta,
   activarAdmision,
   listarAdmisionesActivas,
+  obtenerAdmisionesActivasMedico,
   listarAdmisionesPorServicio,
   listarEmergenciasActivas,
   listarEmergenciasPendientesHospitalizacion,
@@ -50,6 +51,13 @@ router.get('/emergencias-pendientes-hospitalizacion', listarEmergenciasPendiente
  * @access  Private (Administrativo)
  */
 router.post('/hospitalizar-desde-emergencia', hospitalizarDesdeEmergencia);
+
+/**
+ * @route   GET /api/admisiones/medico/:medicoId/activas
+ * @desc    Listar admisiones activas de un médico específico
+ * @access  Private
+ */
+router.get('/medico/:medicoId/activas', obtenerAdmisionesActivasMedico);
 
 /**
  * @route   GET /api/admisiones/servicio/:servicio

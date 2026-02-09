@@ -9,9 +9,11 @@ import {
 } from "@/services/encuentros.service";
 import { formatDateLongVenezuela } from "@/utils/dateUtils";
 import { EncuentroDetailModal } from "@/components";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Props {}
 export default function TodayEncounters({}: Props) {
+  const { user } = useAuth();
   const [encuentros, setEncuentros] = useState<Encuentro[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEncuentro, setSelectedEncuentro] = useState<Encuentro | null>(
@@ -19,12 +21,18 @@ export default function TodayEncounters({}: Props) {
   );
 
   useEffect(() => {
-    cargarEncuentrosHoy();
-  }, []);
+    if (user?.id) {
+      cargarEncuentrosHoy();
+    } else {
+      // Si no hay usuario, marcar como no cargado
+      setLoading(false);
+    }
+  }, [user?.id]);
 
   const cargarEncuentrosHoy = async () => {
     try {
-      const data = await encuentrosService.obtenerHoy();
+      // Obtener encuentros solo del médico actual
+      const data = await encuentrosService.obtenerHoyDelMedico(user!.id);
       setEncuentros(data);
     } catch (err) {
       console.error("Error al cargar encuentros:", err);
