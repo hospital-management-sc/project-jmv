@@ -47,50 +47,25 @@ export default function AdminDashboard() {
         )}
         <div className={styles.card}>
           <h2>Total de Pacientes</h2>
-          <div className={styles['stat-value']}>
-            {loading ? '...' : stats?.totalPacientes ?? 0}
-          </div>
-          <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '0.5rem' }}>
-            {!loading && stats && (
-              <>
-                🪖 {stats.pacientesMilitares} Militares · 
-                👨‍👩‍👧‍👦 {stats.pacientesAfiliados} Afiliados · 
-                👤 {stats.pacientesPNA} PNA
-              </>
-            )}
+          <div className={styles['patient-breakdown']}>
+            <div className={styles['patient-count']}>
+              {loading ? '...' : stats?.totalPacientes ?? 0}
+            </div>
+            <div className={styles['patient-details']}>
+              {!loading && stats && (
+                <>
+                  <div className={styles['detail-row']}>{stats.pacientesMilitares} Militares</div>
+                  <div className={styles['detail-row']}>{stats.pacientesAfiliados} Afiliados</div>
+                  <div className={styles['detail-row']}>{stats.pacientesPNA} PNA</div>
+                </>
+              )}
+            </div>
           </div>
         </div>
         <div className={styles.card}>
           <h2>Citas Programadas Hoy</h2>
           <div className={styles['stat-value']}>
             {loading ? '...' : stats?.citasProgramadasHoy ?? 0}
-          </div>
-        </div>
-        <div className={styles.card}>
-          <h2>Registros de Auditoría</h2>
-          <div className={styles['stat-value']}>
-            {loading ? '...' : stats?.registrosAuditoria ?? 0}
-          </div>
-        </div>
-        <div className={styles.card}>
-          <h2>🏥 Pacientes Hospitalizados</h2>
-          <div className={styles['stat-value']}>
-            {loading ? '...' : stats?.pacientesHospitalizados ?? 0}
-          </div>
-        </div>
-        <div className={styles.card}>
-          <h2>🚨 Pacientes en Emergencia</h2>
-          <div className={styles['stat-value']}>
-            {loading ? '...' : stats?.pacientesEnEmergencia ?? 0}
-          </div>
-        </div>
-        <div className={styles.card} style={{ background: 'linear-gradient(135deg, var(--color-warning) 0%, rgba(217, 119, 6, 0.9) 100%)' }}>
-          <h2>⚠️ Emergencias Pendientes</h2>
-          <div className={styles['stat-value']}>
-            {loading ? '...' : stats?.emergenciasPendientesHospitalizacion ?? 0}
-          </div>
-          <div style={{ fontSize: '0.85rem', color: 'white', marginTop: '0.5rem', opacity: 0.9 }}>
-            Pacientes requieren asignación de cama
           </div>
         </div>
       </section>
@@ -144,57 +119,6 @@ export default function AdminDashboard() {
             <div className={styles['btn-content']}>
               <span className={styles['btn-title']}>Generar Cita Médica</span>
               <span className={styles['btn-description']}>Programe consultas y asigne especialidades</span>
-            </div>
-          </button>
-          <button 
-            className={styles['admin-btn']}
-            onClick={() => setViewMode('register-admission')}
-          >
-            <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
-            <div className={styles['btn-content']}>
-              <span className={styles['btn-title']}>🏥 Nueva Admisión de Hospitalización</span>
-              <span className={styles['btn-description']}>Asigne cama y servicio para pacientes que requieren hospitalización</span>
-            </div>
-          </button>
-          <button 
-            className={styles['admin-btn']}
-            onClick={() => setViewMode('hospitalized-patients')}
-          >
-            <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9 22 9 12 15 12 15 22" />
-            </svg>
-            <div className={styles['btn-content']}>
-              <span className={styles['btn-title']}>Pacientes Hospitalizados</span>
-              <span className={styles['btn-description']}>Visualice pacientes actualmente internados</span>
-            </div>
-          </button>
-          <button 
-            className={styles['admin-btn']}
-            onClick={() => setViewMode('emergencias-pendientes')}
-          >
-            <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
-            <div className={styles['btn-content']}>
-              <span className={styles['btn-title']}>🚨 Emergencias Pendientes de Hospitalización</span>
-              <span className={styles['btn-description']}>Asigne cama a pacientes de emergencia que requieren hospitalización</span>
-            </div>
-          </button>
-          <button 
-            className={styles['admin-btn']}
-            onClick={() => setViewMode('pacientes-emergencia')}
-          >
-            <svg className={styles.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
-            <div className={styles['btn-content']}>
-              <span className={styles['btn-title']}>📊 Pacientes en Emergencia Actualmente</span>
-              <span className={styles['btn-description']}>Monitoree pacientes en atención de emergencia</span>
             </div>
           </button>
         </div>

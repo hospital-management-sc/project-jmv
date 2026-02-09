@@ -3,15 +3,44 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+// Zona horaria de Venezuela (UTC-4)
+const VENEZUELA_TIMEZONE = 'America/Caracas'
+
+/**
+ * Obtiene la fecha en formato YYYY-MM-DD en zona horaria Caracas
+ */
+function getDateStringInVenezuela(date: Date): string {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: VENEZUELA_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+  return formatter.format(date)
+}
+
+/**
+ * Obtiene la fecha de hoy en zona horaria Caracas
+ */
+function getTodayInVenezuela(): { startOfDay: Date; endOfDay: Date } {
+  const today = getDateStringInVenezuela(new Date())
+  const [year, month, day] = today.split('-').map(Number)
+  
+  // Crear fecha en UTC para el inicio del día en Caracas
+  const startOfDay = new Date(Date.UTC(year, month - 1, day, 4, 0, 0, 0)) // 00:00 Caracas = 04:00 UTC
+  const endOfDay = new Date(Date.UTC(year, month - 1, day, 27, 59, 59, 999)) // 23:59 Caracas = 03:59 UTC del próximo día
+  
+  return { startOfDay, endOfDay }
+}
+
 /**
  * Obtener estadísticas del dashboard en tiempo real
  * GET /api/dashboard/stats
  */
 export const getDashboardStats = async (_req: Request, res: Response): Promise<void> => {
   try {
-    // Obtener fecha de hoy sin hora
-    const hoy = new Date()
-    hoy.setHours(0, 0, 0, 0)
+    // Obtener fecha de hoy en zona horaria Caracas
+    const { startOfDay, endOfDay } = getTodayInVenezuela()
 
     // Ejecutar todas las queries en paralelo para mejor performance
     const [
@@ -47,8 +76,8 @@ export const getDashboardStats = async (_req: Request, res: Response): Promise<v
       prisma.cita.count({
         where: {
           fechaCita: {
-            gte: hoy,
-            lt: new Date(hoy.getTime() + 24 * 60 * 60 * 1000), // Hasta mañana a las 00:00
+            gte: startOfDay,
+            lte: endOfDay,
           },
           estado: 'PROGRAMADA',
         },
@@ -58,8 +87,8 @@ export const getDashboardStats = async (_req: Request, res: Response): Promise<v
       prisma.auditLog.count({
         where: {
           creadoEn: {
-            gte: hoy,
-            lt: new Date(hoy.getTime() + 24 * 60 * 60 * 1000),
+            gte: startOfDay,
+            lte: endOfDay,
           },
         },
       }),

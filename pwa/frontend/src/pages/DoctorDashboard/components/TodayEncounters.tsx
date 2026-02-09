@@ -63,7 +63,7 @@ export default function TodayEncounters({}: Props) {
   return (
     <section className={styles["view-section"]}>
       <div className={styles["section-header"]}>
-        <h2>📅 Atenciones de Hoy</h2>
+        <h2>Atenciones de Hoy</h2>
         <p className={styles["section-subtitle"]}>
           {formatDateLongVenezuela(new Date())}
         </p>

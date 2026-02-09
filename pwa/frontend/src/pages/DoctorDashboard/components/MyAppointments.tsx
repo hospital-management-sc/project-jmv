@@ -19,7 +19,7 @@ interface Props {
   refreshKey?: number; // Trigger para recargar citas desde el padre
 }
 
-export default function MyAppointments({ doctorId, onRegisterEncounter, onEncounterRegistered, refreshKey = 0 }: Props) {
+export default function MyAppointments({ doctorId, onRegisterEncounter, refreshKey = 0 }: Props) {
   const [citas, setCitas] = useState<Cita[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

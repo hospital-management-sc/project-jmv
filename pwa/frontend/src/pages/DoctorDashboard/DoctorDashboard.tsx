@@ -157,7 +157,6 @@ export default function DoctorDashboard() {
               <MyAppointments 
                 doctorId={Number(user.id)}
                 onRegisterEncounter={onRegisterPatientEncounter}
-                onEncounterRegistered={onEncounterRegistered}
                 refreshKey={appointmentRefreshKey}
               />
             )}
