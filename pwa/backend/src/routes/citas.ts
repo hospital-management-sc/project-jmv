@@ -9,6 +9,7 @@ import {
   listarCitasProximas,
   obtenerEspecialidades,
   obtenerCitasHoyMedico,
+  obtenerCitasProximosMedico,
   iniciarCita,
   completarCita,
 } from '../controllers/citas'
@@ -32,6 +33,9 @@ router.get('/medico/:medicoId', obtenerCitasPorMedico)
 
 // Obtener citas de hoy para un médico
 router.get('/medico/:medicoId/hoy', obtenerCitasHoyMedico)
+
+// Obtener citas de los próximos días para un médico
+router.get('/medico/:medicoId/proximos', obtenerCitasProximosMedico)
 
 // Obtener una cita específica
 router.get('/:id', obtenerCita)

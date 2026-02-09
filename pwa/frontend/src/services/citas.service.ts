@@ -101,21 +101,56 @@ export async function cancelarCita(id: number, motivo?: string): Promise<Cita> {
  * Obtener citas del día actual para un médico específico
  */
 export async function obtenerCitasDelDia(medicoId: number): Promise<Cita[]> {
-  return apiService.get<Cita[]>(`/citas/hoy/medico/${medicoId}`);
+  const response = await apiService.get<{
+    success: boolean;
+    data: Cita[];
+    count: number;
+    fecha: string;
+  }>(`/citas/medico/${medicoId}/hoy`);
+  
+  return Array.isArray(response.data) ? response.data : [];
+}
+
+/**
+ * Obtener citas de los próximos días para un médico específico
+ */
+export async function obtenerCitasProximos(medicoId: number, dias: number = 7): Promise<Cita[]> {
+  const response = await apiService.get<{
+    success: boolean;
+    data: Cita[];
+    count: number;
+    fechaInicio: string;
+    fechaFinal: string;
+    dias: number;
+  }>(`/citas/medico/${medicoId}/proximos?dias=${dias}`);
+  
+  return Array.isArray(response.data) ? response.data : [];
 }
 
 /**
  * Marcar una cita como atendida (el paciente llegó y está siendo atendido)
  */
 export async function atenderCita(id: number): Promise<Cita> {
-  return apiService.patch<Cita>(`/citas/${id}/atender`, {});
+  const response = await apiService.patch<{
+    success: boolean;
+    message: string;
+    data: Cita;
+  }>(`/citas/${id}/iniciar`, {});
+  
+  return response.data || {} as Cita;
 }
 
 /**
  * Completar una cita (finalizar la atención)
  */
 export async function completarCita(id: number, notas?: string): Promise<Cita> {
-  return apiService.patch<Cita>(`/citas/${id}/completar`, { notas });
+  const response = await apiService.patch<{
+    success: boolean;
+    message: string;
+    data: Cita;
+  }>(`/citas/${id}/completar`, { notas });
+  
+  return response.data || {} as Cita;
 }
 
 /**
@@ -129,14 +164,24 @@ export async function marcarNoAsistio(id: number): Promise<Cita> {
  * Obtener citas de un paciente
  */
 export async function obtenerCitasPorPaciente(pacienteId: number): Promise<Cita[]> {
-  return apiService.get<Cita[]>(`/citas/paciente/${pacienteId}`);
+  const response = await apiService.get<{
+    success: boolean;
+    data: Cita[];
+  }>(`/citas/paciente/${pacienteId}`);
+  
+  return Array.isArray(response.data) ? response.data : [];
 }
 
 /**
  * Obtener citas de un médico
  */
 export async function obtenerCitasPorMedico(medicoId: number): Promise<Cita[]> {
-  return apiService.get<Cita[]>(`/citas/medico/${medicoId}`);
+  const response = await apiService.get<{
+    success: boolean;
+    data: Cita[];
+  }>(`/citas/medico/${medicoId}`);
+  
+  return Array.isArray(response.data) ? response.data : [];
 }
 
 // Constantes útiles

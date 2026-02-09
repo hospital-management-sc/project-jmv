@@ -5,78 +5,48 @@
 import { useEffect, useState } from "react";
 import styles from "../DoctorDashboard.module.css";
 import type { Cita } from "@/services";
+import type { PatientBasic } from "../interfaces";
 import * as citasService from '@/services/citas.service'
-import { API_BASE_URL } from "@/utils/constants";
 import { formatDateLongVenezuela, formatTimeVenezuela } from "@/utils/dateUtils";
 import { toast } from "sonner";
 
 interface Props {
   doctorId: number;
+  onRegisterEncounter?: (patient: PatientBasic) => void;
 }
 
-export default function MyAppointments({ doctorId }: Props) {
+export default function MyAppointments({ doctorId, onRegisterEncounter }: Props) {
   const [citas, setCitas] = useState<Cita[]>([])
   const [loading, setLoading] = useState(true)
-  const [procesando, setProcesando] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  // Validar que doctorId sea un número válido
+  const validDoctorId = typeof doctorId === 'number' && doctorId > 0 ? doctorId : null
 
   // TODO: Obtener ID del médico actual del contexto de autenticación
   // const medicoId = 1 // Temporal
 
   useEffect(() => {
+    if (!validDoctorId) {
+      setError('ID del médico no válido')
+      setLoading(false)
+      return
+    }
     cargarCitas()
-  }, [doctorId])
+  }, [validDoctorId])
 
   const cargarCitas = async () => {
     try {
-      // Intentar cargar citas del día para el médico actual
-      const citasHoy = await citasService.obtenerCitasDelDia(doctorId)
-      setCitas(citasHoy)
+      // Cargar citas de los próximos 7 días para el médico actual
+      const citasProximas = await citasService.obtenerCitasProximos(validDoctorId!, 7)
+      setCitas(citasProximas)
     } catch (err) {
       console.error('Error al cargar citas:', err)
-      // Fallback al endpoint anterior si falla
-      try {
-        const response = await fetch(`${API_BASE_URL}/citas/lista/proximas`)
-        const result = await response.json()
-        if (result.success) {
-          setCitas(result.data || [])
-        }
-      } catch {
-        console.error('Fallback también falló')
-      }
+      const errorMsg = err instanceof Error ? err.message : 'Error desconocido'
+      setError(errorMsg)
+      toast.error('❌ Error al cargar las citas')
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleAtenderCita = async (citaId: number) => {
-    setProcesando(citaId)
-    try {
-      await citasService.atenderCita(citaId)
-      await cargarCitas()
-      // alert('✅ Cita marcada como en atención')
-      toast.success('✅ Cita marcada como en atención')
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al atender cita'
-      // alert('❌ ' + errorMessage)
-      toast.error(`❌ ${errorMessage}`)
-    } finally {
-      setProcesando(null)
-    }
-  }
-
-  const handleCompletarCita = async (citaId: number) => {
-    setProcesando(citaId)
-    try {
-      await citasService.completarCita(citaId)
-      await cargarCitas()
-      // alert('✅ Cita completada')
-      toast.success('✅ Cita completada')
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al completar cita'
-      // alert('❌ ' + errorMessage)
-      toast.error(`❌ ${errorMessage}`)
-    } finally {
-      setProcesando(null)
     }
   }
 
@@ -92,6 +62,45 @@ export default function MyAppointments({ doctorId }: Props) {
     return labels[estado] || estado
   }
 
+  const formatearFecha = (fechaCita: any) => {
+    try {
+      if (!fechaCita) return '📅 Sin fecha'
+      const fecha = new Date(fechaCita)
+      if (isNaN(fecha.getTime())) {
+        console.warn('Fecha inválida:', fechaCita)
+        return '📅 Fecha inválida'
+      }
+      return '📅 ' + formatDateLongVenezuela(fecha)
+    } catch (e) {
+      console.error('Error al formatear fecha:', e)
+      return '📅 Error en fecha'
+    }
+  }
+
+  const formatearHoraCita = (horaCita: string | null) => {
+    try {
+      if (!horaCita) return '🕐 Sin hora'
+      // horaCita viene como string HH:MM:SS o HH:MM
+      // Lo convertimos a hora legible
+      const horas = horaCita.split(':')
+      if (horas.length < 2) return '🕐 ' + horaCita
+      return '🕐 ' + horas[0] + ':' + horas[1]
+    } catch (e) {
+      console.error('Error al formatear hora:', e)
+      return '🕐 Error en hora'
+    }
+  }
+
+  // Mapear estado del backend al estado esperado
+  const mapearEstado = (estadoBackend: string): string => {
+    const mapeo: Record<string, string> = {
+      'PROGRAMADA': 'CONFIRMADA',
+      'EN_PROCESO': 'EN_CURSO',
+      'REALIZADA': 'COMPLETADA',
+    }
+    return mapeo[estadoBackend] || estadoBackend
+  }
+
   if (loading) {
     return (
       <div className={styles['loading-container']}>
@@ -101,13 +110,27 @@ export default function MyAppointments({ doctorId }: Props) {
     )
   }
 
+  if (error) {
+    return (
+      <section className={styles['view-section']}>
+        <div className={styles['section-header']}>
+          <h2>📅 Mis Citas - Próximos 7 Días</h2>
+        </div>
+        <div className={styles['form-card']}>
+          <div style={{ padding: '2rem', backgroundColor: '#fee2e2', borderRadius: '0.5rem', textAlign: 'center' }}>
+            <p style={{ color: '#dc2626', fontWeight: 'bold' }}>
+              ⚠️ {error}
+            </p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className={styles['view-section']}>
       <div className={styles['section-header']}>
-        <h2>📅 Mis Citas del Día</h2>
-        <p className={styles['section-subtitle']}>
-          {formatDateLongVenezuela(new Date())}
-        </p>
+        <h2>📅 Mis Citas - Próximos 7 Días</h2>
       </div>
 
       <div className={styles['form-card']}>
@@ -118,13 +141,13 @@ export default function MyAppointments({ doctorId }: Props) {
           </div>
           <div className={styles['stat-box']}>
             <span className={styles['stat-number']}>
-              {citas.filter(c => c.estado === 'PENDIENTE' || c.estado === 'CONFIRMADA').length}
+              {citas.filter(c => (c as any).estado === 'PROGRAMADA' || (c as any).estado === 'EN_PROCESO').length}
             </span>
             <span className={styles['stat-label']}>Por Atender</span>
           </div>
           <div className={styles['stat-box']}>
             <span className={styles['stat-number']}>
-              {citas.filter(c => c.estado === 'COMPLETADA').length}
+              {citas.filter(c => (c as any).estado === 'REALIZADA').length}
             </span>
             <span className={styles['stat-label']}>Completadas</span>
           </div>
@@ -133,7 +156,7 @@ export default function MyAppointments({ doctorId }: Props) {
         {citas.length === 0 ? (
           <div className={styles['empty-state']}>
             <span className={styles['empty-icon']}>📅</span>
-            <h3>No hay citas programadas para hoy</h3>
+            <h3>No hay citas programadas para los próximos 7 días</h3>
             <p>Las citas asignadas aparecerán aquí</p>
           </div>
         ) : (
@@ -141,11 +164,16 @@ export default function MyAppointments({ doctorId }: Props) {
             {citas.map((cita) => (
               <div key={cita.id} className={styles['appointment-card']}>
                 <div className={styles['appointment-header']}>
-                  <span className={styles['appointment-time']}>
-                    {formatTimeVenezuela(cita.fechaHora)}
-                  </span>
-                  <span className={`${styles['status-badge']} ${styles[`status-${cita.estado?.toLowerCase()}`]}`}>
-                    {getEstadoLabel(cita.estado)}
+                  <div>
+                    <div className={styles['appointment-date']}>
+                      {formatearFecha((cita as any).fechaCita)}
+                    </div>
+                    <span className={styles['appointment-time']}>
+                      {formatearHoraCita((cita as any).horaCita)}
+                    </span>
+                  </div>
+                  <span className={`${styles['status-badge']} ${styles[`status-${(cita as any).estado?.toLowerCase()}`]}`}>
+                    {getEstadoLabel(mapearEstado((cita as any).estado))}
                   </span>
                 </div>
                 <div className={styles['appointment-body']}>
@@ -158,26 +186,26 @@ export default function MyAppointments({ doctorId }: Props) {
                   )}
                 </div>
                 <div className={styles['appointment-actions']}>
-                  {(cita.estado === 'PENDIENTE' || cita.estado === 'CONFIRMADA') && (
+                  {((cita as any).estado === 'PROGRAMADA' || (cita as any).estado === 'EN_PROCESO') && onRegisterEncounter && cita.paciente && (
                     <button 
                       className={styles['btn-primary']} 
-                      onClick={() => handleAtenderCita(cita.id)}
-                      disabled={procesando === cita.id}
+                      onClick={() => {
+                        const patientData: PatientBasic = {
+                          id: String(cita.paciente!.id),
+                          nroHistoria: cita.paciente!.nroHistoria,
+                          apellidosNombres: cita.paciente!.apellidosNombres,
+                          ci: cita.paciente!.ci,
+                          fechaNacimiento: cita.paciente!.fechaNacimiento,
+                          sexo: cita.paciente!.sexo,
+                        }
+                        onRegisterEncounter(patientData)
+                      }}
                     >
-                      {procesando === cita.id ? '⏳...' : '▶️ Atender'}
+                      📝 Registrar Encuentro
                     </button>
                   )}
-                  {cita.estado === 'EN_CURSO' && (
-                    <button 
-                      className={styles['btn-primary']} 
-                      onClick={() => handleCompletarCita(cita.id)}
-                      disabled={procesando === cita.id}
-                    >
-                      {procesando === cita.id ? '⏳...' : '✅ Completar'}
-                    </button>
-                  )}
-                  {cita.estado === 'COMPLETADA' && (
-                    <span className={styles['completed-label']}>✅ Atención finalizada</span>
+                  {((cita as any).estado === 'REALIZADA') && (
+                    <span className={styles['completed-label']}>✅ Encuentro registrado</span>
                   )}
                 </div>
               </div>

@@ -626,6 +626,108 @@ export const obtenerCitasHoyMedico = async (req: Request, res: Response): Promis
 }
 
 /**
+ * Obtener citas de los próximos N días para un médico
+ * GET /api/citas/medico/:medicoId/proximos
+ */
+export const obtenerCitasProximosMedico = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { medicoId } = req.params
+    const { dias = 7 } = req.query
+    const diasNumero = parseInt(dias as string) || 7
+
+    // Validar que el médico exista y obtener su especialidad
+    const medico = await prisma.usuario.findUnique({
+      where: { id: Number(medicoId) },
+    })
+
+    if (!medico) {
+      res.status(404).json({
+        success: false,
+        message: 'Médico no encontrado',
+      })
+      return
+    }
+
+    // Construir rango de fechas
+    const hoy = new Date()
+    hoy.setHours(0, 0, 0, 0)
+    const fechaFinal = new Date(hoy)
+    fechaFinal.setDate(fechaFinal.getDate() + diasNumero)
+
+    // Obtener especialidad del médico (puede ser cargo si no tiene especialidad)
+    const especialidadMedico = (medico as any).especialidad || medico.cargo || ''
+
+    // Buscar citas asignadas directamente al médico O citas de su especialidad sin médico asignado
+    const citas = await prisma.cita.findMany({
+      where: {
+        AND: [
+          {
+            fechaCita: {
+              gte: hoy,
+              lt: fechaFinal,
+            },
+          },
+          {
+            OR: [
+              { medicoId: Number(medicoId) },
+              {
+                AND: [
+                  { medicoId: null },
+                  { especialidad: especialidadMedico },
+                ],
+              },
+            ],
+          },
+          {
+            estado: {
+              in: ['PROGRAMADA', 'EN_PROCESO'],
+            },
+          },
+        ],
+      },
+      include: {
+        paciente: {
+          select: {
+            id: true,
+            nroHistoria: true,
+            apellidosNombres: true,
+            ci: true,
+            fechaNacimiento: true,
+            sexo: true,
+            telefono: true,
+          },
+        },
+        medico: {
+          select: {
+            id: true,
+            nombre: true,
+          },
+        },
+      },
+      orderBy: [
+        { fechaCita: 'asc' },
+        { horaCita: 'asc' },
+      ],
+    })
+
+    res.json({
+      success: true,
+      data: convertBigIntToString(citas),
+      count: citas.length,
+      fechaInicio: hoy.toISOString().split('T')[0],
+      fechaFinal: fechaFinal.toISOString().split('T')[0],
+      dias: diasNumero,
+    })
+  } catch (error: any) {
+    console.error('Error al obtener citas próximas:', error)
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error al obtener citas próximas',
+    })
+  }
+}
+
+/**
  * Marcar cita como en proceso (médico comenzó a atender)
  * PATCH /api/citas/:id/iniciar
  */

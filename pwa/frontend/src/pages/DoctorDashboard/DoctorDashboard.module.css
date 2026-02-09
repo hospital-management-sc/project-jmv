@@ -1049,15 +1049,30 @@
 .appointment-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 1rem;
   padding: 1rem;
   background: var(--bg-tertiary);
   border-bottom: 1px solid var(--border-color);
 }
 
+.appointment-header > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
 .appointment-time {
   font-weight: 600;
   color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.appointment-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  display: block;
 }
 
 .status-badge {
@@ -1098,13 +1113,22 @@
 
 .appointment-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   padding: 1rem;
   border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
 }
 
 .appointment-actions button {
   flex: 1;
+  min-width: 140px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.appointment-actions .btn-secondary {
+  padding: 0.65rem 0.75rem;
+  font-size: 0.9rem;
 }
 
 /* Loading */

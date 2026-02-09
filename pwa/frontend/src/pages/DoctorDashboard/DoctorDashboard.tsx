@@ -136,10 +136,33 @@ export default function DoctorDashboard() {
         )}
         {viewMode === "today-encounters" && <TodayEncounters />}
         {viewMode === "my-appointments" && (
-          <MyAppointments doctorId={user?.id as number} />
+          <>
+            {!user?.id ? (
+              <div style={{ padding: '2rem', backgroundColor: '#fee2e2', borderRadius: '0.5rem', textAlign: 'center' }}>
+                <p style={{ color: '#dc2626', fontWeight: 'bold' }}>
+                  ⚠️ Error: No se puede obtener tu ID de usuario. Por favor, recarga la página o inicia sesión nuevamente.
+                </p>
+              </div>
+            ) : (
+              <MyAppointments 
+                doctorId={Number(user.id)}
+                onRegisterEncounter={onRegisterPatientEncounter}
+              />
+            )}
+          </>
         )}
         {viewMode === "interconsultas" && (
-          <Interconsultas doctorId={user?.id as number} />
+          <>
+            {!user?.id ? (
+              <div style={{ padding: '2rem', backgroundColor: '#fee2e2', borderRadius: '0.5rem', textAlign: 'center' }}>
+                <p style={{ color: '#dc2626', fontWeight: 'bold' }}>
+                  ⚠️ Error: No se puede obtener tu ID de usuario. Por favor, recarga la página o inicia sesión nuevamente.
+                </p>
+              </div>
+            ) : (
+              <Interconsultas doctorId={Number(user.id)} />
+            )}
+          </>
         )}
         {viewMode === "register-emergency" && (
           <RegistrarEmergencia onBack={() => setViewMode("main")} />
