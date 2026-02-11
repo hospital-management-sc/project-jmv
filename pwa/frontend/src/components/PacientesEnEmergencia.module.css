@@ -1,7 +1,7 @@
 .container {
-  padding: var(--spacing-xl);
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 10px; /* Reducimos a lo mínimo necesario */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .header {
@@ -10,11 +10,18 @@
 
 .headerTop {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
+  flex-direction: column; /* Apilado en móvil */
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .headerTop {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 
 .headerActions {
@@ -23,14 +30,15 @@
 }
 
 .header h2 {
-  font-size: 1.8rem;
-  color: var(--text-primary);
-  margin: 0;
+  font-size: clamp(1.3rem, 5vw, 1.8rem); /* Tamaño fluido */
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
 }
 
 .subtitle {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  display: block; /* Asegura que tome su propia línea */
 }
 
 .refreshBtn {
@@ -165,8 +173,16 @@
 
 .cardsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 1.5rem;
+}
+
+@media (min-width: 480px) {
+  .cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 1.5rem;
+  }
 }
 
 .card {
@@ -200,9 +216,18 @@
 }
 
 .cardHeader {
-  background: linear-gradient(135deg, var(--color-error) 0%, rgba(239, 68, 68, 0.8) 100%);
-  color: white;
-  padding: 1.2rem;
+  display: flex;
+  flex-direction: column; /* Apilar por defecto en móvil */
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+@media (min-width: 480px) {
+  .cardHeader {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 
 .cardHeader h3 {
@@ -210,11 +235,23 @@
   margin-bottom: 0.5rem;
 }
 
+.pacienteNombre {
+  font-size: 1.1rem;
+  word-break: break-word; /* Rompe palabras si son demasiado largas */
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
 .badges {
   display: flex;
+  flex-wrap: wrap; /* Permite que el segundo badge baje si no cabe */
   gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.75rem;
+}
+
+.tiempoBadge, .hospitalizacionBadge {
+  font-size: 0.75rem; /* Un poco más pequeño para móvil */
+  padding: 0.25rem 0.6rem;
+  white-space: nowrap; /* Evita que el texto interno del badge se rompa */
 }
 
 .badge {
@@ -250,18 +287,51 @@
 
 .infoRow {
   display: flex;
-  padding: 0.5rem 0;
+  flex-direction: column; /* Cambiamos a columna por defecto */
+  padding: 0.6rem 0;
   border-bottom: 1px solid var(--border-color);
+  gap: 2px;
 }
 
 .infoRow strong {
-  min-width: 100px;
+  min-width: auto; /* Eliminamos el ancho fijo */
+  font-size: 0.75rem;
   color: var(--text-secondary);
-  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .infoRow span {
-  color: var(--text-primary);
+  word-break: break-all; /* Para números de historia o CIs largos */
+}
+
+@media (min-width: 600px) {
+  .infoRow {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 10px;
+  }
+  
+  .infoRow strong {
+    min-width: 120px;
+  }
+}
+
+.emergenciasGrid {
+  display: grid;
+  grid-template-columns: 1fr; /* 1 card por fila en móvil */
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .emergenciasGrid {
+    grid-template-columns: repeat(2, 1fr); /* 2 cards en tablets */
+  }
+}
+
+@media (min-width: 1200px) {
+  .emergenciasGrid {
+    grid-template-columns: repeat(3, 1fr); /* 3 cards en pantallas grandes */
+  }
 }
 
 .diagnostico,

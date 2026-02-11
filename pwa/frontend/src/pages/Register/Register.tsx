@@ -238,9 +238,9 @@ export default function Register() {
           {...register('nombre')}
         />
 
-        <div className={styles.formGroup}>
-          <label htmlFor="ciTipo">C.I. (Cédula de Identidad)</label>
-          <div className={styles["dual-input-group"]}>
+        <div className={styles.ciGroup}>
+          <label htmlFor="ciTipo" className={styles.label}>C.I. (Cédula de Identidad)</label>
+          <div className={styles.ciInputsWrapper}>
             <select
               id="ciTipo"
               {...register('ciTipo')}
@@ -256,7 +256,7 @@ export default function Register() {
               placeholder="10200300"
               maxLength={9}
               {...register('ciNumeros')}
-              className={errors.ciNumeros ? styles.inputError : ''}
+              className={`${styles.ciNumberInput} ${errors.ciNumeros ? styles.inputError : ''}`}
             />
           </div>
           {errors.ciTipo?.message && <span className={styles.error}>{errors.ciTipo.message}</span>}

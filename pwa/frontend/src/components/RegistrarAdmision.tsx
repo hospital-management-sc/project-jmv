@@ -199,46 +199,51 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
       {/* Paso 1: Búsqueda de Paciente */}
       {paso === 'busqueda' && (
         <>
-          <div className={styles.section}>
+          <div className={styles.busquedaCard}>
             <h3>Paso 1: Buscar Paciente por CI</h3>
-            <div className={styles.busquedaContainer}>
-              <div className={styles.busquedaInput}>
-                <select
-                  value={busquedaCITipo}
-                  onChange={(e) => setBusquedaCITipo(e.target.value)}
-                  disabled={buscando}
-                >
-                  <option value="V">V</option>
-                  <option value="E">E</option>
-                  <option value="P">P</option>
-                </select>
-                <input
-                  type="text"
-                  placeholder="12345678"
-                  value={busquedaCINumeros}
-                  onChange={(e) => handleCINumerosChange(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && buscarPaciente()}
-                  disabled={buscando}
-                  maxLength={8}
-                />
-                <button onClick={buscarPaciente} disabled={buscando}>
-                  {buscando ? '🔍 Buscando...' : '🔍 Buscar'}
-                </button>
+            <div className={styles.busquedaForm}>
+              <div className={styles.ciGroup}>
+                <div className={styles.ciInputsWrapper}>
+                  <select
+                    className={styles.ciTipoSelect}
+                    value={busquedaCITipo}
+                    onChange={(e) => setBusquedaCITipo(e.target.value)}
+                    disabled={buscando}
+                  >
+                    <option value="V">V</option>
+                    <option value="E">E</option>
+                    <option value="P">P</option>
+                  </select>
+                  <input
+                    type="text"
+                    className={styles.ciInput}
+                    placeholder="12345678"
+                    value={busquedaCINumeros}
+                    onChange={(e) => handleCINumerosChange(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && buscarPaciente()}
+                    disabled={buscando}
+                    maxLength={8}
+                  />
+                </div>
+                {errorBusqueda && (
+                  <>
+                    <div className={styles.errorMsg}>⚠️ {errorBusqueda}</div>
+                    <div className={styles.registroSuggestion}>
+                      <p>¿El paciente no está registrado?</p>
+                      <button
+                        onClick={() => setPaso('registro')}
+                        className={styles.registrarBtn}
+                      >
+                        Registrar nuevo paciente
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
-              {errorBusqueda && (
-                <>
-                  <div className={styles.errorMsg}>⚠️ {errorBusqueda}</div>
-                  <div className={styles.registroSuggestion}>
-                    <p>¿El paciente no está registrado?</p>
-                    <button
-                      onClick={() => setPaso('registro')}
-                      className={styles.registrarBtn}
-                    >
-                      Registrar nuevo paciente
-                    </button>
-                  </div>
-                </>
-              )}
+              <button onClick={buscarPaciente} disabled={buscando}>
+                {buscando ? '🔍 Buscando...' : '🔍 Buscar'}
+              </button>
+
             </div>
           </div>
 

@@ -231,9 +231,9 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       <p className={styles["form-description"]}>Busque el paciente y programe una cita médica</p>
 
       {/* Búsqueda de Paciente */}
-      <div className="search-patient-box" style={{ marginBottom: '2rem' }}>
+      <div className={styles["search-patient-box"]}style={{ marginBottom: '2rem' }}>
         <h3 style={{ marginBottom: '1rem' }}>1. Buscar Paciente</h3>
-        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
+        <div className={styles['search-input-group']}>
           {/* Dual input para CI */}
           <select
             value={searchCITipo}
@@ -265,15 +265,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
             }}
             placeholder="Ej: 12345678"
             maxLength={8}
-            style={{
-              flex: 1,
-              padding: '0.75rem',
-              backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '0.375rem',
-              color: 'var(--text-primary)',
-              fontSize: '0.95rem',
-            }}
+            className={styles['search-input']}
             disabled={selectedPatient ? true : false}
           />
           <button

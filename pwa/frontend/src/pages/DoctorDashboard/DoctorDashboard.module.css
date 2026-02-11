@@ -1,5 +1,13 @@
 /* Dashboard Médico - Dark Mode */
 
+.view-section, 
+.form-card,
+.dashboard-header {
+  box-sizing: border-box; 
+  max-width: 100%;
+  overflow-x: hidden; 
+}
+
 .dashboard-container {
   width: 100%;
 }
@@ -99,7 +107,7 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 0.5rem;
-  padding: 2rem;
+  padding: 2rem 1rem;
   box-shadow: var(--shadow-sm);
 }
 
@@ -180,29 +188,44 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 0.5rem;
-  padding: 2rem;
+  padding: 1rem 0rem;
   box-shadow: var(--shadow-sm);
 }
 
 .section-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column; 
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
+  padding: 0 1rem 1rem 1rem; 
   border-bottom: 2px solid var(--border-color);
+  align-items: flex-start;
 }
 
 .section-header h2 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   color: var(--text-primary);
+  line-height: 1.2;
 }
 
 .section-subtitle {
-  margin: 0.5rem 0 0 0;
+  margin: 0;
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+@media (min-width: 768px) {
+  .section-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
 }
 
 .back-link {
@@ -959,20 +982,33 @@
 
 /* Stats Summary */
 .stats-summary {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1rem;
-  margin-bottom: 1.5rem;
   padding: 1rem;
   background: var(--bg-secondary);
   border-radius: 0.5rem;
 }
 
 .stat-box {
-  flex: 1;
-  text-align: center;
-  padding: 1rem;
+  width: 100%; 
+  padding: 1.25rem;
   background: var(--bg-tertiary);
-  border-radius: 0.375rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 480px) {
+  .stats-summary {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-box {
+    flex: 1 1 100%;
+  }
 }
 
 .stat-box .stat-number {
@@ -1650,5 +1686,36 @@
 
   .dual-input-group select {
     flex: 0 0 70px;
+  }
+}
+
+@media (max-width: 768px) {
+  .view-section {
+    padding: 1rem 0.5rem; 
+  }
+
+  .form-card {
+    padding: 1rem;
+  }
+  
+  .section-header h2 {
+    font-size: 1.2rem; 
+  }
+}
+
+@media (max-width: 768px) {
+  .appointment-header {
+    flex-direction: column; 
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .appointment-actions {
+    flex-direction: column; 
+    gap: 0.75rem;
+  }
+
+  .appointment-actions button {
+    width: 100%; 
   }
 }

@@ -1,9 +1,10 @@
 .container {
   max-width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
+  margin: 0;
+  padding: 0;
   min-height: calc(100vh - 100px);
   color: var(--text-primary);
+  box-sizing: border-box;
 }
 
 /* Header */
@@ -13,8 +14,8 @@
 }
 
 .header h1 {
-  color: #2c3e50;
-  font-size: 28px;
+  color: var(--text-primary);
+  font-size: clamp(1.2rem, 5vw, 1.75rem);
   margin-bottom: 10px;
 }
 
@@ -27,7 +28,7 @@
 .busquedaCard {
   background: var(--bg-secondary);
   border-radius: 12px;
-  padding: 40px;
+  padding: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   margin-bottom: 30px;
 }
@@ -52,21 +53,16 @@
 .busquedaInput {
   display: flex;
   gap: 10px;
-  max-width: 500px;
-  margin: 0 auto;
+  flex-wrap: wrap;
 }
 
 .ciSelect {
-  width: 80px;
+  flex: 0 0 70px;
   padding: 12px;
-  border: 2px solid var(--border-color);
   border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
   color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.2s;
 }
 
 .ciSelect:focus {
@@ -75,14 +71,13 @@
 }
 
 .ciInput {
-  flex: 1;
-  padding: 12px 15px;
-  border: 2px solid var(--border-color);
+  flex: 1; 
+  min-width: 140px;
+  padding: 12px;
   border-radius: 8px;
-  font-size: 16px;
-  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
   color: var(--text-primary);
-  transition: all 0.2s;
 }
 
 .ciInput:focus {
@@ -92,16 +87,14 @@
 }
 
 .buscarBtn {
-  padding: 12px 30px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  flex: 1 1 100%;
+  padding: 12px;
+  background: var(--color-primary, #2563eb);
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
 }
 
 .buscarBtn:hover:not(:disabled) {
@@ -189,25 +182,28 @@
 /* Paso 3: Paciente Encontrado */
 .pacienteCard {
   background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  margin-bottom: 30px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-md);
 }
 
 .pacienteHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .pacienteHeader h2 {
-  color: #2c3e50;
-  font-size: 24px;
   margin: 0;
+  color: var(--color-primary);
+  font-size: 1.5rem;
 }
 
 .pacienteBadge {
@@ -221,39 +217,61 @@
 
 .pacienteGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-bottom: 20px;
+  grid-template-columns: 1fr; 
+  gap: 1rem;
+}
+
+@media (min-width: 600px) {
+  .pacienteGrid {
+    grid-template-columns: repeat(2, 1fr); 
+  }
+  .container {
+    margin: 0 auto;
+    padding: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  .pacienteGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .container {
+    margin: 0 auto;
+    padding: 15px;
+  }
 }
 
 .pacienteItem {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: var(--bg-tertiary); 
+  border-radius: 8px;
 }
 
 .itemLabel {
-  font-size: 12px;
-  color: #7f8c8d;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary); 
   text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05rem;
 }
 
 .itemValue {
-  font-size: 16px;
-  color: #2c3e50;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary); 
+  word-break: break-word; 
 }
 
 .historialBox {
-  margin-top: 20px;
-  padding: 15px;
-  background: #e8f5e9;
-  border: 1px solid #c8e6c9;
-  border-radius: 8px;
-  color: #2e7d32;
-  font-size: 14px;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(37, 99, 235, 0.1);
+  border-left: 4px solid #2563eb;
+  border-radius: 4px;
+  color: var(--text-primary);
 }
 
 /* Actions */
@@ -282,8 +300,9 @@
 
 .confirmarActions {
   display: flex;
-  justify-content: space-between;
-  gap: 15px;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 25px;
 }
 
 .cambiarBtn {
@@ -296,6 +315,24 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+.cambiarBtn, .continuarBtn {
+  width: 100%;
+  padding: 15px;
+  text-align: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+@media (min-width: 600px) {
+  .confirmarActions {
+    flex-direction: row; /* Lado a lado en desktop */
+    justify-content: space-between;
+  }
+  .cambiarBtn, .continuarBtn {
+    width: auto;
+  }
 }
 
 .cambiarBtn:hover {
@@ -350,5 +387,19 @@
 
   .continuarBtn {
     max-width: 100%;
+  }
+}
+
+
+@media (min-width: 600px) {
+  .busquedaInput {
+    flex-wrap: nowrap;
+  }
+  .buscarBtn {
+    flex: 0 0 auto;
+    padding: 12px 25px;
+  }
+  .busquedaCard {
+    padding: 40px;
   }
 }

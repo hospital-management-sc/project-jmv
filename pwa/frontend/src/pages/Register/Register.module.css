@@ -9,6 +9,41 @@
   margin-bottom: var(--spacing-sm);
 }
 
+.ciGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.ciInputsWrapper {
+  display: flex;
+  align-items: stretch; /* Asegura que ambos tengan la misma altura */
+  width: 100%;
+}
+
+.ciTypeSelect {
+  flex: 0 0 70px; /* Ancho fijo para el selector */
+  border-radius: var(--border-radius) 0 0 var(--border-radius);
+  border-right: none;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 0 10px;
+  cursor: pointer;
+  font-size: var(--font-size-base);
+}
+
+.ciNumberInput {
+  flex: 1; /* Ocupa todo el espacio restante */
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  border: 1px solid var(--border-color);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  width: 100%;
+  min-width: 0; /* Evita que el input desborde el flexbox */
+}
+
 .subtitle {
   text-align: center;
   color: var(--text-secondary);
@@ -200,8 +235,9 @@
 
 .error {
   color: var(--color-error);
-  font-size: var(--font-size-sm);
-  margin-top: -var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  margin-top: 4px;
+  display: block;
 }
 
 .dual-input-group {

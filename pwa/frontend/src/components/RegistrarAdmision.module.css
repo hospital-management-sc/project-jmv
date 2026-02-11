@@ -1,19 +1,63 @@
 .container {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 1000px;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 480px) {
+  .container {
+    margin: 0 auto;
+  }
 }
 
 .header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 20px;
 }
 
 .header h1 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: white;
+  font-size: clamp(1.2rem, 5vw, 1.8rem);
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.busquedaCard {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+}
+
+/* Este es el contenedor que mencionas */
+.busquedaForm {
+  display: flex;
+  flex-direction: column; /* Apilado por defecto para móvil */
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .busquedaForm {
+    flex-direction: row; /* Vuelve a fila en escritorio */
+    align-items: flex-end;
+  }
+}
+
+.formCard, .pacienteEncontradoCard {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 15px; /* Padding dinámico */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .busquedaCard, .formCard {
+    padding: 30px; /* Más aire en desktop */
+  }
 }
 
 .subtitle {
@@ -140,7 +184,7 @@
 }
 
 .section {
-  padding: 2rem;
+  /* padding: 2rem; */
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -183,7 +227,7 @@
   background: var(--bg-tertiary);
   color: var(--text-primary);
   cursor: pointer;
-  min-width: 70px;
+  /* min-width: 70px; */
 }
 
 .busquedaInput button {
@@ -249,8 +293,17 @@
 /* Formulario */
 .formGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 1fr; /* 1 columna en móvil */
+  gap: 15px;
+}
+
+@media (min-width: 768px) {
+  .formGrid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas en desktop */
+  }
+  .fullWidth {
+    grid-column: 1 / -1;
+  }
 }
 
 .formGroup {
@@ -312,10 +365,76 @@
 /* Acciones del Formulario */
 .formActions {
   display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  padding: 1.5rem 2rem;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+@media (min-width: 600px) {
+  .formActions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+/* Grupo de Cédula (Selector + Input) */
+.ciGroup {
+  flex: 1; /* En escritorio toma el espacio restante */
+  width: 100%; /* En móvil toma todo el ancho */
+}
+
+.ciInputsWrapper {
+  display: flex;
+  width: 100%;
+  height: 48px; /* Altura táctil estándar */
+}
+
+.ciTipoSelect {
+  flex: 0 0 70px;
+  border-radius: 8px 0 0 8px;
+  border: 1px solid var(--border-color);
+  border-right: none;
   background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.ciInput {
+  flex: 1;
+  border-radius: 0 8px 8px 0;
+  border: 1px solid var(--border-color);
+  padding: 0 12px;
+  font-size: 16px;
+  width: 100%;
+  min-width: 0; /* Evita que el input empuje el layout */
+}
+
+.submitBtn, .cancelBtn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+}
+
+@media (min-width: 600px) {
+  .submitBtn, .cancelBtn {
+    width: auto;
+    padding: 12px 25px;
+  }
+}
+
+.submitBtn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.cancelBtn {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
 }
 
 .cancelBtn {
@@ -447,5 +566,24 @@
 
   .pacienteGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+.btnBuscar {
+  width: 100%; /* Ancho completo en móvil */
+  height: 48px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+@media (min-width: 600px) {
+  .btnBuscar {
+    width: auto; /* Ancho ajustado al texto en escritorio */
+    padding: 0 25px;
   }
 }

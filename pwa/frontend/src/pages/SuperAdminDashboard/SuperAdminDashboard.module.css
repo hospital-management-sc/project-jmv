@@ -149,7 +149,7 @@
 
 /* Main Content */
 .main {
-  padding: 2rem;
+  padding: 1rem 0rem;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -653,7 +653,7 @@
   }
   
   .main {
-    padding: 1rem;
+    padding: 0rem 1rem;
   }
   
   .filters {
@@ -680,5 +680,72 @@
   
   .modalActions {
     flex-direction: column;
+  }
+}
+
+/* --- Mejoras de Contenedor y Main --- */
+@media (max-width: 768px) {
+  .main {
+    padding: 1rem 0rem; /* Reducimos el espacio desperdiciado en móvil */
+  }
+  
+  .headerContent {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .userInfo {
+    align-items: center;
+  }
+}
+
+/* --- Filtros Responsivos --- */
+.filters {
+  display: flex;
+  flex-wrap: wrap; /* Permite que los select bajen de línea */
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .filters > * {
+    flex: 1 1 100%; /* Cada filtro ocupa el 100% del ancho en móviles */
+  }
+  
+  .searchInput {
+    order: -1; /* Mantenemos la búsqueda arriba */
+  }
+}
+
+/* --- Tabla Responsiva (Scroll Horizontal) --- */
+.tableContainer {
+  width: 100%;
+  overflow-x: auto; /* Habilita el scroll lateral si la tabla es muy ancha */
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  min-width: 800px; /* Forzamos un mínimo para que no se amontone el texto */
+  border-collapse: collapse;
+}
+
+/* --- Stats Grid Responsivo --- */
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr; /* Una sola columna de tarjetas */
+  }
+  
+  .nav {
+    flex-direction: column;
+  }
+  
+  .navBtn {
+    width: 100%;
+    text-align: center;
   }
 }
