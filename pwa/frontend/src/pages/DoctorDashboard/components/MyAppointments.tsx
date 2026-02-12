@@ -224,14 +224,17 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
 
         <div className={styles['stats-summary']}>
           <div className={styles['stat-box']}>
+            <span className={styles['stat-icon']}>📅</span>
             <span className={styles['stat-number']}>{estadisticas.total}</span>
             <span className={styles['stat-label']}>Total Citas</span>
           </div>
           <div className={styles['stat-box']}>
+            <span className={styles['stat-icon']}>⏳</span>
             <span className={styles['stat-number']}>{estadisticas.porAtender}</span>
             <span className={styles['stat-label']}>Por Atender</span>
           </div>
           <div className={styles['stat-box']}>
+            <span className={styles['stat-icon']}>✅</span>
             <span className={styles['stat-number']}>{estadisticas.completadas}</span>
             <span className={styles['stat-label']}>Completadas</span>
           </div>
@@ -253,7 +256,7 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
                       {formatearFecha((cita as any).fechaCita)}
                     </div>
                     <span className={styles['appointment-time']}>
-                      {formatearHoraCita((cita as any).horaCita)}
+                      ⏰ {formatearHoraCita((cita as any).horaCita)}
                     </span>
                   </div>
                   <span className={`${styles['status-badge']} ${styles[`status-${(cita as any).estado?.toLowerCase()}`]}`}>
@@ -261,13 +264,76 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
                   </span>
                 </div>
                 <div className={styles['appointment-body']}>
-                  <p><strong>Paciente:</strong> {cita.paciente?.apellidosNombres || 'N/A'}</p>
-                  <p><strong>CI:</strong> {cita.paciente?.ci || 'N/A'}</p>
-                  <p><strong>Especialidad:</strong> {cita.especialidad || 'N/A'}</p>
-                  <p><strong>Motivo:</strong> {cita.motivo || 'No especificado'}</p>
-                  {cita.horaLlegada && (
-                    <p><strong>Hora llegada:</strong> {formatTimeVenezuela(cita.horaLlegada)}</p>
-                  )}
+                  <div className={styles['patient-info-grid']}>
+                    {/* Patient Name - Most Important */}
+                    <div className={`${styles['patient-info-row']} ${styles['patient-name']}`}>
+                      <span className="icon">👤</span>
+                      <span className={styles['patient-info-value']}>
+                        {cita.paciente?.apellidosNombres || 'N/A'}
+                      </span>
+                    </div>
+                    
+                    {/* CI - Critical Info */}
+                    <div className={styles['patient-info-row']}>
+                      <svg className={styles['patient-info-icon']} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="4" width="18" height="16" rx="2"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                      </svg>
+                      <div className={styles['patient-info-content']}>
+                        <div className={styles['patient-info-label']}>Cédula</div>
+                        <div className={`${styles['patient-info-value']} ${styles['highlight']}`}>
+                          {cita.paciente?.ci || 'N/A'}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Specialty */}
+                    <div className={styles['patient-info-row']}>
+                      <svg className={styles['patient-info-icon']} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9,22 9,12 15,12 15,22"/>
+                      </svg>
+                      <div className={styles['patient-info-content']}>
+                        <div className={styles['patient-info-label']}>Especialidad</div>
+                        <div className={styles['patient-info-value']}>
+                          {cita.especialidad || 'N/A'}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Motivo */}
+                    <div className={styles['patient-info-row']}>
+                      <svg className={styles['patient-info-icon']} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                      </svg>
+                      <div className={styles['patient-info-content']}>
+                        <div className={styles['patient-info-label']}>Motivo</div>
+                        <div className={styles['patient-info-value']}>
+                          {cita.motivo || 'No especificado'}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Hora llegada */}
+                    {cita.horaLlegada && (
+                      <div className={styles['patient-info-row']}>
+                        <svg className={styles['patient-info-icon']} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"/>
+                          <polyline points="12,6 12,12 16,14"/>
+                        </svg>
+                        <div className={styles['patient-info-content']}>
+                          <div className={styles['patient-info-label']}>Hora Llegada</div>
+                          <div className={styles['patient-info-value']}>
+                            {formatTimeVenezuela(cita.horaLlegada)}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className={styles['appointment-actions']}>
                   {(cita as any).estado === 'PROGRAMADA' && onRegisterEncounter && cita.paciente && (
