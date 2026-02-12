@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  width: 100%;
 }
 
 .label {
@@ -10,9 +11,13 @@
   font-size: var(--font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  /* Minimum readable size for mobile */
+  min-height: 20px;
 }
 
 .input {
+  /* Touch target minimum - 44px */
+  min-height: 44px;
   padding: var(--spacing-md);
   border: 2px solid var(--border-color);
   border-radius: var(--border-radius);
@@ -21,6 +26,11 @@
   font-size: var(--font-size-base);
   font-family: inherit;
   transition: var(--transition);
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .input:focus {
@@ -46,10 +56,75 @@
   color: var(--color-error);
   font-size: var(--font-size-sm);
   margin-top: -var(--spacing-xs);
+  min-height: 18px;
 }
 
 .hint {
   color: var(--text-tertiary);
   font-size: var(--font-size-xs);
   margin-top: -var(--spacing-xs);
+  min-height: 16px;
+}
+
+/* Input with icon */
+.inputIcon {
+  position: relative;
+}
+
+.inputIcon input {
+  padding-right: 44px;
+}
+
+.inputIcon .icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+}
+
+/* Responsive: Mobile small (320px - 375px) */
+@media screen and (min-width: 320px) and (max-width: 374px) {
+  .input {
+    min-height: 40px;
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+
+  .label {
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* Responsive: Mobile standard (375px - 480px) */
+@media screen and (min-width: 375px) and (max-width: 479px) {
+  .input {
+    min-height: 42px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* Dual input group - stack on mobile */
+@media screen and (max-width: 599px) {
+  .dualGroup {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .dualGroup > * {
+    width: 100%;
+  }
+}
+
+/* Form row - stack on mobile */
+@media screen and (max-width: 767px) {
+  .formRow {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .formRow > * {
+    width: 100%;
+  }
 }
