@@ -1,3 +1,8 @@
+/* ==========================================================================
+   FORM INPUT COMPONENT - Responsive Styles
+   Hospital PWA - 44px Touch Target Minimum
+   ========================================================================== */
+
 .formGroup {
   display: flex;
   flex-direction: column;
@@ -11,7 +16,8 @@
   font-size: var(--font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  /* Minimum readable size for mobile */
+  /* Minimum readable size for mobile - never below 12px */
+  font-size: max(0.75rem, var(--font-size-sm, 0.875rem));
   min-height: 20px;
 }
 
@@ -54,15 +60,15 @@
 
 .error {
   color: var(--color-error);
-  font-size: var(--font-size-sm);
-  margin-top: -var(--spacing-xs);
+  font-size: max(0.75rem, 0.8125rem);
+  margin-top: calc(var(--spacing-xs) * -1);
   min-height: 18px;
 }
 
 .hint {
   color: var(--text-tertiary);
-  font-size: var(--font-size-xs);
-  margin-top: -var(--spacing-xs);
+  font-size: max(0.75rem, 0.75rem);
+  margin-top: calc(var(--spacing-xs) * -1);
   min-height: 16px;
 }
 
@@ -83,29 +89,49 @@
   color: var(--text-tertiary);
 }
 
-/* Responsive: Mobile small (320px - 375px) */
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+
+/* Mobile Small (320px - 375px) - Edge case */
 @media screen and (min-width: 320px) and (max-width: 374px) {
   .input {
-    min-height: 40px;
+    min-height: 44px;
     padding: var(--spacing-sm);
     font-size: var(--font-size-sm);
   }
 
   .label {
-    font-size: var(--font-size-xs);
+    font-size: max(0.75rem, 0.75rem);
+  }
+
+  .formGroup {
+    gap: var(--spacing-xs);
   }
 }
 
-/* Responsive: Mobile standard (375px - 480px) */
+/* Mobile Standard (375px - 480px) */
 @media screen and (min-width: 375px) and (max-width: 479px) {
   .input {
-    min-height: 42px;
+    min-height: 44px;
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: var(--font-size-sm);
   }
+
+  .label {
+    font-size: max(0.75rem, 0.8125rem);
+  }
 }
 
-/* Dual input group - stack on mobile */
+/* Mobile Large (480px - 600px) */
+@media screen and (min-width: 480px) and (max-width: 599px) {
+  .input {
+    min-height: 44px;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+/* Dual input group - stack on mobile <600px */
 @media screen and (max-width: 599px) {
   .dualGroup {
     flex-direction: column;
@@ -115,9 +141,13 @@
   .dualGroup > * {
     width: 100%;
   }
+
+  .dualGroup .input {
+    min-height: 44px;
+  }
 }
 
-/* Form row - stack on mobile */
+/* Form row - stack on mobile <768px */
 @media screen and (max-width: 767px) {
   .formRow {
     flex-direction: column;
@@ -126,5 +156,34 @@
 
   .formRow > * {
     width: 100%;
+  }
+}
+
+/* Tablet Portrait (600px - 768px) */
+@media screen and (min-width: 600px) and (max-width: 767px) {
+  .input {
+    min-height: 44px;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+/* Desktop Standard (1024px - 1200px) */
+@media screen and (min-width: 1024px) and (max-width: 1200px) {
+  .input {
+    padding: var(--spacing-md);
+  }
+}
+
+/* Desktop Large (1200px - 1400px) */
+@media screen and (min-width: 1200px) and (max-width: 1400px) {
+  .input {
+    padding: var(--spacing-md);
+  }
+}
+
+/* Desktop Extra Large (>1400px) */
+@media screen and (min-width: 1401px) {
+  .input {
+    padding: var(--spacing-lg) var(--spacing-md);
   }
 }
