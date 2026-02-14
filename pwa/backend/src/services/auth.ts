@@ -14,6 +14,7 @@ import bcrypt from 'bcryptjs';
 import { getPrismaClient } from '../database/connection';
 import { ValidationError, UnauthorizedError, InvalidCredentialsError } from '../types/responses';
 import { verifyAuthorizedPersonnel, markAsRegistered, VALID_ROLES } from './authorizedPersonnel';
+import { generarHorariosPorDefecto } from './generarHorariosMedico';
 import config from '../config';
 import logger from '../utils/logger';
 
@@ -260,6 +261,23 @@ export const registerUser = async (payload: RegisterPayload): Promise<TokenRespo
       },
     },
   });
+
+  // ============================================
+  // GENERAR HORARIOS POR DEFECTO (SI ES MÉDICO)
+  // ============================================
+  if (newUser.role === 'MEDICO' && newUser.especialidad) {
+    const resultadoHorarios = await generarHorariosPorDefecto(
+      newUser.id,
+      newUser.especialidad,
+      newUser.nombre || 'Médico'
+    );
+    
+    if (!resultadoHorarios.exitoso) {
+      logger.warn(
+        `[AUTH] Advertencia al generar horarios para ${newUser.nombre}: ${resultadoHorarios.mensaje}`
+      );
+    }
+  }
 
   // Generate token
   const token = generateToken(

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { PrismaClient } from '@prisma/client'
+import { regenerarHorariosMedico } from '../services/generarHorariosMedico'
 
 const router = Router()
 const prisma = new PrismaClient()
@@ -335,6 +336,47 @@ router.get('/:medicoId/disponibilidad', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Error al verificar disponibilidad',
+      error: error.message,
+    })
+  }
+})
+
+/**
+ * POST /api/medicos/:medicoId/regenerar-horarios
+ * Regenera/crea horarios por defecto para un médico
+ * Útil para médicos registrados antes de esta funcionalidad
+ */
+router.post('/:medicoId/regenerar-horarios', async (req, res) => {
+  try {
+    const { medicoId } = req.params
+
+    if (!medicoId) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID del médico requerido',
+      })
+    }
+
+    const resultado = await regenerarHorariosMedico(Number(medicoId))
+
+    if (!resultado.exitoso) {
+      return res.status(400).json({
+        success: false,
+        message: resultado.mensaje,
+        horariosCreados: resultado.horariosCreados,
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: resultado.mensaje,
+      horariosCreados: resultado.horariosCreados,
+    })
+  } catch (error: any) {
+    console.error('❌ Error al regenerar horarios:', error)
+    return res.status(500).json({
+      success: false,
+      message: 'Error al regenerar horarios',
       error: error.message,
     })
   }

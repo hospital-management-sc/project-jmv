@@ -232,7 +232,7 @@ async function main() {
         nombreCompleto: 'Dra. María Elena López Rodríguez',
         email: 'ginecologia@hospital.com',
         rolAutorizado: 'MEDICO',
-        departamento: 'Ginecología y Obstetricia',
+        departamento: 'Ginecología',
         especialidad: 'Ginecología',
         cargo: 'Médica Ginecóloga',
         fechaIngreso: new Date('2018-09-20'),

@@ -174,7 +174,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     id: 'ginecologia',
     nombre: 'Ginecología',
     codigo: 'GI',
-    departamento: 'Ginecología y Obstetricia',
+    departamento: 'Ginecología',
     descripcion: 'Salud reproductiva femenina y obstetricia',
     color: '#D946EF',
     vistaDashboard: {

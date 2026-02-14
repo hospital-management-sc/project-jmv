@@ -7,7 +7,7 @@ import styles from "../DoctorDashboard.module.css";
 import type { Cita } from "@/services";
 import type { PatientBasic } from "../interfaces";
 import * as citasService from '@/services/citas.service'
-import { formatDateLongVenezuela, formatTimeVenezuela } from "@/utils/dateUtils";
+import { formatDateLongLocal, formatTimeVenezuela } from "@/utils/dateUtils";
 import { toast } from "sonner";
 
 type FilterType = 'TODAS' | 'PASADAS' | 'FUTURAS'
@@ -23,7 +23,7 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
   const [citas, setCitas] = useState<Cita[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [filterType, setFilterType] = useState<FilterType>('FUTURAS') // Por defecto mostrar futuras
+  const [filterType, setFilterType] = useState<FilterType>('TODAS') // Por defecto mostrar todas (pasadas + futuras)
 
   // Validar que doctorId sea un número válido
   const validDoctorId = typeof doctorId === 'number' && doctorId > 0 ? doctorId : null
@@ -67,12 +67,7 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
   const formatearFecha = (fechaCita: any) => {
     try {
       if (!fechaCita) return 'Sin fecha'
-      const fecha = new Date(fechaCita)
-      if (isNaN(fecha.getTime())) {
-        console.warn('Fecha inválida:', fechaCita)
-        return 'Fecha inválida'
-      }
-      return formatDateLongVenezuela(fecha)
+      return formatDateLongLocal(fechaCita)
     } catch (e) {
       console.error('Error al formatear fecha:', e)
       return 'Error en fecha'
@@ -240,8 +235,8 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
         {citasFiltradas.length === 0 ? (
           <div className={styles['empty-state']}>
             <span className={styles['empty-icon']}>📅</span>
-            <h3>No hay citas programadas para los próximos 7 días</h3>
-            <p>Las citas asignadas aparecerán aquí</p>
+            <h3>No hay citas en el rango seleccionado</h3>
+            <p>Tus citas asignadas aparecerán aquí</p>
           </div>
         ) : (
           <div className={styles['appointments-list']}>

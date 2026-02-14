@@ -204,6 +204,53 @@ export function formatDateLongVenezuela(date: Date | string | number): string {
 }
 
 /**
+ * Formatea una fecha LOCAL de forma larga legible SIN conversión de zona horaria
+ * USAR PARA: fechas en columnas separadas (fechaCita, fechaAdmision, fechaNacimiento)
+ * (ej: "lunes, 16 de febrero de 2026")
+ * @param date - Fecha a formatear (Date, string ISO YYYY-MM-DD o ISO completo)
+ * @returns Fecha legible en español de Venezuela SIN aplicar timezone
+ */
+export function formatDateLongLocal(date: Date | string | number): string {
+  if (!date) return '-';
+  
+  try {
+    let dateStr: string;
+    
+    if (date instanceof Date) {
+      // Si es Date object, extraer la parte ISO en UTC
+      const isoString = date.toISOString();
+      dateStr = isoString.split('T')[0]; // Obtener YYYY-MM-DD
+    } else if (typeof date === 'string') {
+      // Si es string, extraer la parte de fecha
+      dateStr = date.includes('T') ? date.split('T')[0] : date;
+    } else {
+      return '-';
+    }
+    
+    // Parsear YYYY-MM-DD
+    const [year, month, day] = dateStr.split('-').map(Number);
+    
+    // MÉTODO CORRECTO: Crear la Date como si fuera la fecha local (Venezuela)
+    // Sumarle 4 horas para convertir de UTC (lo que el backend envía) a Venezuela (UTC-4)
+    // Ejemplo: 2026-02-16T00:00:00.000Z en UTC = 2026-02-15T20:00:00 en Venezuela
+    // Sumamos 4 horas: 2026-02-16T04:00:00.000Z para que en UTC-4 sea 2026-02-16T00:00:00
+    const dateObj = new Date(Date.UTC(year, month - 1, day, 4, 0, 0));
+    
+    // Formatear CON timeZone de Venezuela
+    // Ahora como tenemos 04:00 UTC, en UTC-4 será las 00:00 del mismo día
+    return dateObj.toLocaleDateString(VENEZUELA_LOCALE, {
+      timeZone: VENEZUELA_TIMEZONE,
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  } catch {
+    return '-';
+  }
+}
+
+/**
  * Formatea una fecha de forma corta legible (ej: "Lun, 15 Ene")
  * @param date - Fecha a formatear
  * @returns Fecha corta en español de Venezuela
@@ -426,11 +473,13 @@ export function isToday(date: Date | string | number): boolean {
 const dateUtils = {
   VENEZUELA_TIMEZONE,
   VENEZUELA_LOCALE,
+  formatDateLocal,
   formatDateVenezuela,
   formatDateTimeVenezuela,
   formatTimeVenezuela,
   formatTimeMilitaryVenezuela,
   formatDateLongVenezuela,
+  formatDateLongLocal,
   formatDateShortVenezuela,
   getTodayVenezuelaISO,
   getCurrentTimeVenezuela,

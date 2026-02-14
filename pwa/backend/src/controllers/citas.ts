@@ -648,11 +648,15 @@ export const obtenerCitasProximosMedico = async (req: Request, res: Response): P
       return
     }
 
-    // Construir rango de fechas
+    // Construir rango de fechas: últimos 7 días + próximos 7 días
     const hoy = new Date()
     hoy.setHours(0, 0, 0, 0)
+    
+    const fechaInicio = new Date(hoy)
+    fechaInicio.setDate(fechaInicio.getDate() - diasNumero) // 7 días atrás
+    
     const fechaFinal = new Date(hoy)
-    fechaFinal.setDate(fechaFinal.getDate() + diasNumero)
+    fechaFinal.setDate(fechaFinal.getDate() + diasNumero) // 7 días adelante
 
     // Obtener especialidad del médico (puede ser cargo si no tiene especialidad)
     const especialidadMedico = (medico as any).especialidad || medico.cargo || ''
@@ -663,7 +667,7 @@ export const obtenerCitasProximosMedico = async (req: Request, res: Response): P
         AND: [
           {
             fechaCita: {
-              gte: hoy,
+              gte: fechaInicio,
               lt: fechaFinal,
             },
           },
@@ -714,7 +718,7 @@ export const obtenerCitasProximosMedico = async (req: Request, res: Response): P
       success: true,
       data: convertBigIntToString(citas),
       count: citas.length,
-      fechaInicio: hoy.toISOString().split('T')[0],
+      fechaInicio: fechaInicio.toISOString().split('T')[0],
       fechaFinal: fechaFinal.toISOString().split('T')[0],
       dias: diasNumero,
     })
