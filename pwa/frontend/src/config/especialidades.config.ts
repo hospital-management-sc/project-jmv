@@ -831,9 +831,8 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
               grupo: "examenFisico",
               opciones: [
                 { valor: "localizada", etiqueta: "Localizada" },
-                { valor: "regional", etiqueta: "Regional" },
-                { valor: "generalizada", etiqueta: "Generalizada" },
-                { valor: "universal", etiqueta: "Universal" }
+                { valor: "diseminada", etiqueta: "Diseminada" },
+                { valor: "generalizada", etiqueta: "Generalizada" }
               ]
             },
             {
@@ -845,15 +844,11 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
             },
             {
               id: "extension",
-              tipo: "select",
+              tipo: "textarea",
               label: "Extensión",
-              grupo: "examenFisico",
-              opciones: [
-                { valor: "puntual", etiqueta: "Puntual" },
-                { valor: "pequeña", etiqueta: "Pequeña (<10%)" },
-                { valor: "moderada", etiqueta: "Moderada (10-30%)" },
-                { valor: "extensa", etiqueta: "Extensa (>30%)" }
-              ]
+              placeholder: "Describa la extensión y zona del cuerpo afectada (ej: región abdominal, 15% de superficie corporal)...",
+              rows: 2,
+              grupo: "examenFisico"
             },
             {
               id: "simetria",
@@ -1026,18 +1021,19 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
               grupo: "diagnostico"
             },
             {
-              id: "codigoCie",
-              tipo: "input",
-              label: "Código CIE-10 (opcional)",
-              placeholder: "Ej: L20.9 (Dermatitis atópica)",
-              grupo: "diagnostico"
-            },
-            {
               id: "tratamiento",
               tipo: "textarea",
               label: "Tratamiento e Indicaciones",
               placeholder: "Medicamentos tópicos, sistémicos, indicaciones generales, cuidados de la piel...",
               rows: 4,
+              grupo: "tratamiento"
+            },
+            {
+              id: "notaQuirurgica",
+              tipo: "textarea",
+              label: "Nota Quirúrgica",
+              placeholder: "Describe procedimientos quirúrgicos realizados, técnicas utilizadas, hallazgos intraoperatorios...",
+              rows: 3,
               grupo: "tratamiento"
             },
             {
