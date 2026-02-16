@@ -1367,6 +1367,44 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
           titulo: "Examen Físico",
           campos: [
             {
+              id: "taSistolica",
+              tipo: "number",
+              label: "T.A. Sistólica (mmHg)",
+              placeholder: "120",
+              grupo: "signosVitales"
+            },
+            {
+              id: "taDiastolica",
+              tipo: "number",
+              label: "T.A. Diastólica (mmHg)",
+              placeholder: "80",
+              grupo: "signosVitales"
+            },
+            {
+              id: "pulso",
+              tipo: "number",
+              label: "Frecuencia Cardíaca (lpm)",
+              placeholder: "72",
+              grupo: "signosVitales"
+            },
+            {
+              id: "fr",
+              tipo: "number",
+              label: "Frecuencia Respiratoria (rpm)",
+              placeholder: "18",
+              grupo: "signosVitales"
+            },
+            {
+              id: "saturacionO2",
+              tipo: "number",
+              label: "Saturación de Oxígeno (%)",
+              placeholder: "98",
+              step: "0.1",
+              min: "0",
+              max: "100",
+              grupo: "signosVitales"
+            },
+            {
               id: "examenAbdominal",
               tipo: "textarea",
               label: "Examen Abdominal",
