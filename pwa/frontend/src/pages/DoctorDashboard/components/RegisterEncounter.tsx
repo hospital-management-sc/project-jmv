@@ -173,9 +173,10 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
           : undefined;
 
       // Construir objeto de impresión diagnóstica
-      // Buscar campos de diagnóstico: puede ser "diagnostico", "impresionDx", u otros nombres
-      const diagnosticoFields = ['diagnostico', 'impresionDx', 'impresionDiagnostica'];
-      const fieldDiagnostico = diagnosticoFields.find(field => formData[field]);
+      // SOLO si hay codigoCie o campos genéricos de impresión (impresionDx, impresionDiagnostica)
+      // El campo 'diagnostico' es especializado y debe ir en examenFisico
+      const diagnosticoFieldsGenericos = ['impresionDx', 'impresionDiagnostica'];
+      const fieldDiagnostico = diagnosticoFieldsGenericos.find(field => formData[field]);
       const fieldCodigoCie = 'codigoCie';
       
       const impresionDiagnostica = fieldDiagnostico || formData[fieldCodigoCie]
@@ -187,13 +188,13 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
 
       // Construir objeto de examen físico (JSONB) desde campos dinámicos
       // ⚠️ CAPTURAR TODOS LOS PASOS (excepto paso 1 que es búsqueda y pasos que contengan tipo/fecha/hora)
-      const examenFisico: {[key: string]: string | undefined} = {};
+      const examenFisico: {[key: string]: string | number | undefined} = {};
       const camposExcluidos = new Set([
         'ciTipo', 'ciNumeros', // Paso 1 - búsqueda
         'tipo', 'fecha', 'hora', 'procedencia', 'nroCama', // Campos que ya están mapeados en encuentroData
         'motivoConsulta', 'enfermedadActual', // Campos que ya están mapeados en encuentroData
-        'taSistolica', 'taDiastolica', 'pulso', 'temperatura', 'fr', 'observaciones', // Signos vitales
-        fieldDiagnostico, fieldCodigoCie, // Campos de diagnóstico (ya mapeados)
+        fieldDiagnostico, fieldCodigoCie, // Solo campos de diagnóstico GENÉRICO (impresionDx, codigoCie)
+        // NOTA: 'diagnostico', 'observaciones' NO se excluyen - son campos especializados que van en examenFisico
       ]);
 
       if (formularioConfig) {
@@ -202,10 +203,19 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
           paso.campos.forEach(campo => {
             // Solo incluir si el campo tiene dato y no está en la lista de excluidos
             if (formData[campo.id] && !camposExcluidos.has(campo.id)) {
-              examenFisico[campo.id] = String(formData[campo.id]);
+              examenFisico[campo.id] = formData[campo.id];
             }
           });
         });
+      }
+
+      // ✅ NUEVO: Incluir signos vitales directamente en examenFisico (porque la tabla SignosVitales no existe)
+      if (signosVitales) {
+        examenFisico['taSistolica'] = signosVitales.taSistolica;
+        examenFisico['taDiastolica'] = signosVitales.taDiastolica;
+        examenFisico['pulso'] = signosVitales.pulso;
+        examenFisico['temperatura'] = signosVitales.temperatura;
+        examenFisico['fr'] = signosVitales.fr;
       }
 
       // ✅ IMPORTANTE: Incluir especialidadId como metadata para ayudar a identificar la especialidad
@@ -247,6 +257,9 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
           medicoId: doctorId,
           motivoConsulta: String(formData.motivoConsulta),
           enfermedadActual: formData.enfermedadActual ? String(formData.enfermedadActual) : undefined,
+          procedencia: formData.procedencia ? String(formData.procedencia) : undefined,
+          nroCama: formData.nroCama ? String(formData.nroCama) : undefined,
+          examenFisico: Object.keys(examenFisico).length > 0 ? examenFisico : undefined, // ✅ Ahora incluye signos vitales
           impresionDiagnostica: impresionDiagnostica,
           tratamiento: impresionDiagnostica?.descripcion,
           observaciones: formData.observaciones ? String(formData.observaciones) : undefined,

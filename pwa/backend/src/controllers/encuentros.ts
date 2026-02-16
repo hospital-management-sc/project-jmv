@@ -195,6 +195,9 @@ export const crearEncuentroDesdeCita = async (
       medicoId,
       motivoConsulta,
       enfermedadActual,
+      procedencia,
+      nroCama,
+      examenFisico,
       impresionDiagnostica,
       tratamiento,
       observaciones,
@@ -243,7 +246,9 @@ export const crearEncuentroDesdeCita = async (
           hora: new Date().toTimeString().slice(0, 5), // HH:MM
           motivoConsulta: motivoConsulta || cita.motivo,
           enfermedadActual,
-          procedencia: 'CITA_PROGRAMADA',
+          procedencia: procedencia || 'CITA_PROGRAMADA', // Usar procedencia del frontend si se proporciona, si no usar default
+          nroCama: nroCama || null,
+          examenFisico: examenFisico || null, // Ahora sí se guarda el examenFisico
           createdById: Number(medicoId),
         },
       });

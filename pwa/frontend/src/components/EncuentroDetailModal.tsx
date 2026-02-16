@@ -182,10 +182,69 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
             </section>
           )}
 
-          {/* Signos Vitales */}
+          {/* Signos Vitales - Extraer desde examenFisico */}
+          {encuentro.examenFisico && (
+            (() => {
+              // Campos de signos vitales que buscamos en examenFisico
+              const signosVitalesFields = ['taSistolica', 'taDiastolica', 'pulso', 'fr', 'temperatura', 'saturacionO2'];
+              const signosEncontrados = signosVitalesFields.filter(campo => 
+                encuentro.examenFisico?.[campo] !== undefined && 
+                encuentro.examenFisico[campo] !== null && 
+                encuentro.examenFisico[campo] !== ''
+              );
+
+              // Si hay algún signo vital registrado
+              if (signosEncontrados.length > 0) {
+                return (
+                  <section className={styles.section}>
+                    <h3 className={styles.sectionTitle}>💓 Signos Vitales</h3>
+                    <div className={styles.signosCard}>
+                      <div className={styles.signosGrid}>
+                        {encuentro.examenFisico?.taSistolica && encuentro.examenFisico?.taDiastolica && (
+                          <div className={styles.signoItem}>
+                            <span className={styles.signoLabel}>Presión Arterial</span>
+                            <span className={styles.signoValue}>
+                              {encuentro.examenFisico.taSistolica}/{encuentro.examenFisico.taDiastolica} mmHg
+                            </span>
+                          </div>
+                        )}
+                        {encuentro.examenFisico?.pulso && (
+                          <div className={styles.signoItem}>
+                            <span className={styles.signoLabel}>Frecuencia Cardíaca</span>
+                            <span className={styles.signoValue}>{encuentro.examenFisico.pulso} lpm</span>
+                          </div>
+                        )}
+                        {encuentro.examenFisico?.temperatura && (
+                          <div className={styles.signoItem}>
+                            <span className={styles.signoLabel}>Temperatura</span>
+                            <span className={styles.signoValue}>{encuentro.examenFisico.temperatura}°C</span>
+                          </div>
+                        )}
+                        {encuentro.examenFisico?.fr && (
+                          <div className={styles.signoItem}>
+                            <span className={styles.signoLabel}>Frecuencia Respiratoria</span>
+                            <span className={styles.signoValue}>{encuentro.examenFisico.fr} rpm</span>
+                          </div>
+                        )}
+                        {encuentro.examenFisico?.saturacionO2 && (
+                          <div className={styles.signoItem}>
+                            <span className={styles.signoLabel}>Saturación de Oxígeno</span>
+                            <span className={styles.signoValue}>{encuentro.examenFisico.saturacionO2} %</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </section>
+                );
+              }
+              return null;
+            })()
+          )}
+
+          {/* Signos Vitales - Dejar fallback para compatibilidad con datos antiguos */}
           {encuentro.signosVitales && encuentro.signosVitales.length > 0 && (
             <section className={styles.section}>
-              <h3 className={styles.sectionTitle}>💓 Signos Vitales</h3>
+              <h3 className={styles.sectionTitle}>💓 Signos Vitales (Registro antiguo)</h3>
               {encuentro.signosVitales.map((signos, index) => (
                 <div key={signos.id} className={styles.signosCard}>
                   {encuentro.signosVitales.length > 1 && (
@@ -209,7 +268,7 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
                     {signos.temperatura && (
                       <div className={styles.signoItem}>
                         <span className={styles.signoLabel}>Temperatura</span>
-                        {/* <span className={styles.signoValue}>{signos.temperatura}°C</span> */}
+                        <span className={styles.signoValue}>{signos.temperatura}°C</span>
                       </div>
                     )}
                     {signos.fr && (
@@ -263,12 +322,16 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
               {formularioEspecializado ? (
                 // Renderizar dinámicamente según el formularioEspecializado
                 formularioEspecializado.pasos.map((paso) => {
-                  // Filtrar campos que tengan datos en examenFisico (excluir metadata)
+                  // Campos de signos vitales que ya se muestran en la sección dedicada
+                  const camposSignosVitales = new Set(['taSistolica', 'taDiastolica', 'pulso', 'fr', 'temperatura', 'saturacionO2']);
+                  
+                  // Filtrar campos que tengan datos en examenFisico (excluir metadata y signos vitales)
                   const camposConDatos = paso.campos.filter(
                     campo => encuentro.examenFisico?.[campo.id] !== undefined && 
                              encuentro.examenFisico[campo.id] !== null &&
                              encuentro.examenFisico[campo.id] !== '' &&
-                             !campo.id.startsWith('__') // Excluir metadata
+                             !campo.id.startsWith('__') && // Excluir metadata
+                             !camposSignosVitales.has(campo.id) // Excluir signos vitales (ya se muestran arriba)
                   );
 
                   // Solo mostrar el paso si tiene campos con datos
@@ -281,7 +344,7 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
                         {paso.titulo}
                       </h3>
                       
-                      {/* Agrupar campos por grupo */}
+                      {/* Agrupar campos por grupo pero sin mostrar sub-títulos */}
                       {(() => {
                         const grupos = new Map<string, typeof camposConDatos>();
                         camposConDatos.forEach(campo => {
@@ -294,12 +357,7 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
 
                         return Array.from(grupos.entries()).map(([grupo, campos]) => (
                           <div key={grupo} className={styles.campoGrupo}>
-                            {/* Solo mostrar titulo del subgrupo si hay múltiples grupos */}
-                            {grupos.size > 1 && grupo !== 'general' && (
-                              <h4 className={styles.subgrupoTitle}>
-                                {grupo.replace(/([A-Z])/g, ' $1').trim()}
-                              </h4>
-                            )}
+                            {/* NO mostrar sub-títulos de grupo - solo mostrar campos directamente */}
                             <div className={styles.infoGrid}>
                               {campos.map(campo => (
                                 <div key={campo.id} className={styles.infoItem}>

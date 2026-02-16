@@ -7,7 +7,7 @@ import styles from "../DoctorDashboard.module.css";
 import type { Cita } from "@/services";
 import type { PatientBasic } from "../interfaces";
 import * as citasService from '@/services/citas.service'
-import { formatDateLongLocal, formatTimeVenezuela } from "@/utils/dateUtils";
+import { formatDateLongLocal, formatTimeVenezuela, getTodayVenezuelaISO } from "@/utils/dateUtils";
 import { toast } from "sonner";
 
 type FilterType = 'TODAS' | 'PASADAS' | 'FUTURAS'
@@ -97,22 +97,28 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
     return mapeo[estadoBackend] || estadoBackend
   }
 
-  // Filtrar citas según el tipo seleccionado
-  const citasFiltradas = citas.filter(cita => {
-    const fechaCita = new Date(cita.fechaCita || cita.fechaHora || '')
-    const hoy = new Date()
-    hoy.setHours(0, 0, 0, 0)
-    
-    // Comparar solo las fechas (sin horas)
-    fechaCita.setHours(0, 0, 0, 0)
+  // Obtener la fecha de hoy en zona horaria de Venezuela (YYYY-MM-DD)
+  const hoyVE = getTodayVenezuelaISO()
 
-    if (filterType === 'PASADAS') {
-      return fechaCita < hoy
-    } else if (filterType === 'FUTURAS') {
-      return fechaCita >= hoy
-    }
-    return true // TODAS
-  })
+  // Filtrar citas según el tipo seleccionado y ordenar en orden descendente (más recientes primero)
+  const citasFiltradas = citas
+    .filter(cita => {
+      // Extraer la fecha en formato YYYY-MM-DD
+      const fechaCitaStr = String(cita.fechaCita || cita.fechaHora || '').split('T')[0]
+      
+      if (filterType === 'PASADAS') {
+        return fechaCitaStr < hoyVE
+      } else if (filterType === 'FUTURAS') {
+        return fechaCitaStr >= hoyVE
+      }
+      return true // TODAS
+    })
+    .sort((a, b) => {
+      // Ordenar en orden descendente (más recientes primero)
+      const fechaA = new Date(a.fechaCita || a.fechaHora || '')
+      const fechaB = new Date(b.fechaCita || b.fechaHora || '')
+      return fechaB.getTime() - fechaA.getTime()
+    })
 
   // Contar estadísticas según el filtro actual
   const estadisticas = {
@@ -170,11 +176,8 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
             }}
           >
             Citas Futuras ({citas.filter(c => {
-              const f = new Date(c.fechaCita || c.fechaHora || '')
-              const h = new Date()
-              h.setHours(0, 0, 0, 0)
-              f.setHours(0, 0, 0, 0)
-              return f >= h
+              const fechaStr = String(c.fechaCita || c.fechaHora || '').split('T')[0]
+              return fechaStr >= hoyVE
             }).length})
           </button>
           
@@ -192,11 +195,8 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
             }}
           >
             Citas Pasadas ({citas.filter(c => {
-              const f = new Date(c.fechaCita || c.fechaHora || '')
-              const h = new Date()
-              h.setHours(0, 0, 0, 0)
-              f.setHours(0, 0, 0, 0)
-              return f < h
+              const fechaStr = String(c.fechaCita || c.fechaHora || '').split('T')[0]
+              return fechaStr < hoyVE
             }).length})
           </button>
           

@@ -423,7 +423,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
   return (
     <section className={styles["view-section"]}>
       <div className={styles["section-header"]}>
-        <h2>📋 Historia Clínica Completa</h2>
+        <h2>Historia Clínica Completa</h2>
         <button className={styles["back-link"]} onClick={onBack}>
           ← Volver a búsqueda
         </button>
@@ -440,7 +440,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
         }}
       >
         <h3 style={{ marginTop: 0, marginBottom: "1.5rem" }}>
-          📋 Datos del Paciente
+          Datos del Paciente
         </h3>
 
         {/* Sección 1: Identificación */}
@@ -618,7 +618,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
           >
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                📞 Teléfono Principal:
+                Teléfono Principal:
               </strong>
               <span style={{ fontSize: "1rem", fontWeight: "500" }}>
                 {datosCompletos?.telefono || "N/A"}
@@ -626,7 +626,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                🚨 Teléfono de Emergencia:
+                Teléfono de Emergencia:
               </strong>
               <span
                 style={{
@@ -647,7 +647,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
               }}
             >
               <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                🏠 Dirección Completa:
+                Dirección Completa:
               </strong>
               <span style={{ fontSize: "1rem" }}>
                 {datosCompletos?.direccion || "N/A"}
@@ -668,8 +668,8 @@ export default function PatientHistory({ patient, onBack }: Props) {
             border: "1px solid rgba(124, 58, 237, 0.3)",
           }}
         >
-          <h3 style={{ marginTop: 0, marginBottom: "1.5rem", color: "#7c3aed" }}>
-            🎖️ Datos Militares
+          <h3 style={{ marginTop: 0, marginBottom: "1.5rem", color: "#8888ff" }}>
+            Datos Militares
           </h3>
           <div
             style={{
@@ -728,7 +728,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
       {/* Timeline de eventos */}
       <div>
         <h3 style={{ marginBottom: "1.5rem" }}>
-          📅 Línea de Tiempo (Más Reciente Primero)
+          Línea de Tiempo (Más Reciente Primero)
         </h3>
 
         {/* Buscador de eventos */}
@@ -755,7 +755,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
                 letterSpacing: "0.5px",
               }}
             >
-              🔍 Buscar eventos
+              Buscar eventos
             </label>
             <input
               id="buscar-eventos"
@@ -799,15 +799,15 @@ export default function PatientHistory({ patient, onBack }: Props) {
               }}
             >
               {[
-                { key: "REGISTRO", label: "📋 Registro en el Sistema" },
-                { key: "ADMISION", label: "🏥 Admisiones" },
-                { key: "FORMATO_EMERGENCIA", label: "🚨 Formato de Emergencia" },
+                { key: "REGISTRO", label: "Registro en el Sistema" },
+                { key: "ADMISION", label: "Admisiones" },
+                { key: "FORMATO_EMERGENCIA", label: "Formato de Emergencia" },
                 {
                   key: "FORMATO_HOSPITALIZACION",
-                  label: "📊 Formato de Hospitalización",
+                  label: "Formato de Hospitalización",
                 },
-                { key: "ENCUENTRO", label: "⚕️ Encuentros Médicos" },
-                { key: "CITA", label: "📅 Citas Médicas" },
+                { key: "ENCUENTRO", label: "Encuentros Médicos" },
+                { key: "CITA", label: "Citas Médicas" },
               ].map(({ key, label }) => (
                 <label
                   key={key}
@@ -988,7 +988,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
                           fontFamily: "monospace",
                         }}
                       >
-                        🕐 {formatTimeMilitaryVenezuela(evento.hora)}
+                        {formatTimeMilitaryVenezuela(evento.hora)}
                       </span>
                     </div>
                   </div>
