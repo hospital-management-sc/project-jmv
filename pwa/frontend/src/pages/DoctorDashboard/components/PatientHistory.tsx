@@ -22,6 +22,23 @@ export default function PatientHistory({ patient, onBack }: Props) {
   const [encuentros, setEncuentros] = useState<Encuentro[]>([]);
   const [loading, setLoading] = useState(true);
   const [encuentroSeleccionado, setEncuentroSeleccionado] = useState<Encuentro | null>(null);
+  // Buscador y filtros
+  const [filtroTexto, setFiltroTexto] = useState("");
+  const [filtrosTipo, setFiltrosTipo] = useState<{
+    REGISTRO: boolean;
+    ADMISION: boolean;
+    FORMATO_EMERGENCIA: boolean;
+    FORMATO_HOSPITALIZACION: boolean;
+    ENCUENTRO: boolean;
+    CITA: boolean;
+  }>({
+    REGISTRO: true,
+    ADMISION: true,
+    FORMATO_EMERGENCIA: true,
+    FORMATO_HOSPITALIZACION: true,
+    ENCUENTRO: true,
+    CITA: true,
+  });
 
   useEffect(() => {
     cargarHistoriaCompleta();
@@ -334,6 +351,60 @@ export default function PatientHistory({ patient, onBack }: Props) {
   };
 
   const timeline = construirTimeline();
+
+  // Función de filtrado de eventos
+  const filtrarEventos = () => {
+    return timeline.filter((evento) => {
+      // Validar que el tipo esté seleccionado
+      if (!filtrosTipo[evento.tipo as keyof typeof filtrosTipo]) {
+        return false;
+      }
+
+      // Si no hay texto de búsqueda, mostrar el evento
+      if (!filtroTexto.trim()) {
+        return true;
+      }
+
+      const textoBusqueda = filtroTexto.toLowerCase();
+
+      // Buscar en nombre del evento
+      if (evento.titulo.toLowerCase().includes(textoBusqueda)) {
+        return true;
+      }
+
+      // Buscar en descripción
+      if (evento.descripcion.toLowerCase().includes(textoBusqueda)) {
+        return true;
+      }
+
+      // Buscar en fecha (formato DD/MM/YYYY)
+      const fechaFormato = formatDateLocal(evento.fecha);
+      if (fechaFormato.includes(textoBusqueda)) {
+        return true;
+      }
+
+      // Buscar en hora
+      if (evento.hora) {
+        const horaFormato = formatTimeMilitaryVenezuela(evento.hora);
+        if (horaFormato.includes(textoBusqueda)) {
+          return true;
+        }
+      }
+
+      // Buscar en información de auditoría (nombre y especialidad del doctor)
+      if (
+        evento.registradoPor?.nombre.toLowerCase().includes(textoBusqueda) ||
+        evento.registradoPor?.especialidad?.toLowerCase().includes(textoBusqueda) ||
+        evento.registradoPor?.cargo?.toLowerCase().includes(textoBusqueda)
+      ) {
+        return true;
+      }
+
+      return false;
+    });
+  };
+
+  const eventosFiltrados = filtrarEventos();
 
   if (loading) {
     return (
@@ -660,6 +731,129 @@ export default function PatientHistory({ patient, onBack }: Props) {
           📅 Línea de Tiempo (Más Reciente Primero)
         </h3>
 
+        {/* Buscador de eventos */}
+        <div
+          style={{
+            backgroundColor: "var(--bg-tertiary)",
+            padding: "1.5rem",
+            borderRadius: "0.5rem",
+            marginBottom: "1.5rem",
+            border: "1px solid var(--border-color)",
+          }}
+        >
+          {/* Campo de búsqueda */}
+          <div style={{ marginBottom: "1.5rem" }}>
+            <label
+              htmlFor="buscar-eventos"
+              style={{
+                display: "block",
+                fontSize: "0.9rem",
+                fontWeight: "600",
+                color: "var(--text-secondary)",
+                marginBottom: "0.5rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+              }}
+            >
+              🔍 Buscar eventos
+            </label>
+            <input
+              id="buscar-eventos"
+              type="text"
+              placeholder="Busca por nombre, especialidad, doctor, fecha o hora..."
+              value={filtroTexto}
+              onChange={(e) => setFiltroTexto(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "0.75rem",
+                fontSize: "1rem",
+                border: "1px solid var(--border-color)",
+                borderRadius: "0.375rem",
+                backgroundColor: "var(--bg-secondary)",
+                color: "var(--text-primary)",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          {/* Filtros por tipo de evento */}
+          <div>
+            <h4
+              style={{
+                fontSize: "0.9rem",
+                fontWeight: "600",
+                color: "var(--text-secondary)",
+                marginBottom: "1rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                margin: "0 0 1rem 0",
+              }}
+            >
+              Filtrar por tipo
+            </h4>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: "1rem",
+              }}
+            >
+              {[
+                { key: "REGISTRO", label: "📋 Registro en el Sistema" },
+                { key: "ADMISION", label: "🏥 Admisiones" },
+                { key: "FORMATO_EMERGENCIA", label: "🚨 Formato de Emergencia" },
+                {
+                  key: "FORMATO_HOSPITALIZACION",
+                  label: "📊 Formato de Hospitalización",
+                },
+                { key: "ENCUENTRO", label: "⚕️ Encuentros Médicos" },
+                { key: "CITA", label: "📅 Citas Médicas" },
+              ].map(({ key, label }) => (
+                <label
+                  key={key}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={filtrosTipo[key as keyof typeof filtrosTipo]}
+                    onChange={(e) =>
+                      setFiltrosTipo((prev) => ({
+                        ...prev,
+                        [key]: e.target.checked,
+                      }))
+                    }
+                    style={{
+                      cursor: "pointer",
+                      width: "1rem",
+                      height: "1rem",
+                    }}
+                  />
+                  <span style={{ fontSize: "0.95rem" }}>{label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Información de resultados */}
+        {timeline.length > 0 && (
+          <div
+            style={{
+              marginBottom: "1.5rem",
+              fontSize: "0.9rem",
+              color: "var(--text-secondary)",
+            }}
+          >
+            Mostrando <strong>{eventosFiltrados.length}</strong> de{" "}
+            <strong>{timeline.length}</strong> eventos
+          </div>
+        )}
+
         {timeline.length === 0 ? (
           <div
             style={{
@@ -672,6 +866,20 @@ export default function PatientHistory({ patient, onBack }: Props) {
           >
             <p style={{ color: "var(--text-secondary)" }}>
               No hay eventos registrados en la historia clínica
+            </p>
+          </div>
+        ) : eventosFiltrados.length === 0 ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "3rem",
+              backgroundColor: "var(--bg-tertiary)",
+              borderRadius: "0.5rem",
+              border: "1px solid var(--border-color)",
+            }}
+          >
+            <p style={{ color: "var(--text-secondary)" }}>
+              No se encontraron eventos
             </p>
           </div>
         ) : (
@@ -688,7 +896,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
               }}
             />
 
-            {timeline.map((evento, index) => (
+            {eventosFiltrados.map((evento, index) => (
               <div
                 key={index}
                 style={{
