@@ -1,7 +1,7 @@
 // ==========================================
 // COMPONENTE: Registrar Encuentro (DINÁMICO)
 // ==========================================
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import styles from "../DoctorDashboard.module.css";
 import type { PatientBasic } from "../interfaces";
 import { API_BASE_URL } from "@/utils/constants";
@@ -24,6 +24,9 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
   } else {
     console.log('[RegisterEncounter] ✅ doctorId available:', doctorId);
   }
+  
+  // Referencia para hacer scroll automático al cambiar de paso
+  const formTopRef = useRef<HTMLDivElement>(null);
   
   // Obtener configuración de especialidad por ID
   const especialidad = useMemo(() => obtenerEspecialidadPorId(especialidadId), [especialidadId]);
@@ -52,6 +55,16 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
     fecha: getTodayVenezuelaISO(),
     hora: getCurrentTimeVenezuela(),
   });
+
+  // ✅ Scroll automático al cambiar de paso
+  useEffect(() => {
+    if (formTopRef.current) {
+      formTopRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }
+  }, [step]);
 
   function initializeFormDataFromConfig(config?: typeof formularioConfig): {[key: string]: string} {
     if (!config) return {};
@@ -339,18 +352,33 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
       ) : (
         <>
           {/* Step Indicator Dinámico */}
-          <div className={styles["step-indicator"]}>
-            {formularioConfig.pasos.map((paso, idx) => (
-              <div key={paso.numero}>
-                <div className={`${styles.step} ${step >= paso.numero ? styles.active : ""}`}>
-                  <span className={styles["step-number"]}>{paso.numero}</span>
-                  <span className={styles["step-label"]}>{paso.titulo}</span>
+          <div ref={formTopRef} className={styles["step-indicator"]}>
+            {/* Vista Desktop: Mostrar todos los pasos */}
+            <div className={styles["step-indicator-desktop"]}>
+              {formularioConfig.pasos.map((paso, idx) => (
+                <div key={paso.numero}>
+                  <div className={`${styles.step} ${step >= paso.numero ? styles.active : ""}`}>
+                    <span className={styles["step-number"]}>{paso.numero}</span>
+                    <span className={styles["step-label"]}>{paso.titulo}</span>
+                  </div>
+                  {idx < formularioConfig.pasos.length - 1 && (
+                    <div className={styles["step-line"]}></div>
+                  )}
                 </div>
-                {idx < formularioConfig.pasos.length - 1 && (
-                  <div className={styles["step-line"]}></div>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
+            
+            {/* Vista Móvil: Mostrar solo el paso activo */}
+            <div className={styles["step-indicator-mobile"]}>
+              {formularioConfig.pasos.find(paso => paso.numero === step) && (
+                <div className={`${styles.step} ${styles.active}`}>
+                  <span className={styles["step-number"]}>{step}</span>
+                  <span className={styles["step-label"]}>
+                    {formularioConfig.pasos.find(p => p.numero === step)?.titulo}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Step 1: Buscar Paciente */}

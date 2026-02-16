@@ -498,6 +498,7 @@
   display: flex;
   gap: 0.75rem;
   margin-bottom: 1rem;
+  width: 100%;
 }
 
 .search-box input {
@@ -581,12 +582,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.patient-summary h3 {
+.patient-summary h4 {
   margin: 0 0 0.5rem 0;
   font-size: 0.9rem;
   color: var(--text-secondary);
+  width: 100%;
+}
+
+.patient-details {
+  flex: 1;
+  min-width: 200px;
 }
 
 .patient-details p {
@@ -730,6 +739,22 @@
   padding: 1rem;
   background: var(--bg-tertiary);
   border-radius: 0.5rem;
+}
+
+/* Vista Desktop: Mostrar todos los pasos */
+.step-indicator-desktop {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+/* Vista Móvil: Oculta por defecto */
+.step-indicator-mobile {
+  display: none;
+  width: 100%;
+  justify-content: center;
 }
 
 .step {
@@ -1243,21 +1268,52 @@
     font-size: 2rem;
   }
 
+  /* Step Indicator Mobile */
   .step-indicator {
-    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+  }
+
+  .step-indicator-desktop {
+    display: none;
+  }
+
+  .step-indicator-mobile {
+    display: flex;
   }
 
   .step-label {
-    display: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  /* Patient Summary Mobile */
+  .patient-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .patient-details {
+    width: 100%;
+  }
+
+  .change-patient-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Search Box Mobile */
+  .search-box {
+    flex-direction: column;
+  }
+
+  .search-box button {
+    width: 100%;
   }
 
   .search-type-selector {
     flex-direction: column;
     gap: 0.75rem;
-  }
-
-  .search-box {
-    flex-direction: column;
   }
 
   .patient-stats {
@@ -1290,6 +1346,11 @@
 
   .appointments-list button {
     width: 100%;
+  }
+
+  /* Form Grid Mobile */
+  .form-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1600,6 +1661,8 @@
   display: flex;
   gap: 0;
   flex: 1;
+  width: 100%;
+  min-width: 0;
 }
 
 .dual-input-group select {
@@ -1624,6 +1687,7 @@
 
 .dual-input-group input {
   flex: 1;
+  min-width: 0;
   padding: 0.75rem 1rem;
   border: 1px solid var(--border-color);
   border-radius: 0 0.375rem 0.375rem 0;

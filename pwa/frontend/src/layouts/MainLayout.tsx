@@ -37,7 +37,7 @@ export default function MainLayout() {
       </main>
 
       <footer className={styles.footer}>
-        <p>&copy; 2025 Hospital JMV. Todos los derechos reservados.</p>
+        <p>Sistema de Gestión Clínica y Administrativa - Hospital Militar Tipo I "Dr. José María Vargas"</p>
       </footer>
     </div>
   )
