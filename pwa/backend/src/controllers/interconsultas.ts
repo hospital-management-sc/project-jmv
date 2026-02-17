@@ -4,12 +4,12 @@
  */
 
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { getPrismaClient } from '../database/connection';
 import { convertBigIntToString } from '../utils/bigIntSerializer';
 import { obtenerNombresEspecialidades } from '../config/especialidades.config';
 import logger from '../utils/logger';
 
-const prisma = new PrismaClient();
+const prisma = getPrismaClient();
 
 // 🎯 Especialidades disponibles para interconsultas (CENTRALIZADO - desde config/especialidades.config.ts)
 export const ESPECIALIDADES = obtenerNombresEspecialidades();

@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import { PrismaClient } from '@prisma/client'
+import { getPrismaClient } from '../database/connection'
 import { regenerarHorariosMedico } from '../services/generarHorariosMedico'
 
 const router = Router()
-const prisma = new PrismaClient()
+const prisma = getPrismaClient()
 
 // Zona horaria de Venezuela (UTC-4)
 const VENEZUELA_TIMEZONE = 'America/Caracas'

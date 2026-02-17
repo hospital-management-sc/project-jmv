@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { getPrismaClient } from '../database/connection';
+const prisma = getPrismaClient();
 
 /**
  * Valida la disponibilidad de un médico para una cita.

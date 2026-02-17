@@ -1,7 +1,7 @@
 import { Response } from 'express'
-import { PrismaClient } from '@prisma/client'
+import { getPrismaClient } from '../database/connection'
 
-const prisma = new PrismaClient()
+const prisma = getPrismaClient()
 
 // Zona horaria de Venezuela (UTC-4)
 const VENEZUELA_TIMEZONE = 'America/Caracas'

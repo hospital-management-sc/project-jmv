@@ -4,10 +4,10 @@
  */
 
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { getPrismaClient } from '../database/connection';
 import logger from '../utils/logger';
 
-const prisma = new PrismaClient();
+const prisma = getPrismaClient();
 
 /**
  * Función helper para convertir BigInt a string

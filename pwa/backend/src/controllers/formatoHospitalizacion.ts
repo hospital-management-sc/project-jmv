@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { getPrismaClient } from '../database/connection';
 
-const prisma = new PrismaClient();
+const prisma = getPrismaClient();
 
 /**
  * Helper: Procesar fecha/hora desde strings del frontend

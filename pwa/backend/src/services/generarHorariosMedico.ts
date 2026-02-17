@@ -5,10 +5,10 @@
  * basándose en templates predefinidos por especialidad.
  */
 
-import { PrismaClient } from '@prisma/client';
+import { getPrismaClient } from '../database/connection';
 import logger from '../utils/logger';
 
-const prisma = new PrismaClient();
+const prisma = getPrismaClient();
 
 /**
  * Templates de horarios por especialidad

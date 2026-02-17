@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { getPrismaClient } from '../database/connection';
 import { validarDisponibilidadMedico } from '../services/disponibilidad';
-const prisma = new PrismaClient();
+const prisma = getPrismaClient();
 const router = Router();
 
 // POST /api/citas

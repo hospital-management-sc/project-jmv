@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
+import { getPrismaClient } from '../database/connection'
 
-const prisma = new PrismaClient()
+const prisma = getPrismaClient()
 
 // Función auxiliar para convertir BigInt a string y formatear fechas/horas
 function convertBigIntToString(obj: any): any {
