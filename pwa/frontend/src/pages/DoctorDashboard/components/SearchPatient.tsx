@@ -84,7 +84,6 @@ export default function SearchPatient({
       const result = await response.json();
 
       if (result.success && result.data) {
-        console.log("El paciente:", result?.data);
         setPaciente(result.data);
       } else {
         setError("Paciente no encontrado");

@@ -82,7 +82,7 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
       const data = await formatoService.getOrdenesMedicas(formato.id);
       setOrdenes(data);
     } catch (error: any) {
-      console.error('Error cargando órdenes:', error);
+      // Error loading medical orders
     }
   }, [formato.id]);
 

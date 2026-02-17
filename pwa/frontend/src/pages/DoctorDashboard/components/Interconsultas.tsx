@@ -66,7 +66,6 @@ export default function InterconsultasView({ doctorId }: Props) {
       setInterconsultasEnviadas(enviadas);
       setInterconsultasRecibidas(recibidas);
     } catch (err) {
-      console.error("Error al cargar interconsultas:", err);
       setError("Error al cargar interconsultas");
       toast.error("Error al cargar interconsultas");
     } finally {

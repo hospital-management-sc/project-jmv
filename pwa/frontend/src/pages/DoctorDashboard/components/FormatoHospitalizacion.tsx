@@ -98,7 +98,6 @@ export default function FormatoHospitalizacionView({}: Props) {
       );
       setFormato(formatoData);
     } catch (err: any) {
-      console.error('Error al cargar datos:', err);
       setError(err.message || 'Error al cargar la información');
     } finally {
       setLoading(false);

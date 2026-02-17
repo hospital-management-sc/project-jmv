@@ -25,12 +25,6 @@ import PacientesEnEmergencia from "@/components/PacientesEnEmergencia";
 export default function DoctorDashboard() {
   const { user } = useAuth();
   
-  // DEBUG: Verificar que user tiene id
-  console.log('[DoctorDashboard] User from AuthContext:', user);
-  if (user && !user.id) {
-    console.error('[DoctorDashboard] ⚠️ User does not have id!', { user });
-  }
-  
   // Obtener especialidad del usuario - intenta código primero, luego nombre, luego fallback a ORL
   const especialidad = useMemo(() => {
     if (!user?.especialidad) {
@@ -47,7 +41,6 @@ export default function DoctorDashboard() {
     if (esp) return esp;
     
     // Fallback: retornar ORL
-    console.warn(`Especialidad "${user.especialidad}" no encontrada, usando ORL como fallback`);
     return obtenerEspecialidadPorCodigo("ORL");
   }, [user?.especialidad]);
   

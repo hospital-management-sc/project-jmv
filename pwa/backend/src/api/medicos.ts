@@ -162,8 +162,6 @@ router.get('/:medicoId/disponibilidad', async (req, res) => {
     // Obtener el día de la semana en zona horaria Venezuela
     const diaAjustado = getDayOfWeekInVenezuela(fechaCitaCorregida)
     
-    console.log(`🔍 DEBUG: Fecha seleccionada: ${fecha}, Día calculado: ${diaAjustado} (${getDayNameInSpanish(diaAjustado)}), Especialidad: ${especialidad}, Doctor: ${medicoId}`)
-    
     // Si es sábado (5) o domingo (6), no hay atención
     if (diaAjustado > 4) {
       const horariosDisponibles = await prisma.horarioMedico.findMany({
@@ -217,22 +215,6 @@ router.get('/:medicoId/disponibilidad', async (req, res) => {
         activo: true,
       },
     })
-
-    console.log(`🔍 Horarios disponibles para doctor ${medicoId} en especialidad ${especialidad}:`)
-    const todosHorarios = await prisma.horarioMedico.findMany({
-      where: {
-        usuarioId: Number(medicoId),
-        especialidad: especialidad as string,
-        activo: true,
-      },
-    })
-    console.log(todosHorarios.map(h => `  - Día ${h.diaSemana} (${getDayNameInSpanish(h.diaSemana)}): ${h.horaInicio}-${h.horaFin}`))
-
-    if (!horario) {
-      console.log(`❌ No se encontró horario para día ${diaAjustado} (${getDayNameInSpanish(diaAjustado)})`)
-    } else {
-      console.log(`✅ Se encontró horario para día ${diaAjustado}`)
-    }
 
     if (!horario) {
       // Obtener próximas fechas disponibles (próximos 21 días)

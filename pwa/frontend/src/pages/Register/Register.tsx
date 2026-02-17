@@ -125,8 +125,6 @@ export default function Register() {
     setShowSuccessMessage(false)
     
     try {
-      console.log('[Register] Form submitted with email:', data.email)
-      
       const ciCompleta = `${data.ciTipo}${data.ciNumeros}`
       const response = await authService.register({
         nombre: data.nombre,
@@ -136,10 +134,7 @@ export default function Register() {
         role: data.role,
       })
       
-      console.log('[Register] Response received:', response)
-      
       if (response.success) {
-        console.log('[Register] Registration successful, redirecting to login')
         setShowSuccessMessage(true)
         setTimeout(() => {
           navigate('/login')
@@ -151,7 +146,6 @@ export default function Register() {
       }
     } catch (error: any) {
       const errorMessage = error?.message || 'Error desconocido'
-      console.error('[Register] Exception caught:', errorMessage)
       const errorCode = detectErrorCode(errorMessage)
       setApiError({ code: errorCode, message: errorMessage })
     }

@@ -124,7 +124,6 @@ export const crearCita = async (req: Request, res: Response): Promise<void> => {
       data: convertBigIntToString(cita),
     })
   } catch (error: any) {
-    console.error('Error al crear cita:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al crear la cita',
@@ -187,7 +186,6 @@ export const obtenerCitasPorPaciente = async (req: Request, res: Response): Prom
       data: convertBigIntToString(citas),
     })
   } catch (error: any) {
-    console.error('Error al obtener citas:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al obtener citas',
@@ -257,7 +255,6 @@ export const obtenerCitasPorMedico = async (req: Request, res: Response): Promis
       data: convertBigIntToString(citas),
     })
   } catch (error: any) {
-    console.error('Error al obtener citas por médico:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al obtener citas',
@@ -300,7 +297,6 @@ export const obtenerCita = async (req: Request, res: Response): Promise<void> =>
       data: convertBigIntToString(cita),
     })
   } catch (error: any) {
-    console.error('Error al obtener cita:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al obtener cita',
@@ -364,7 +360,6 @@ export const actualizarCita = async (req: Request, res: Response): Promise<void>
       data: convertBigIntToString(cita),
     })
   } catch (error: any) {
-    console.error('Error al actualizar cita:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al actualizar cita',
@@ -425,7 +420,6 @@ export const cancelarCita = async (req: Request, res: Response): Promise<void> =
       data: convertBigIntToString(cita),
     })
   } catch (error: any) {
-    console.error('Error al cancelar cita:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al cancelar cita',
@@ -491,7 +485,6 @@ export const listarCitasProximas = async (req: Request, res: Response): Promise<
       data: convertBigIntToString(citas),
     })
   } catch (error: any) {
-    console.error('Error al listar citas próximas:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al listar citas',
@@ -519,7 +512,6 @@ export const obtenerEspecialidades = async (_req: Request, res: Response): Promi
       data: listaEspecialidades,
     })
   } catch (error: any) {
-    console.error('Error al obtener especialidades:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al obtener especialidades',
@@ -617,7 +609,6 @@ export const obtenerCitasHoyMedico = async (req: Request, res: Response): Promis
       fecha: hoy.toISOString().split('T')[0],
     })
   } catch (error: any) {
-    console.error('Error al obtener citas de hoy:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al obtener citas de hoy',
@@ -723,7 +714,6 @@ export const obtenerCitasProximosMedico = async (req: Request, res: Response): P
       dias: diasNumero,
     })
   } catch (error: any) {
-    console.error('Error al obtener citas próximas:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al obtener citas próximas',
@@ -782,7 +772,6 @@ export const iniciarCita = async (req: Request, res: Response): Promise<void> =>
       data: convertBigIntToString(citaActualizada),
     })
   } catch (error: any) {
-    console.error('Error al iniciar cita:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al iniciar cita',
@@ -843,7 +832,6 @@ export const completarCita = async (req: Request, res: Response): Promise<void> 
       data: convertBigIntToString(citaActualizada),
     })
   } catch (error: any) {
-    console.error('Error al completar cita:', error)
     res.status(500).json({
       success: false,
       message: error.message || 'Error al completar cita',

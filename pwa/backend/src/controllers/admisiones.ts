@@ -124,7 +124,6 @@ export const crearAdmision = async (req: Request, res: Response) => {
       admision: admisionSerializada,
     });
   } catch (error) {
-    console.error('Error al crear admisión:', error);
     return res.status(500).json({
       error: 'Error al crear admisión',
       details: error instanceof Error ? error.message : 'Error desconocido',
@@ -196,7 +195,6 @@ export const obtenerAdmision = async (req: Request, res: Response) => {
 
     return res.status(200).json(admisionSerializada);
   } catch (error) {
-    console.error('Error al obtener admisión:', error);
     return res.status(500).json({
       error: 'Error al obtener admisión',
       details: error instanceof Error ? error.message : 'Error desconocido',
@@ -260,7 +258,6 @@ export const listarAdmisionesPaciente = async (req: Request, res: Response) => {
       admisiones: admisionesSerializadas,
     });
   } catch (error) {
-    console.error('Error al listar admisiones del paciente:', error);
     return res.status(500).json({
       error: 'Error al listar admisiones del paciente',
       details: error instanceof Error ? error.message : 'Error desconocido',
@@ -328,7 +325,6 @@ export const actualizarAdmision = async (req: Request, res: Response) => {
       admision: admisionSerializada,
     });
   } catch (error) {
-    console.error('Error al actualizar admisión:', error);
     return res.status(500).json({
       error: 'Error al actualizar admisión',
       details: error instanceof Error ? error.message : 'Error desconocido',
@@ -426,7 +422,6 @@ export const registrarAlta = async (req: Request, res: Response) => {
       diasHospitalizacion: diasHosp,
     });
   } catch (error) {
-    console.error('Error al registrar alta:', error);
     return res.status(500).json({
       error: 'Error al registrar alta',
       details: error instanceof Error ? error.message : 'Error desconocido',
@@ -504,7 +499,6 @@ export const activarAdmision = async (req: Request, res: Response) => {
       admision: admisionSerializada,
     });
   } catch (error) {
-    console.error('Error al activar admisión:', error);
     return res.status(500).json({
       error: 'Error al activar admisión',
       details: error instanceof Error ? error.message : 'Error desconocido',
@@ -614,7 +608,6 @@ export const listarAdmisionesActivas = async (req: Request, res: Response) => {
       admisiones: admisionesSerializadas,
     });
   } catch (error) {
-    console.error('Error al listar admisiones activas:', error);
     return res.status(500).json({
       error: 'Error al listar admisiones activas',
       details: error instanceof Error ? error.message : 'Error desconocido',
@@ -692,7 +685,6 @@ export const listarEmergenciasActivas = async (_req: Request, res: Response) => 
       admisiones: admisionesSerializadas,
     });
   } catch (error) {
-    console.error('Error al listar emergencias activas:', error);
     return res.status(500).json({
       error: 'Error al listar emergencias activas',
       details: error instanceof Error ? error.message : 'Error desconocido',
@@ -792,7 +784,6 @@ export const listarEmergenciasPendientesHospitalizacion = async (_req: Request, 
       admisiones: pendientesSerializados,
     });
   } catch (error) {
-    console.error('Error al listar emergencias pendientes:', error);
     return res.status(500).json({
       error: 'Error al listar emergencias pendientes de hospitalización',
       details: error instanceof Error ? error.message : 'Error desconocido',
@@ -916,7 +907,6 @@ export const hospitalizarDesdeEmergencia = async (req: Request, res: Response) =
       admision: admisionSerializada,
     });
   } catch (error) {
-    console.error('Error al hospitalizar desde emergencia:', error);
     return res.status(500).json({
       error: 'Error al crear admisión de hospitalización',
       details: error instanceof Error ? error.message : 'Error desconocido',
@@ -972,7 +962,6 @@ export const listarAdmisionesPorServicio = async (req: Request, res: Response) =
       admisiones: admisionesSerializadas,
     });
   } catch (error) {
-    console.error('Error al listar admisiones por servicio:', error);
     return res.status(500).json({
       error: 'Error al listar admisiones por servicio',
       details: error instanceof Error ? error.message : 'Error desconocido',

@@ -46,7 +46,6 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
       const citasProximas = await citasService.obtenerCitasProximos(validDoctorId!, 7)
       setCitas(citasProximas)
     } catch (err) {
-      console.error('Error al cargar citas:', err)
       const errorMsg = err instanceof Error ? err.message : 'Error desconocido'
       setError(errorMsg)
       toast.error('❌ Error al cargar las citas')
@@ -69,7 +68,6 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
       if (!fechaCita) return 'Sin fecha'
       return formatDateLongLocal(fechaCita)
     } catch (e) {
-      console.error('Error al formatear fecha:', e)
       return 'Error en fecha'
     }
   }
@@ -83,7 +81,6 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
       if (horas.length < 2) return horaCita
       return horas[0] + ':' + horas[1]
     } catch (e) {
-      console.error('Error al formatear hora:', e)
       return 'Error en hora'
     }
   }

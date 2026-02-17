@@ -131,19 +131,12 @@ export default function Login() {
     setLoginError(null)
     
     try {
-      console.log('[Login] Form submitted with email:', data.email)
-      console.log('[Login] API_BASE_URL:', import.meta.env.VITE_API_URL || 'using constants')
-      
       const response = await authService.login({
         email: data.email,
         password: data.password,
       })
       
-      console.log('[Login] Response received:', response)
-      
       if (response.success && response.data?.token) {
-        console.log('[Login] Token validated, saving to localStorage')
-        
         // Usar el método login del contexto
         const userData = {
           id: response.data.id,
@@ -155,27 +148,17 @@ export default function Login() {
         
         login(userData, response.data.token)
         
-        console.log('[Login] User data saved via context:', userData)
-        console.log('[Login] Redirecting to dashboard for role:', userData.role)
-        
         // Redirigir al dashboard correspondiente según el rol
         const dashboardPath = userData.role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/medico'
         navigate(dashboardPath)
       } else {
         const errorMsg = response.error || 'Respuesta inválida del servidor'
-        console.error('[Login] Invalid response structure:', { response, errorMsg })
         const errorCode = detectErrorCode(errorMsg)
         setLoginError({ code: errorCode, message: errorMsg })
       }
     } catch (error: any) {
       const errorType = error?.name || 'Unknown'
       const errorMessage = error?.message || 'Error desconocido'
-      console.error('[Login] Exception caught:', {
-        type: errorType,
-        message: errorMessage,
-        stack: error?.stack,
-        fullError: error,
-      })
       const errorCode = detectErrorCode(errorMessage)
       setLoginError({ code: errorCode, message: errorMessage })
     }

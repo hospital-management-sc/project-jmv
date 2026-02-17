@@ -67,7 +67,6 @@ export const getFormatoByAdmision = async (req: Request, res: Response): Promise
 
     res.json(formato);
   } catch (error: any) {
-    console.error('Error al obtener formato:', error);
     res.status(500).json({ error: 'Error al obtener formato de hospitalización' });
   }
 };
@@ -109,7 +108,6 @@ export const createFormato = async (req: Request, res: Response): Promise<void> 
 
     res.status(201).json(formato);
   } catch (error: any) {
-    console.error('Error al crear formato:', error);
     res.status(500).json({ error: 'Error al crear formato de hospitalización' });
   }
 };
@@ -144,7 +142,6 @@ export const addSignosVitales = async (req: Request, res: Response) => {
 
     res.status(201).json(registro);
   } catch (error: any) {
-    console.error('Error al agregar signos vitales:', error);
     res.status(500).json({ error: 'Error al agregar signos vitales', details: error.message });
   }
 };
@@ -177,7 +174,6 @@ export const updateSignosVitales = async (req: Request, res: Response) => {
 
     res.json(registro);
   } catch (error: any) {
-    console.error('Error al actualizar signos vitales:', error);
     res.status(500).json({ error: 'Error al actualizar signos vitales', details: error.message });
   }
 };
@@ -196,7 +192,6 @@ export const deleteSignosVitales = async (req: Request, res: Response) => {
 
     res.status(204).send();
   } catch (error: any) {
-    console.error('Error al eliminar signos vitales:', error);
     res.status(500).json({ error: 'Error al eliminar signos vitales' });
   }
 };
@@ -222,7 +217,6 @@ export const addLaboratorio = async (req: Request, res: Response) => {
 
     res.status(201).json(registro);
   } catch (error: any) {
-    console.error('Error al agregar laboratorio:', error);
     res.status(500).json({ error: 'Error al agregar laboratorio', details: error.message });
   }
 };
@@ -241,7 +235,6 @@ export const deleteLaboratorio = async (req: Request, res: Response) => {
 
     res.status(204).send();
   } catch (error: any) {
-    console.error('Error al eliminar laboratorio:', error);
     res.status(500).json({ error: 'Error al eliminar laboratorio' });
   }
 };
@@ -267,7 +260,6 @@ export const addEstudioEspecial = async (req: Request, res: Response) => {
 
     res.status(201).json(registro);
   } catch (error: any) {
-    console.error('Error al agregar estudio especial:', error);
     res.status(500).json({ error: 'Error al agregar estudio especial', details: error.message });
   }
 };
@@ -286,7 +278,6 @@ export const deleteEstudioEspecial = async (req: Request, res: Response) => {
 
     res.status(204).send();
   } catch (error: any) {
-    console.error('Error al eliminar estudio especial:', error);
     res.status(500).json({ error: 'Error al eliminar estudio especial' });
   }
 };
@@ -312,7 +303,6 @@ export const addElectrocardiograma = async (req: Request, res: Response) => {
 
     res.status(201).json(registro);
   } catch (error: any) {
-    console.error('Error al agregar electrocardiograma:', error);
     res.status(500).json({ error: 'Error al agregar electrocardiograma', details: error.message });
   }
 };
@@ -336,7 +326,6 @@ export const updateElectrocardiograma = async (req: Request, res: Response) => {
 
     res.json(registro);
   } catch (error: any) {
-    console.error('Error al actualizar electrocardiograma:', error);
     res.status(500).json({ error: 'Error al actualizar electrocardiograma', details: error.message });
   }
 };
@@ -355,7 +344,6 @@ export const deleteElectrocardiograma = async (req: Request, res: Response) => {
 
     res.status(204).send();
   } catch (error: any) {
-    console.error('Error al eliminar electrocardiograma:', error);
     res.status(500).json({ error: 'Error al eliminar electrocardiograma' });
   }
 };
@@ -391,7 +379,6 @@ export const updateAntecedentesDetallados = async (req: Request, res: Response) 
 
     res.json(registro);
   } catch (error: any) {
-    console.error('Error al actualizar antecedentes:', error);
     res.status(500).json({ error: 'Error al actualizar antecedentes detallados' });
   }
 };
@@ -426,7 +413,6 @@ export const updateExamenFuncional = async (req: Request, res: Response) => {
 
     res.json(registro);
   } catch (error: any) {
-    console.error('Error al actualizar examen funcional:', error);
     res.status(500).json({ error: 'Error al actualizar examen funcional' });
   }
 };
@@ -461,7 +447,6 @@ export const updateExamenFisicoCompleto = async (req: Request, res: Response) =>
 
     res.json(registro);
   } catch (error: any) {
-    console.error('Error al actualizar examen físico:', error);
     res.status(500).json({ error: 'Error al actualizar examen físico completo' });
   }
 };
@@ -496,7 +481,6 @@ export const updateResumenIngreso = async (req: Request, res: Response) => {
 
     res.json(registro);
   } catch (error: any) {
-    console.error('Error al actualizar resumen de ingreso:', error);
     res.status(500).json({ error: 'Error al actualizar resumen de ingreso' });
   }
 };
@@ -516,7 +500,6 @@ export const getOrdenesMedicas = async (req: Request, res: Response) => {
 
     res.json(ordenes);
   } catch (error: any) {
-    console.error('Error al obtener órdenes:', error);
     res.status(500).json({ error: 'Error al obtener órdenes médicas' });
   }
 };
@@ -542,7 +525,6 @@ export const addOrdenMedica = async (req: Request, res: Response) => {
 
     res.status(201).json(registro);
   } catch (error: any) {
-    console.error('Error al agregar orden médica:', error);
     res.status(500).json({ error: 'Error al agregar orden médica', details: error.message });
   }
 };
@@ -566,7 +548,6 @@ export const updateOrdenMedica = async (req: Request, res: Response): Promise<vo
 
     res.json(registro);
   } catch (error: any) {
-    console.error('Error al actualizar orden médica:', error);
     res.status(500).json({ error: 'Error al actualizar orden médica', details: error.message });
   }
 };
@@ -585,7 +566,6 @@ export const deleteOrdenMedica = async (req: Request, res: Response): Promise<vo
 
     res.status(204).send();
   } catch (error: any) {
-    console.error('Error al eliminar orden médica:', error);
     res.status(500).json({ error: 'Error al eliminar orden médica' });
   }
 };
@@ -611,7 +591,6 @@ export const addEvolucionMedica = async (req: Request, res: Response) => {
 
     res.status(201).json(registro);
   } catch (error: any) {
-    console.error('Error al agregar evolución médica:', error);
     res.status(500).json({ error: 'Error al agregar evolución médica', details: error.message });
   }
 };
@@ -635,7 +614,6 @@ export const updateEvolucionMedica = async (req: Request, res: Response) => {
 
     res.json(registro);
   } catch (error: any) {
-    console.error('Error al actualizar evolución médica:', error);
     res.status(500).json({ error: 'Error al actualizar evolución médica', details: error.message });
   }
 };
@@ -654,7 +632,6 @@ export const deleteEvolucionMedica = async (req: Request, res: Response) => {
 
     res.status(204).send();
   } catch (error: any) {
-    console.error('Error al eliminar evolución médica:', error);
     res.status(500).json({ error: 'Error al eliminar evolución médica' });
   }
 };

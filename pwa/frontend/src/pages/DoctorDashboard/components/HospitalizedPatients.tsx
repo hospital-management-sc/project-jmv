@@ -65,7 +65,6 @@ export default function HospitalizedPatientsView({}: Props) {
         }
       }
       
-      console.error("[HospitalizedPatients] Error:", err);
       setError(errorMessage);
     } finally {
       setLoading(false);

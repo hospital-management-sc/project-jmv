@@ -35,7 +35,7 @@ export default function TodayEncounters({}: Props) {
       const data = await encuentrosService.obtenerHoyDelMedico(user!.id);
       setEncuentros(data);
     } catch (err) {
-      console.error("Error al cargar encuentros:", err);
+      // Error loading today's encounters
     } finally {
       setLoading(false);
     }

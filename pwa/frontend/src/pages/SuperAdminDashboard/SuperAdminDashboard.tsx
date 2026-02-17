@@ -174,7 +174,7 @@ export default function SuperAdminDashboard() {
         setStats(result.data)
       }
     } catch (err) {
-      console.error('Error al cargar estadísticas:', err)
+      // Error loading stats
     }
   }, [getHeaders])
 

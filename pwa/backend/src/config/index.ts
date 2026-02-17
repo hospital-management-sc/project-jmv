@@ -15,14 +15,12 @@ function getCorsOrigin(): string {
   if (codespaceHost) {
     // Format: {codespace-name}-5173.app.github.dev
     const corsUrl = `https://${codespaceHost}-5173.app.github.dev`;
-    console.log(`[CONFIG] Codespace detected: ${corsUrl}`);
     return corsUrl;
   }
 
   // Then check environment variable (for explicit configuration)
   const envCors = process.env.CORS_ORIGIN;
   if (envCors) {
-    console.log(`[CONFIG] Using CORS_ORIGIN from .env: ${envCors}`);
     return envCors;
   }
 
@@ -31,13 +29,11 @@ function getCorsOrigin(): string {
   if (nodeEnv === 'production') {
     // For production on Render backend with Vercel frontend
     const corsUrl = 'https://project-jmv.vercel.app';
-    console.log(`[CONFIG] Production detected: ${corsUrl}`);
     return corsUrl;
   }
 
   // Default to localhost for local development
   const defaultCors = 'http://localhost:5173';
-  console.log(`[CONFIG] Using default localhost: ${defaultCors}`);
   return defaultCors;
 }
 
@@ -48,20 +44,17 @@ function getBackendUrl(): string {
   if (codespaceHost) {
     // Format: {codespace-name}-3001.app.github.dev
     const backendUrl = `https://${codespaceHost}-3001.app.github.dev`;
-    console.log(`[CONFIG] Codespace backend URL: ${backendUrl}`);
     return backendUrl;
   }
 
   // Then check environment variable (for explicit configuration)
   const envBackend = process.env.BACKEND_URL;
   if (envBackend) {
-    console.log(`[CONFIG] Using BACKEND_URL from .env: ${envBackend}`);
     return envBackend;
   }
 
   // Default to localhost for local development
   const defaultBackend = 'http://localhost:3001';
-  console.log(`[CONFIG] Using default localhost: ${defaultBackend}`);
   return defaultBackend;
 }
 
@@ -96,7 +89,7 @@ if (!config.databaseUrl) {
 }
 
 if (!config.jwtSecret || config.jwtSecret === 'your-secret-key') {
-  console.warn('⚠️  JWT_SECRET is using default value. Please set it in production.');
+  // JWT_SECRET is using default value
 }
 
 export default config;

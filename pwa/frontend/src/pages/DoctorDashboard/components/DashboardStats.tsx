@@ -112,7 +112,7 @@ export default function DashboardStats({}: Props) {
         pacientesEnEmergencia: 0, // Por implementar
       });
     } catch (error) {
-      console.error("Error fetching doctor stats:", error);
+      // Error fetching doctor statistics
     } finally {
       setLoading(false);
     }

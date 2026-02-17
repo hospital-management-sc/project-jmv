@@ -8,7 +8,6 @@ export const APP_NAME = import.meta.env.VITE_APP_NAME || 'Hospital Management Sy
 function getApiBaseUrl(): string {
   // Si hay variable de entorno explícita, usarla primero
   if (import.meta.env.VITE_API_URL) {
-    console.log('[CONSTANTS] Using VITE_API_URL:', import.meta.env.VITE_API_URL)
     return import.meta.env.VITE_API_URL
   }
 
@@ -21,21 +20,18 @@ function getApiBaseUrl(): string {
     if (hostname.includes('app.github.dev')) {
       const apiHostname = hostname.replace('-5173.', '-3001.')
       const apiUrl = `${protocol}//${apiHostname}/api`
-      console.log('[CONSTANTS] Codespace detected. API URL:', apiUrl)
       return apiUrl
     }
     
     // Si estamos en Vercel o producción, usar el backend de producción
     if (hostname.includes('vercel.app') || hostname.includes('project-jmv')) {
       const productionUrl = 'https://project-jmv.onrender.com/api'
-      console.log('[CONSTANTS] Production environment detected. API URL:', productionUrl)
       return productionUrl
     }
   }
 
   // Default para desarrollo local
   const defaultUrl = 'http://localhost:3001/api'
-  console.log('[CONSTANTS] Using default localhost URL:', defaultUrl)
   return defaultUrl
 }
 

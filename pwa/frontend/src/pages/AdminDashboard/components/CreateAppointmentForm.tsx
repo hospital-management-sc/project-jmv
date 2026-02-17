@@ -63,7 +63,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
             setCitasExistentes(citasResult.data || [])
           }
         } catch (err) {
-          console.error('Error al cargar citas:', err)
+          // Error loading patient appointments
         }
       }
       cargarCitasPaciente()
@@ -103,13 +103,10 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
 
       if (result.success) {
         setMedicosDisponibles(result.data || [])
-        console.log(`✅ ${result.data?.length || 0} médicos cargados para ${especialidad}`)
       } else {
-        console.error('Error al cargar médicos:', result.message)
         setSearchError('No se pudieron cargar los médicos de esta especialidad')
       }
     } catch (err: any) {
-      console.error('Error al cargar médicos:', err)
       setSearchError('Error al cargar médicos disponibles')
     } finally {
       setLoadingMedicos(false)
@@ -170,7 +167,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
         }
       }
     } catch (err: any) {
-      console.error('Error al validar disponibilidad:', err)
+      // Error checking doctor availability
     } finally {
       setLoadingDisponibilidad(false)
     }
@@ -282,8 +279,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
         notas: null,
       }
 
-      console.log('📅 Datos de cita a enviar:', citaData)
-
       const response = await fetch(`${API_BASE_URL}/citas`, {
         method: 'POST',
         headers: {
@@ -330,7 +325,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
 
       setTimeout(() => setSubmitMessage(''), 5000)
     } catch (error: any) {
-      console.error('Error:', error)
       alert(`❌ Error: ${error.message}`)
     } finally {
       setSubmitLoading(false)

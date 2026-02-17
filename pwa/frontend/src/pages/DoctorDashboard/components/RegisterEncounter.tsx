@@ -20,9 +20,7 @@ interface Props {
 export default function RegisterEncounter({ patient = null, doctorId, especialidadId, onEncounterRegistered }: Props) {
   // ⚠️ VALIDACIÓN CRÍTICA - doctorId es requerido para createdById
   if (!doctorId) {
-    console.error('[RegisterEncounter] ⚠️ CRITICAL: doctorId is missing!', { doctorId });
-  } else {
-    console.log('[RegisterEncounter] ✅ doctorId available:', doctorId);
+    // doctorId is missing - will throw error when trying to submit
   }
   
   // Referencia para hacer scroll automático al cambiar de paso
@@ -32,10 +30,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
   const especialidad = useMemo(() => obtenerEspecialidadPorId(especialidadId), [especialidadId]);
   const formularioConfig = especialidad?.formularioEspecializado;
 
-  // Log para debugging
-  if (!formularioConfig) {
-    console.warn(`⚠️ No hay formularioEspecializado para ID: ${especialidadId}. Especialidad encontrada:`, especialidad?.nombre);
-  }
+  // Formulario config may not be available for all specialties
 
   const [step, setStep] = useState(patient ? 2 : 1);
   const [paciente, setPaciente] = useState<PatientBasic | null>(patient);
@@ -135,7 +130,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
         setError("Paciente no encontrado");
       }
     } catch (err) {
-      console.error("Error buscando paciente:", err);
       setError("Error al buscar paciente");
       toast.error("Error al buscar paciente");
     } finally {
@@ -254,15 +248,12 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
 
       // ⚠️ VALIDACIÓN ANTES DE ENVIAR
       if (!encuentroData.createdById) {
-        console.error('[RegisterEncounter] ❌ createdById is missing before sending to API!', { encuentroData, doctorId });
         throw new Error('Error crítico: No se puede identificar al médico. Por favor, recarga la página.');
       }
 
-      console.log('[RegisterEncounter] ✅ Sending encuentroData:', encuentroData);
-
       // 🆕 Si viene de una cita (tiene citaId), usar endpoint /desde-cita que actualiza la cita
       if (paciente.citaId) {
-        console.log('[RegisterEncounter] 📋 Registrando encuentro DESDE CITA ID:', paciente.citaId);
+        // Registrando encuentro desde cita
         
         // Preparar datos para endpoint /desde-cita
         const encuentroDesdeCitaData = {
@@ -278,7 +269,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
           observaciones: formData.observaciones ? String(formData.observaciones) : undefined,
         };
 
-        console.log('[RegisterEncounter] 📤 Enviando a /encuentros/desde-cita:', encuentroDesdeCitaData);
+        // Enviar al endpoint de encuentros desde cita
         
         // Usar endpoint que actualiza la cita a COMPLETADA
         const response = await fetch(`${API_BASE_URL}/encuentros/desde-cita`, {
@@ -295,10 +286,8 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
         }
 
         const result = await response.json();
-        console.log('[RegisterEncounter] ✅ Encuentro registrado desde cita:', result);
       } else {
         // Si NO viene de una cita, usar endpoint genérico
-        console.log('[RegisterEncounter] 📝 Registrando encuentro GENÉRICO (sin cita)');
         await encuentrosService.crearEncuentro(encuentroData);
       }
 

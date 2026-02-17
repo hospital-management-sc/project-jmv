@@ -49,10 +49,9 @@ export default function PatientHistory({ patient, onBack }: Props) {
     setLoading(true);
     try {
       const data = await pacientesService.buscarPorId(Number(patient.id));
-      console.log("📊 Datos completos del paciente:", data);
       setHistoriaCompleta(data);
     } catch (err) {
-      console.error("Error al cargar historia:", err);
+      // Error loading patient history
     } finally {
       setLoading(false);
     }
@@ -62,9 +61,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
     try {
       const data = await encuentrosService.obtenerPorPaciente(Number(patient.id));
       setEncuentros(data);
-      console.log("✅ Encuentros cargados:", data.length);
     } catch (err) {
-      console.error("Error al cargar encuentros:", err);
       setEncuentros([]);
     }
   };
@@ -342,7 +339,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
 
         return fechaHoraB - fechaHoraA;
       } catch (err) {
-        console.error("Error ordenando eventos:", err, { a, b });
+        // Error sorting timeline events
         return 0;
       }
     });

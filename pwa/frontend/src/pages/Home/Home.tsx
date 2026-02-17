@@ -11,7 +11,6 @@ export default function Home() {
     if (!loading && isAuthenticated && user) {
       // Redirigir al dashboard correspondiente según el rol
       const dashboardPath = user.role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/medico'
-      console.log('[Home] User authenticated, redirecting to:', dashboardPath)
       navigate(dashboardPath, { replace: true })
     }
   }, [loading, isAuthenticated, user, navigate])
