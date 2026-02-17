@@ -285,7 +285,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
           throw new Error(errorData.error || 'Error al registrar encuentro desde cita');
         }
 
-        const result = await response.json();
+        await response.json();
       } else {
         // Si NO viene de una cita, usar endpoint genérico
         await encuentrosService.crearEncuentro(encuentroData);

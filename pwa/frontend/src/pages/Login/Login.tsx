@@ -157,7 +157,6 @@ export default function Login() {
         setLoginError({ code: errorCode, message: errorMsg })
       }
     } catch (error: any) {
-      const errorType = error?.name || 'Unknown'
       const errorMessage = error?.message || 'Error desconocido'
       const errorCode = detectErrorCode(errorMessage)
       setLoginError({ code: errorCode, message: errorMessage })

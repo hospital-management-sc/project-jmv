@@ -4,7 +4,6 @@
 
 export async function runDiagnostics() {
   // Diagnostics can be enabled by uncommenting console.log statements
-  const { API_BASE_URL } = await import('./constants')
 }
 
 /**
