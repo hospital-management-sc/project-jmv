@@ -1,6 +1,6 @@
-/* Service Worker for Hospital Management System */
+/* Service Worker for Hospital JMV */
 
-const CACHE_NAME = 'hms-v1'
+const CACHE_NAME = 'hospital-jmv-v1'
 const urlsToCache = [
   '/',
   '/index.html',

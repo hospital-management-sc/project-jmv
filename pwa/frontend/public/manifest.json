@@ -1,13 +1,13 @@
 {
-  "name": "Hospital Management System",
-  "short_name": "HMS",
-  "description": "A modern, efficient solution for managing hospital operations",
+  "name": "Hospital JMV",
+  "short_name": "HJMV",
+  "description": "Sistema de Gestión Clínica y Administrativa",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#2563eb",
-  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "background_color": "#0f172a",
   "icons": [
     {
       "src": "/icon-192x192.png",
@@ -24,9 +24,9 @@
   ],
   "shortcuts": [
     {
-      "name": "View Patients",
-      "short_name": "Patients",
-      "description": "View and manage patients",
+      "name": "Ver Pacientes",
+      "short_name": "Pacientes",
+      "description": "Ver y gestionar pacientes",
       "url": "/patients",
       "icons": [
         {
