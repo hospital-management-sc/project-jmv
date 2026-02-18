@@ -1,13 +1,13 @@
 {
   "name": "Hospital JMV",
-  "short_name": "HJMV",
+  "short_name": "HM-JMV",
   "description": "Sistema de Gestión Clínica y Administrativa",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#7c3aed",
-  "background_color": "#0f172a",
+  "theme_color": "#0ea5e9",
+  "background_color": "#0ea5e9",
   "icons": [
     {
       "src": "/icon-192x192.png",

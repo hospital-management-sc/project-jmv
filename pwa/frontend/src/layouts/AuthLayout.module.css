@@ -23,10 +23,23 @@
 
 @media (max-width: 768px) {
   .layout {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
+    align-items: flex-start;
+    padding-top: var(--spacing-lg);
+  }
+
+  .container {
+    padding: 0 var(--spacing-sm);
+    max-width: 100%;
   }
 
   .content {
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 400px) {
+  .content {
+    padding: var(--spacing-md);
   }
 }

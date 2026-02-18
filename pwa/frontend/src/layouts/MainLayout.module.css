@@ -24,18 +24,17 @@
   width: 100%;
 }
 
-.header h1 {
-  font-size: var(--font-size-2xl);
-  color: var(--text-primary);
-  margin: 0;
+.logoLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
 }
 
-.logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  margin: 0;
-  letter-spacing: 0.5px;
+.logoImg {
+  height: 50px;
+  width: auto;
+  display: block;
 }
 
 .nav {
@@ -68,12 +67,79 @@
   font-weight: 500;
   font-size: 0.9rem;
   transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .logoutBtn:hover {
   background-color: #dc2626;
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+.logoutText {
+  display: inline;
+}
+
+/* Mobile user icon button */
+.userInfoDesktop {
+  display: flex;
+}
+
+.userInfoMobile {
+  display: none;
+  position: relative;
+}
+
+.userIconBtn {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: var(--transition);
+  padding: 0;
+}
+
+.userIconBtn:hover {
+  background-color: var(--bg-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.userTooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  padding: 0.6rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 200px;
+  z-index: 200;
+  white-space: nowrap;
+}
+
+.tooltipName {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.tooltipEspecialidad {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
 }
 
 .main {
@@ -99,34 +165,34 @@
     padding: 0.5rem 1rem;
   }
 
-  .logo {
-    font-size: 1.1rem;
-    letter-spacing: 0.3px;
+  .logoImg {
+    height: 32px;
   }
 
   .nav {
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
-  .userInfo {
-    font-size: 0.8rem;
-    padding: 0 0.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.1rem;
-    border-right: none;
+  /* Hide desktop user info, show mobile icon */
+  .userInfoDesktop {
+    display: none;
   }
 
-  .especialidad {
-    font-size: 0.7rem;
+  .userInfoMobile {
     display: block;
   }
 
+  /* Logout: icon only on mobile */
+  .logoutText {
+    display: none;
+  }
+
   .logoutBtn {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.75rem;
-    white-space: nowrap;
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
   }
 
   .main {
