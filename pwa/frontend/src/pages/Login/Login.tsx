@@ -167,7 +167,7 @@ export default function Login() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Hospital JMV</h1>
+      <h1 className={styles.title}>Hospital Militar "Dr. José María Vargas"</h1>
       <p className={styles.subtitle}>Inicia sesión en tu cuenta</p>
 
       {/* Mensaje de error estilizado */}

@@ -92,9 +92,17 @@ export const loginUser = async (payload: LoginPayload): Promise<TokenResponse> =
     throw new ValidationError('El correo electrónico y la contraseña son requeridos');
   }
 
-  // Find user by email
+  // Find user by email - SOLO campos necesarios
   const user = await prisma.usuario.findUnique({
     where: { email: email.toLowerCase() },
+    select: {
+      id: true,
+      nombre: true,
+      email: true,
+      password: true,
+      role: true,
+      especialidad: true,
+    },
   });
 
   if (!user) {
@@ -194,111 +202,105 @@ export const registerUser = async (payload: RegisterPayload): Promise<TokenRespo
   logger.info(`[AUTH] Verificación de whitelist EXITOSA para: ${ciNormalized}`);
 
   // ============================================
-  // VALIDACIONES DE UNICIDAD EN BASE DE DATOS
+  // VALIDACIONES DE UNICIDAD EN BASE DE DATOS + CREACIÓN
   // ============================================
-
-  // Check if email already exists
-  const existingUser = await prisma.usuario.findUnique({
-    where: { email: email.toLowerCase() },
-  });
-
-  if (existingUser) {
-    throw new ValidationError('Este email ya está registrado en el sistema');
-  }
-
-  // Check if CI already exists
-  const userWithCi = await prisma.usuario.findUnique({
-    where: { ci: ciNormalized },
-  });
-
-  if (userWithCi) {
-    throw new ValidationError('Esta cédula ya está registrada en el sistema');
-  }
-
-  // ============================================
-  // CREACIÓN DE USUARIO
-  // ============================================
-
-  // Hash password
+  // OPTIMIZADO: En lugar de 2 queries de búsqueda + 1 de creación,
+  // intentamos crear directamente y dejamos que Prisma/DB maneje los unique constraints
+  
+  // Hash password upfront
   const hashedPassword = await hashPassword(password);
 
   // Get additional data from whitelist record
   const personnelRecord = verificationResult.personnelRecord;
 
-  // Create user with data from whitelist
-  const newUser = await prisma.usuario.create({
-    data: {
-      nombre: personnelRecord?.nombreCompleto || nombre, // Usar nombre oficial de la whitelist
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      ci: ciNormalized,
-      role: personnelRecord?.rolAutorizado || roleToUse, // Usar rol de la whitelist
-      especialidad: personnelRecord?.departamento || undefined, // Usar departamento como especialidad de la whitelist (si aplica)
-      cargo: personnelRecord?.cargo || null,
-    },
-  });
-
-  // ============================================
-  // ACTUALIZAR WHITELIST Y AUDITORÍA
-  // ============================================
-
-  // Mark as registered in whitelist
-  await markAsRegistered(ciNormalized, newUser.id);
-
-  // Register in audit log
-  await prisma.auditLog.create({
-    data: {
-      tabla: 'Usuario',
-      registroId: newUser.id,
-      usuarioId: newUser.id,
-      accion: 'REGISTER',
-      detalle: {
-        ci: ciNormalized,
+  try {
+    // Create user with data from whitelist
+    const newUser = await prisma.usuario.create({
+      data: {
+        nombre: personnelRecord?.nombreCompleto || nombre,
         email: email.toLowerCase(),
-        role: newUser.role,
-        whitelistVerified: true,
-        personalAutorizadoId: personnelRecord?.id ? Number(personnelRecord.id) : null,
+        password: hashedPassword,
+        ci: ciNormalized,
+        role: personnelRecord?.rolAutorizado || roleToUse,
+        especialidad: personnelRecord?.departamento || undefined,
+        cargo: personnelRecord?.cargo || null,
       },
-    },
-  });
+    });
 
-  // ============================================
-  // GENERAR HORARIOS POR DEFECTO (SI ES MÉDICO)
-  // ============================================
-  if (newUser.role === 'MEDICO' && newUser.especialidad) {
-    const resultadoHorarios = await generarHorariosPorDefecto(
-      newUser.id,
-      newUser.especialidad,
-      newUser.nombre || 'Médico'
-    );
-    
-    if (!resultadoHorarios.exitoso) {
-      logger.warn(
-        `[AUTH] Advertencia al generar horarios para ${newUser.nombre}: ${resultadoHorarios.mensaje}`
+    // ============================================
+    // ACTUALIZAR WHITELIST Y AUDITORÍA
+    // ============================================
+
+    // Mark as registered in whitelist
+    await markAsRegistered(ciNormalized, newUser.id);
+
+    // Register in audit log
+    await prisma.auditLog.create({
+      data: {
+        tabla: 'Usuario',
+        registroId: newUser.id,
+        usuarioId: newUser.id,
+        accion: 'REGISTER',
+        detalle: {
+          ci: ciNormalized,
+          email: email.toLowerCase(),
+          role: newUser.role,
+          whitelistVerified: true,
+          personalAutorizadoId: personnelRecord?.id ? Number(personnelRecord.id) : null,
+        },
+      },
+    });
+
+    // ============================================
+    // GENERAR HORARIOS POR DEFECTO (SI ES MÉDICO)
+    // ============================================
+    if (newUser.role === 'MEDICO' && newUser.especialidad) {
+      const resultadoHorarios = await generarHorariosPorDefecto(
+        newUser.id,
+        newUser.especialidad,
+        newUser.nombre || 'Médico'
       );
+      
+      if (!resultadoHorarios.exitoso) {
+        logger.warn(
+          `[AUTH] Advertencia al generar horarios para ${newUser.nombre}: ${resultadoHorarios.mensaje}`
+        );
+      }
     }
+
+    // Generate token
+    const token = generateToken(
+      Number(newUser.id),
+      newUser.nombre || '',
+      newUser.email || '', 
+      newUser.role || '',
+      newUser.especialidad,
+      personnelRecord?.departamento
+    );
+
+    logger.info(`[AUTH] Nuevo usuario registrado exitosamente: ${email} (CI: ${ciNormalized})`);
+
+    return {
+      id: Number(newUser.id),
+      nombre: newUser.nombre,
+      email: newUser.email || '',
+      role: newUser.role || '',
+      especialidad: newUser.especialidad,
+      token,
+    };
+
+  } catch (error: any) {
+    // Manejo de unique constraint violations
+    if (error.code === 'P2002') {
+      const field = error.meta?.target?.[0];
+      if (field === 'email') {
+        throw new ValidationError('Este email ya está registrado en el sistema');
+      } else if (field === 'ci') {
+        throw new ValidationError('Esta cédula ya está registrada en el sistema');
+      }
+    }
+    throw error;
   }
-
-  // Generate token
-  const token = generateToken(
-    Number(newUser.id),
-    newUser.nombre || '',
-    newUser.email || '', 
-    newUser.role || '',
-    newUser.especialidad,
-    personnelRecord?.departamento
-  );
-
-  logger.info(`[AUTH] Nuevo usuario registrado exitosamente: ${email} (CI: ${ciNormalized})`);
-
-  return {
-    id: Number(newUser.id),
-    nombre: newUser.nombre,
-    email: newUser.email || '',
-    role: newUser.role || '',
-    especialidad: newUser.especialidad,
-    token,
-  };
 };
 
 /**

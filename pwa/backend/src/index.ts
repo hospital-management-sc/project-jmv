@@ -69,16 +69,35 @@ const corsOptions: CorsOptions = {
 
 app.use(cors(corsOptions));
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
+// ============================================
+// RATE LIMITING - OPTIMIZADO
+// ============================================
+// General rate limiter para API (más permisivo)
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 500, // 500 requests por IP por 15 minutos (era 100, muy restrictivo)
+  message: 'Demasiadas solicitudes desde esta IP, intente más tarde.',
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // No limitar GET requests (son read-only, no afectan DB)
+    return req.method === 'GET';
+  },
 });
 
-app.use('/api/', limiter);
+// Rate limiter más restrictivo para auth (prevenir ataques de fuerza bruta)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5, // 5 intentos por IP en 15 minutos
+  message: 'Demasiados intentos de login/registro. Intente más tarde.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true, // No contar los intentos exitosos
+});
+
+app.use('/api/', generalLimiter);
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
 
 // ============================================
 // BODY PARSING MIDDLEWARE

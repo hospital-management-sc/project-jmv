@@ -4,7 +4,7 @@
 
 .title {
   text-align: center;
-  color: var(--color-primary);
+  color: var(--text-title);
   font-size: var(--font-size-2xl);
   margin-bottom: var(--spacing-sm);
 }
@@ -131,7 +131,7 @@
 }
 
 .link {
-  color: var(--color-primary);
+  color: var(--text-title);
   font-weight: 600;
   transition: var(--transition);
 }
@@ -234,7 +234,7 @@
 }
 
 .forgotPasswordLink .link {
-  color: var(--color-primary);
+  color: var(--text-title);
   text-decoration: none;
   font-weight: 500;
   transition: var(--transition);

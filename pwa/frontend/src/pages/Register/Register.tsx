@@ -160,7 +160,7 @@ export default function Register() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Hospital JMV</h1>
+      <h1 className={styles.title}>Hospital Militar "Dr. José María Vargas"</h1>
       <p className={styles.subtitle}>
         Registro en el sistema
       </p>

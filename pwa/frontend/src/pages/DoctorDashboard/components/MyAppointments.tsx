@@ -158,21 +158,24 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
 
       <div className={styles['form-card']}>
         {/* Botones de filtro */}
-        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
           <button
             className={styles['btn-small']}
             onClick={() => setFilterType('FUTURAS')}
             style={{
               backgroundColor: filterType === 'FUTURAS' ? '#3b82f6' : '#d1d5db',
               color: filterType === 'FUTURAS' ? 'white' : '#374151',
-              padding: '0.5rem 1rem',
+              padding: '0.4rem 0.8rem',
               borderRadius: '0.375rem',
               border: 'none',
               cursor: 'pointer',
               fontWeight: filterType === 'FUTURAS' ? 'bold' : 'normal',
+              fontSize: '0.8rem',
+              flex: '1 1 auto',
+              minWidth: '120px',
             }}
           >
-            Citas Futuras ({citas.filter(c => {
+            Futuras ({citas.filter(c => {
               const fechaStr = String(c.fechaCita || c.fechaHora || '').split('T')[0]
               return fechaStr >= hoyVE
             }).length})
@@ -184,14 +187,17 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
             style={{
               backgroundColor: filterType === 'PASADAS' ? '#ef4444' : '#d1d5db',
               color: filterType === 'PASADAS' ? 'white' : '#374151',
-              padding: '0.5rem 1rem',
+              padding: '0.4rem 0.8rem',
               borderRadius: '0.375rem',
               border: 'none',
               cursor: 'pointer',
               fontWeight: filterType === 'PASADAS' ? 'bold' : 'normal',
+              fontSize: '0.8rem',
+              flex: '1 1 auto',
+              minWidth: '120px',
             }}
           >
-            Citas Pasadas ({citas.filter(c => {
+            Pasadas ({citas.filter(c => {
               const fechaStr = String(c.fechaCita || c.fechaHora || '').split('T')[0]
               return fechaStr < hoyVE
             }).length})
@@ -203,11 +209,14 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
             style={{
               backgroundColor: filterType === 'TODAS' ? '#8b5cf6' : '#d1d5db',
               color: filterType === 'TODAS' ? 'white' : '#374151',
-              padding: '0.5rem 1rem',
+              padding: '0.4rem 0.8rem',
               borderRadius: '0.375rem',
               border: 'none',
               cursor: 'pointer',
               fontWeight: filterType === 'TODAS' ? 'bold' : 'normal',
+              fontSize: '0.8rem',
+              flex: '1 1 auto',
+              minWidth: '90px',
             }}
           >
             Todas ({citas.length})

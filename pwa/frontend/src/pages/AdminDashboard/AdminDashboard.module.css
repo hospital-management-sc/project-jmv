@@ -682,8 +682,20 @@
 }
 
 @media (max-width: 768px) {
+  .dashboard-header {
+    padding: 1rem;
+  }
+
   .dashboard-header h1 {
-    font-size: 1.8rem;
+    font-size: 1.25rem;
+  }
+
+  .dashboard-header .subtitle {
+    font-size: 0.85rem;
+  }
+
+  .back-btn {
+    align-self: stretch;
   }
 
   .header-content {
