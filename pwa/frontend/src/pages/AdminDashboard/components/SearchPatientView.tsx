@@ -127,9 +127,10 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
       <h2>Consultar Historia Clínica</h2>
       <p className={styles["form-description"]}>Busque pacientes por CI o número de historia clínica</p>
 
-      <div className="search-options" style={{ marginBottom: '2rem' }}>
-        <div className="search-type-selector" style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+      <div className={styles["search-patient-box"]}>
+        {/* Selector de tipo de búsqueda */}
+        <div className={styles["search-type-selector"]}>
+          <label className={styles["radio-label"]}>
             <input
               type="radio"
               checked={searchType === 'ci'}
@@ -144,7 +145,7 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
             />
             Buscar por CI
           </label>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+          <label className={styles["radio-label"]}>
             <input
               type="radio"
               checked={searchType === 'historia'}
@@ -161,10 +162,10 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
           </label>
         </div>
 
-        <div className="search-input-group" style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
+        <div className={styles["search-input-group"]}>
+          {/* Fila de inputs */}
           {searchType === 'ci' ? (
-            <>
-              {/* Dual input para CI */}
+            <div className={styles["dual-input-group"]}>
               <select
                 value={searchCITipo}
                 onChange={(e) => setSearchCITipo(e.target.value)}
@@ -176,6 +177,7 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
                   color: 'var(--text-primary)',
                   fontSize: '0.95rem',
                   cursor: 'pointer',
+                  boxSizing: 'border-box',
                 }}
               >
                 <option value="V">V</option>
@@ -187,23 +189,23 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
                 value={searchCINumeros}
                 onChange={(e) => handleSearchCINumerosChange(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleSearch()
-                  }
+                  if (e.key === 'Enter') handleSearch()
                 }}
                 placeholder="Ej: 12345678"
                 maxLength={8}
                 style={{
                   flex: 1,
+                  minWidth: 0,
                   padding: '0.75rem',
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
                   borderRadius: '0.375rem',
                   color: 'var(--text-primary)',
                   fontSize: '0.95rem',
+                  boxSizing: 'border-box',
                 }}
               />
-            </>
+            </div>
           ) : (
             <input
               type="text"
@@ -213,39 +215,38 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
                 setError('')
               }}
               onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleSearch()
-                }
+                if (e.key === 'Enter') handleSearch()
               }}
               placeholder="Ej: 00-00-00"
               style={{
                 flex: 1,
+                minWidth: 0,
+                width: '100%',
                 padding: '0.75rem',
                 backgroundColor: 'var(--bg-secondary)',
                 border: '1px solid var(--border-color)',
                 borderRadius: '0.375rem',
                 color: 'var(--text-primary)',
                 fontSize: '0.95rem',
+                boxSizing: 'border-box',
               }}
             />
           )}
-          <button 
-            onClick={handleSearch} 
-            disabled={loading}
-            style={{
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#7c3aed',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.375rem',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.6 : 1,
-              fontSize: '0.95rem',
-              fontWeight: 500,
-            }}
-          >
-            {loading ? 'Buscando...' : 'Buscar Paciente'}
-          </button>
+
+          {/* Fila de botón */}
+          <div className={styles["search-actions"]}>
+            <button
+              onClick={handleSearch}
+              disabled={loading}
+              className={styles["btn-search"]}
+              style={{
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1,
+              }}
+            >
+              {loading ? 'Buscando...' : 'Buscar Paciente'}
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -256,54 +257,44 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
       </div>
 
       {patientData && (
-        <div className="patient-details" style={{ marginTop: '2rem' }}>
-          <h3 style={{ marginBottom: '1.5rem' }}>Paciente Encontrado</h3>
-          <div style={{ 
-            backgroundColor: 'var(--bg-tertiary)', 
-            padding: '1.5rem', 
-            borderRadius: '0.5rem', 
-            marginBottom: '2rem',
-            border: '1px solid var(--border-color)'
-          }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
-              <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <strong style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Nro. Historia:</strong>
-                <span style={{ fontSize: '1.1rem', fontWeight: '500' }}>{patientData.nroHistoria}</span>
-              </div>
-              <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <strong style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Nombre Completo:</strong>
-                <span style={{ fontSize: '1.1rem', fontWeight: '500' }}>{patientData.apellidosNombres}</span>
-              </div>
-              <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <strong style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>CI:</strong>
-                <span style={{ fontSize: '1.1rem', fontWeight: '500' }}>{patientData.ci}</span>
-              </div>
-              <div className="detail-item" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <strong style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Edad:</strong>
-                <span style={{ fontSize: '1.1rem', fontWeight: '500' }}>{calcularEdad(patientData.fechaNacimiento)} años</span>
-              </div>
+        <div className={styles["patient-details"]}>
+          <h3 style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>Paciente Encontrado</h3>
+          <div className={styles["details-grid"]}>
+            <div className={styles["detail-item"]}>
+              <strong>Nro. Historia:</strong>
+              <span>{patientData.nroHistoria}</span>
+            </div>
+            <div className={styles["detail-item"]}>
+              <strong>Nombre Completo:</strong>
+              <span>{patientData.apellidosNombres}</span>
+            </div>
+            <div className={styles["detail-item"]}>
+              <strong>CI:</strong>
+              <span>{patientData.ci}</span>
+            </div>
+            <div className={styles["detail-item"]}>
+              <strong>Edad:</strong>
+              <span>{calcularEdad(patientData.fechaNacimiento)} años</span>
             </div>
           </div>
 
-          <div className="action-buttons" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <button 
-              className="btn-primary" 
-              style={{ padding: '0.75rem 1.5rem', cursor: 'pointer' }}
+          <div className={styles["action-buttons"]}>
+            <button
+              className={styles["btn-primary"]}
               onClick={() => onViewHistory(patientData)}
             >
               📋 Ver Historia Completa
             </button>
-            <button 
-              className="btn-secondary" 
-              style={{ padding: '0.75rem 1.5rem', cursor: 'not-allowed', opacity: 0.5 }}
+            <button
+              className={styles["btn-secondary"]}
+              style={{ cursor: 'not-allowed', opacity: 0.5 }}
               disabled
               title="Funcionalidad en desarrollo"
             >
               🖨️ Imprimir Resumen
             </button>
-            <button 
-              className="btn-secondary" 
-              style={{ padding: '0.75rem 1.5rem', cursor: 'pointer' }}
+            <button
+              className={styles["btn-secondary"]}
               onClick={() => onScheduleAppointment(patientData)}
             >
               📅 Programar Cita

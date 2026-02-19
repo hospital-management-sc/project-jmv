@@ -337,99 +337,93 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       <p className={styles["form-description"]}>Busque el paciente y programe una cita médica</p>
 
       {/* Búsqueda de Paciente */}
-      <div className="search-patient-box" style={{ marginBottom: '2rem' }}>
-        <h3 style={{ marginBottom: '1rem' }}>1. Buscar Paciente</h3>
-        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
-          {/* Dual input para CI */}
-          <select
-            value={searchCITipo}
-            onChange={(e) => setSearchCITipo(e.target.value)}
-            disabled={selectedPatient ? true : false}
-            style={{
-              padding: '0.75rem',
-              backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '0.375rem',
-              color: 'var(--text-primary)',
-              fontSize: '0.95rem',
-              cursor: selectedPatient ? 'not-allowed' : 'pointer',
-              opacity: selectedPatient ? 0.6 : 1,
-            }}
-          >
-            <option value="V">V</option>
-            <option value="E">E</option>
-            <option value="P">P</option>
-          </select>
-          <input
-            type="text"
-            value={searchCINumeros}
-            onChange={(e) => handleSearchCINumerosChange(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                handleSearchPatient()
-              }
-            }}
-            placeholder="Ej: 12345678"
-            maxLength={8}
-            style={{
-              flex: 1,
-              padding: '0.75rem',
-              backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '0.375rem',
-              color: 'var(--text-primary)',
-              fontSize: '0.95rem',
-            }}
-            disabled={selectedPatient ? true : false}
-          />
-          <button
-            onClick={handleSearchPatient}
-            disabled={searchLoading || selectedPatient ? true : false}
-            style={{
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#7c3aed',
-              color: 'white',
-              border: 'none',
-              borderRadius: '0.375rem',
-              cursor: selectedPatient ? 'not-allowed' : 'pointer',
-              opacity: selectedPatient ? 0.5 : 1,
-              fontSize: '0.95rem',
-              fontWeight: 500,
-            }}
-          >
-            {searchLoading ? 'Buscando...' : 'Buscar'}
-          </button>
-          {selectedPatient && (
-            <button
-              onClick={() => {
-                setSelectedPatient(null)
-                setSearchCITipo('V')
-                setSearchCINumeros('')
-                setCitasExistentes([])
-                setAppointmentData({
-                  fecha: '',
-                  hora: '',
-                  especialidad: '',
-                  medico: '',
-                  motivo: '',
-                })
-                setMedicosDisponibles([])
-                setDisponibilidadMedico(null)
-              }}
+      <div className={styles["search-patient-box"]} style={{ marginBottom: '2rem' }}>
+        <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>1. Buscar Paciente</h3>
+        <div className={styles["search-input-group"]}>
+          {/* Fila 1: CI select + input */}
+          <div className={styles["dual-input-group"]}>
+            <select
+              value={searchCITipo}
+              onChange={(e) => setSearchCITipo(e.target.value)}
+              disabled={selectedPatient ? true : false}
               style={{
-                padding: '0.75rem 1.5rem',
-                backgroundColor: 'var(--bg-tertiary)',
-                color: 'var(--text-primary)',
+                padding: '0.75rem',
+                backgroundColor: 'var(--bg-secondary)',
                 border: '1px solid var(--border-color)',
                 borderRadius: '0.375rem',
-                cursor: 'pointer',
+                color: 'var(--text-primary)',
                 fontSize: '0.95rem',
+                cursor: selectedPatient ? 'not-allowed' : 'pointer',
+                opacity: selectedPatient ? 0.6 : 1,
+                boxSizing: 'border-box',
               }}
             >
-              Buscar Otro
+              <option value="V">V</option>
+              <option value="E">E</option>
+              <option value="P">P</option>
+            </select>
+            <input
+              type="text"
+              value={searchCINumeros}
+              onChange={(e) => handleSearchCINumerosChange(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearchPatient()
+                }
+              }}
+              placeholder="Ej: 12345678"
+              maxLength={8}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                padding: '0.75rem',
+                backgroundColor: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '0.375rem',
+                color: 'var(--text-primary)',
+                fontSize: '0.95rem',
+                boxSizing: 'border-box',
+              }}
+              disabled={selectedPatient ? true : false}
+            />
+          </div>
+          {/* Fila 2: Botones de acción */}
+          <div className={styles["search-actions"]}>
+            <button
+              onClick={handleSearchPatient}
+              disabled={searchLoading || selectedPatient ? true : false}
+              className={styles["btn-search"]}
+              style={{
+                cursor: selectedPatient ? 'not-allowed' : 'pointer',
+                opacity: selectedPatient ? 0.5 : 1,
+              }}
+            >
+              {searchLoading ? 'Buscando...' : 'Buscar'}
             </button>
-          )}
-        </div>
+            {selectedPatient && (
+              <button
+                onClick={() => {
+                  setSelectedPatient(null)
+                  setSearchCITipo('V')
+                  setSearchCINumeros('')
+                  setCitasExistentes([])
+                  setAppointmentData({
+                    fecha: '',
+                    hora: '',
+                    especialidad: '',
+                    medico: '',
+                    motivo: '',
+                  })
+                  setMedicosDisponibles([])
+                  setDisponibilidadMedico(null)
+                }}
+                className={styles["btn-secondary"]}
+              >
+                Buscar Otro
+              </button>
+            )}
+          </div>{/* end search-actions */}
+        </div>{/* end search-input-group */}
 
         {searchError && (
           <div style={{ color: '#ef4444', marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#fee2e2', borderRadius: '0.375rem' }}>
@@ -712,12 +706,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
             </button>
           </div>
         </form>
-      )}
-
-      {!selectedPatient && !selectedPatient && (
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-          <p>Busque un paciente para comenzar a programar una cita médica</p>
-        </div>
       )}
     </section>
   )

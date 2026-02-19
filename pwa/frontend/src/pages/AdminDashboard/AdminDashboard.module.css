@@ -306,6 +306,12 @@
   margin-left: 0.25rem;
 }
 
+.form-group label {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
 .form-group input,
 .form-group select,
 .form-group textarea {
@@ -317,6 +323,9 @@
   font-family: inherit;
   font-size: 0.95rem;
   transition: all 0.25s ease;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .form-group input:disabled {
@@ -524,8 +533,15 @@
 
 .search-input-group {
   display: flex;
+  flex-direction: column;
   gap: 0.75rem;
   margin-bottom: 1rem;
+}
+
+.search-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .search-input {
@@ -715,14 +731,46 @@
 
   .form-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .form-group label {
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 0.9rem;
+    padding: 0.65rem 0.75rem;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    max-height: 200px;
+  }
+
+  .search-input {
+    font-size: 0.9rem;
   }
 
   .dual-input-group {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .dual-input-group select {
-    min-width: auto;
+    flex: 0 0 85px;
+    width: 85px;
+    min-width: 75px;
+    box-sizing: border-box;
+  }
+
+  .dual-input-group input {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    max-width: 100%;
   }
 
   .radio-group,
@@ -732,7 +780,15 @@
   }
 
   .search-input-group {
+    gap: 0.5rem;
+  }
+
+  .search-actions {
     flex-direction: column;
+  }
+
+  .search-actions button {
+    width: 100%;
   }
 
   .details-grid {
@@ -760,5 +816,15 @@
   .btn-secondary,
   .btn-search {
     width: 100%;
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .form-section {
+    padding: 1rem;
+  }
+
+  .management-section {
+    padding: 1rem;
   }
 }

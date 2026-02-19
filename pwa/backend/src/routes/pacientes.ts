@@ -9,7 +9,8 @@ import {
   obtenerPaciente, 
   buscarPaciente, 
   obtenerUltimos,
-  listarPacientes 
+  listarPacientes,
+  verificarCIDuplicada
 } from '../controllers/pacientes';
 
 const router = Router();
@@ -19,6 +20,10 @@ const router = Router();
 router.post('/', crearPaciente);
 router.get('/ultimos', obtenerUltimos);
 router.get('/', listarPacientes);
+
+// Verificar si una CI ya existe (para validación de duplicados) - DEBE IR ANTES DE /:id
+router.get('/check-duplicate', verificarCIDuplicada);
+
 router.get('/search', buscarPaciente);
 router.get('/:id', obtenerPaciente);
 

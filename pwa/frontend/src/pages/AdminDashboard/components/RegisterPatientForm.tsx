@@ -73,6 +73,8 @@ export function RegisterPatientForm() {
   })
 
   const [errors, setErrors] = useState<{[key: string]: string}>({})
+  const [ciDuplicateError, setCiDuplicateError] = useState<string | null>(null)
+  const [checkingCIDuplicate, setCheckingCIDuplicate] = useState(false)
 
   // Calcular edad desde fecha de nacimiento
   const calcularEdad = (fechaNac: string): number => {
@@ -110,10 +112,51 @@ export function RegisterPatientForm() {
     return pattern.test(value)
   }
 
+  // Validar CI contra la BD para detectar duplicados
+  const checkCIDuplicate = async (ciTipo: string, ciNumeros: string) => {
+    // Solo validar si la CI tiene 7-9 dígitos
+    if (ciNumeros.length < 7) {
+      setCiDuplicateError(null)
+      return
+    }
+
+    setCheckingCIDuplicate(true)
+    try {
+      const ciCompleta = `${ciTipo}-${ciNumeros}`
+      const response = await fetch(`${API_BASE_URL}/pacientes/check-duplicate?ci=${encodeURIComponent(ciCompleta)}`)
+      
+      if (response.ok) {
+        const result = await response.json()
+        
+        if (result.exists) {
+          // Paciente ya existe
+          setCiDuplicateError(`⚠️ Ya existe un paciente registrado con esta cédula (${ciCompleta})`)
+        } else {
+          // Paciente no existe - CI válida
+          setCiDuplicateError(null)
+        }
+      } else {
+        // Error en la búsqueda
+        setCiDuplicateError(null)
+      }
+    } catch (error) {
+      console.error('Error al verificar CI duplicada:', error)
+      setCiDuplicateError(null)
+    } finally {
+      setCheckingCIDuplicate(false)
+    }
+  }
+
   const handleCINumerosChange = (value: string) => {
     if (validateCINumeros(value)) {
       setFormData({...formData, ciNumeros: value})
       setErrors({...errors, ciNumeros: ''})
+      // Validar contra BD si la CI tiene al menos 7 dígitos
+      if (value.length >= 7) {
+        checkCIDuplicate(formData.ciTipo, value)
+      } else {
+        setCiDuplicateError(null)
+      }
     }
   }
 
@@ -169,6 +212,18 @@ export function RegisterPatientForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // VALIDACIÓN CRÍTICA: Verificar que no haya CI duplicada
+    if (ciDuplicateError) {
+      alert(`❌ ${ciDuplicateError}\n\nNo se puede registrar el paciente.`)
+      return
+    }
+
+    // Esperar a que termine la validación de duplicados
+    if (checkingCIDuplicate) {
+      alert('⏳ Por favor, espere a que termine la validación de la cédula...')
+      return
+    }
     
     // Validar campos requeridos
     const newErrors: {[key: string]: string} = {}
@@ -498,7 +553,13 @@ export function RegisterPatientForm() {
             <div className={styles["dual-input-group"]}>
               <select
                 value={formData.ciTipo}
-                onChange={(e) => setFormData({...formData, ciTipo: e.target.value})}
+                onChange={(e) => {
+                  setFormData({...formData, ciTipo: e.target.value})
+                  // Revalidar cuando cambia el tipo de CI
+                  if (formData.ciNumeros.length >= 7) {
+                    checkCIDuplicate(e.target.value, formData.ciNumeros)
+                  }
+                }}
               >
                 <option value="V">V</option>
                 <option value="E">E</option>
@@ -511,9 +572,12 @@ export function RegisterPatientForm() {
                 onChange={(e) => handleCINumerosChange(e.target.value)}
                 placeholder="12345678"
                 maxLength={9}
+                style={ciDuplicateError ? { borderColor: '#ef4444' } : {}}
               />
             </div>
             {errors.ciNumeros && <span className={styles["error-message"]}>{errors.ciNumeros}</span>}
+            {checkingCIDuplicate && <span style={{ color: '#f59e0b', fontSize: '0.85rem', marginTop: '0.25rem' }}>⏳ Validando...</span>}
+            {ciDuplicateError && <span className={styles["error-message"]}>{ciDuplicateError}</span>}
           </div>
 
           <div className={styles["form-group"]}>

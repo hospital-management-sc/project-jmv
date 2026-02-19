@@ -84,6 +84,86 @@
   gap: 1.5rem;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header h2 {
+    font-size: 1.3rem;
+  }
+
+  .cardsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .urgenteBadge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+  }
+
+  .infoRow {
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.4rem 0;
+  }
+
+  .infoRow strong {
+    min-width: unset;
+    font-size: 0.8rem;
+  }
+
+  .infoRow span {
+    font-size: 0.85rem;
+  }
+
+  .modalOverlay {
+    padding: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .modal {
+    max-height: 95vh;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .modalHeader {
+    padding: 1rem;
+  }
+
+  .modalHeader h3 {
+    font-size: 1.1rem;
+  }
+
+  .modalBody {
+    padding: 1rem;
+  }
+
+  .formGroup input,
+  .formGroup select,
+  .formGroup textarea {
+    font-size: 0.9rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .modalActions {
+    flex-direction: column;
+  }
+
+  .cancelBtn,
+  .submitBtn {
+    flex: unset;
+    width: 100%;
+  }
+}
+
 .card {
   background: var(--bg-secondary);
   border-radius: 12px;
@@ -302,6 +382,8 @@
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
   transition: var(--transition);
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .formGroup input:focus,

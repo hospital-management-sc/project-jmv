@@ -42,6 +42,46 @@ function convertBigIntToString(obj: any): any {
 }
 
 /**
+ * Verificar si una Cédula de Identidad ya existe (para detectar duplicados)
+ * GET /api/pacientes/check-duplicate?ci=V-12345678
+ * 
+ * Respuesta MINIMALISTA para validación de duplicados en frontend:
+ * - 200 OK + { "exists": true } si la CI existe
+ * - 200 OK + { "exists": false } si la CI NO existe
+ */
+export const verificarCIDuplicada = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { ci } = req.query;
+
+    if (!ci || typeof ci !== 'string') {
+      res.status(400).json({
+        message: 'Parámetro "ci" requerido',
+      });
+      return;
+    }
+
+    // Búsqueda minimalista - solo verificar existencia SIN cargar relaciones
+    const pacienteExiste = await prisma.paciente.findUnique({
+      where: { ci },
+      select: { id: true }, // Solo seleccionar ID (más rápido)
+    });
+
+    // Respuesta simple y eficiente
+    res.status(200).json({
+      exists: !!pacienteExiste,
+    });
+  } catch (error: any) {
+    logger.error('Error al verificar CI duplicada:', error);
+    res.status(500).json({
+      message: 'Error al verificar cédula',
+    });
+  }
+};
+
+/**
  * Crear un nuevo paciente con su información de admisión
  * POST /api/pacientes
  */
