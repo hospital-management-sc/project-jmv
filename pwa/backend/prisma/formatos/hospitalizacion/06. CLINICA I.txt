@@ -1,0 +1,16 @@
+Nombres y Apellidos:
+Sexo:
+Edad:
+C.I:
+Fecha de Nacimiento:
+Numero de Historia:
+Direccion:
+Fecha de Ingreso:
+Servicio: Medicina Interna
+
+CLINICA I -----
+
+M.C.:
+E.A.:
+
+IDx:

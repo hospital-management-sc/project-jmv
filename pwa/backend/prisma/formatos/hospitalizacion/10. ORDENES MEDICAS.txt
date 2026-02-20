@@ -1,0 +1,10 @@
+ORDENES MEDICAS -----
+
+FECHA:
+HORA:
+
+Px:
+Edad:
+
+
+(espacio en blanco para anexar recipes, ordenes, docs, ...)

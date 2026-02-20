@@ -1,0 +1,206 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+}
+
+.header {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-md) var(--spacing-lg);
+  width: 100%;
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logoImg {
+  height: 50px;
+  width: auto;
+  display: block;
+}
+
+.nav {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+}
+
+.userInfo {
+  color: var(--text-primary);
+  font-weight: 500;
+  padding: 0 var(--spacing-md);
+  border-right: 1px solid var(--border-color);
+  font-size: 0.95rem;
+}
+
+.especialidad {
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.logoutBtn {
+  background-color: var(--color-error);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.logoutBtn:hover {
+  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.logoutText {
+  display: inline;
+}
+
+/* Mobile user icon button */
+.userInfoDesktop {
+  display: flex;
+}
+
+.userInfoMobile {
+  display: none;
+  position: relative;
+}
+
+.userIconBtn {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: var(--transition);
+  padding: 0;
+}
+
+.userIconBtn:hover {
+  background-color: var(--bg-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.userTooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  padding: 0.6rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 200px;
+  z-index: 200;
+  white-space: nowrap;
+}
+
+.tooltipName {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.tooltipEspecialidad {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.main {
+  flex: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  width: 100%;
+}
+
+.footer {
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  padding: var(--spacing-lg);
+  color: var(--text-secondary);
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem 1rem;
+  }
+
+  .logoImg {
+    height: 32px;
+  }
+
+  .nav {
+    gap: 0.5rem;
+  }
+
+  /* Hide desktop user info, show mobile icon */
+  .userInfoDesktop {
+    display: none;
+  }
+
+  .userInfoMobile {
+    display: block;
+  }
+
+  /* Logout: icon only on mobile */
+  .logoutText {
+    display: none;
+  }
+
+  .logoutBtn {
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+  }
+
+  .main {
+    padding: 1rem;
+  }
+
+  .footer {
+    font-size: 0.75rem;
+    padding: 0.75rem;
+  }
+}
