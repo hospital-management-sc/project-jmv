@@ -22,10 +22,9 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className={styles.container}>
-        <div className={styles.hero}>
-          <h1>Cargando...</h1>
-        </div>
+      <div className="loading-overlay">
+        <div className="spinner"></div>
+        <div className="loading-text">Cargando Hospital JMV...</div>
       </div>
     )
   }
@@ -38,7 +37,7 @@ export default function Home() {
         <div style={{ marginTop: '1rem' }}>
           <p>Email: {user?.email}</p>
           <p>Rol: {user?.role}</p>
-          <button 
+          <button
             onClick={handleLogout}
             style={{
               marginTop: '1rem',

@@ -46,7 +46,7 @@ export default function MainLayout() {
   }, [tooltipOpen])
 
   const userLabel = user
-    ? `${user.nombre}${user.especialidad ? ` • ${user.especialidad}` : ''}`
+    ? `Bienvenidx, ${user.nombre}`
     : ''
 
   return (
@@ -60,12 +60,9 @@ export default function MainLayout() {
           <nav className={styles.nav}>
             {isAuthenticated && (
               <>
-                {/* Desktop: nombre + especialidad */}
+                {/* Desktop: nombre sin especialidad */}
                 <span className={`${styles.userInfo} ${styles.userInfoDesktop}`}>
-                  {user?.nombre}
-                  {user?.especialidad && (
-                    <span className={styles.especialidad}> • {user.especialidad}</span>
-                  )}
+                  Bienvenidx, {user?.nombre}
                 </span>
 
                 {/* Mobile: icono con tooltip */}
@@ -85,18 +82,17 @@ export default function MainLayout() {
                   </button>
                   {tooltipOpen && (
                     <div className={styles.userTooltip} role="tooltip">
-                      <span className={styles.tooltipName}>{user?.nombre}</span>
-                      {user?.especialidad && (
-                        <span className={styles.tooltipEspecialidad}>{user.especialidad}</span>
-                      )}
+                      <span className={styles.tooltipName}>Bienvenidx, {user?.nombre}</span>
                     </div>
                   )}
                 </div>
 
-                <button onClick={handleLogout} className={styles.logoutBtn} aria-label="Cerrar Sesión">
-                  <LogoutIcon />
-                  <span className={styles.logoutText}>Cerrar Sesión</span>
-                </button>
+                <div className={styles.logoutWrapper}>
+                  <button onClick={handleLogout} className={styles.logoutBtn} aria-label="Cerrar Sesión">
+                    <LogoutIcon />
+                  </button>
+                  <div className={styles.logoutTooltip}>Cerrar Sesión</div>
+                </div>
               </>
             )}
           </nav>

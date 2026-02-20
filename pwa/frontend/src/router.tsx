@@ -16,7 +16,12 @@ export default function Router() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return (
+      <div className="loading-overlay">
+        <div className="spinner"></div>
+        <div className="loading-text">Cargando Hospital JMV...</div>
+      </div>
+    );
   }
 
   return (

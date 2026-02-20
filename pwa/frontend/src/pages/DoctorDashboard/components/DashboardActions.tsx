@@ -163,8 +163,8 @@ export default function DashboardActions({ onClick }: Props) {
   const { nombre, vistaDashboard } = useEspecialidad();
 
   // Si no hay configuración de vista, mostrar todas las acciones
-  let accionesAMostrar = vistaDashboard?.acciones || 
-    ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 
+  let accionesAMostrar = vistaDashboard?.acciones ||
+    ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia',
       'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta', 'today-encounters'];
 
   // Garantizar que 'today-encounters' sea la última acción
@@ -173,7 +173,12 @@ export default function DashboardActions({ onClick }: Props) {
 
   return (
     <section className={styles["management-section"]}>
-      <h2>Acciones Clínicas {nombre && `- ${nombre}`}</h2>
+      <h2>
+        Acciones Clínicas
+        {nombre && (
+          <span className={styles["especialidad-title"]}>{nombre}</span>
+        )}
+      </h2>
       <div className={styles["action-grid"]}>
         {accionesAMostrar.map((accionId) => {
           const accion = ACCIONES_DISPONIBLES[accionId];
