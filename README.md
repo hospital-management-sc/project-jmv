@@ -74,25 +74,6 @@ Objetivo: Digitalizar flujos de atención, reducir tiempos de espera y mejorar l
 
 ---
 
-## 📂 Estructura del Proyecto
-
-```
-hospital-management-dev/
-├── hospital-management-system/  # 🎯 Código fuente principal
-│   ├── frontend/               # PWA React + TypeScript + Vite
-│   ├── backend/                # API Express + TypeScript + MongoDB
-│   ├── docker-compose.yml      # Orquestación de servicios
-│   ├── README.md               # Guía del proyecto
-│   └── CONTRIBUTING.md         # Guía de contribución
-├── wiki/                       # 📚 Documentación organizada
-│   ├── Home.md                 # Índice principal de la wiki
-│   ├── Guia-del-Proyecto.md   # Guía completa del proyecto
-│   ├── Liderazgo-Equipo.md    # Manual de liderazgo
-│   └── [otros documentos...]   # Más documentación
-└── README.md                   # Este archivo
-```
-
----
 
 ## 🚀 Inicio Rápido
 
@@ -162,10 +143,11 @@ Toda la documentación del proyecto se encuentra organizada en el directorio [`w
 
 ## 📞 Contacto
 
-**Coordinador Técnico**: Carlos Nieves  
+**Coordinador Técnico**: Carlos Nieves /Gustavo Colina
+📧 gustavojose0819@gmail.com
 📧 cmoinr@icloud.com  
 📱 +58 412-564-2771
-
+📱 +58 424-3737-586
 ---
 
 ## 📄 Licencia
@@ -175,6 +157,4 @@ Proyecto académico de Servicio Comunitario - Universidad Nacional Experimental 
 ---
 
 **Estado**: 🟢 En Desarrollo  
-**Última actualización**: 31 de Octubre, 2025  
-**Próximo hito**: Kickoff - 1 de Noviembre, 2025
-
+**Última actualización**: 11 de noviembre, 2025  
