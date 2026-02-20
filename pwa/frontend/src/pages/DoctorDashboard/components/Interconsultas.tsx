@@ -13,7 +13,7 @@ import type { PatientBasic } from "../interfaces";
 import { API_BASE_URL } from "@/utils/constants";
 import { formatDateTimeVenezuela } from "@/utils/dateUtils";
 import InterconsultaModal from "./InterconsultaModal";
-import { toast } from "sonner";
+import { toastCustom } from "@/utils/toastCustom";
 
 interface Props {
   doctorId: number;
@@ -67,7 +67,7 @@ export default function InterconsultasView({ doctorId }: Props) {
       setInterconsultasRecibidas(recibidas);
     } catch (err) {
       setError("Error al cargar interconsultas");
-      toast.error("Error al cargar interconsultas");
+      toastCustom.error("Error al cargar interconsultas");
     } finally {
       setLoading(false);
     }
@@ -76,7 +76,7 @@ export default function InterconsultasView({ doctorId }: Props) {
   const buscarPaciente = async () => {
     if (!searchCI.trim()) {
       setError("Ingrese un número de cédula");
-      toast.error("Ingrese un número de cédula");
+      toastCustom.error("Ingrese un número de cédula");
       return;
     }
     setSearching(true);
@@ -90,11 +90,11 @@ export default function InterconsultasView({ doctorId }: Props) {
         setPacienteSeleccionado(result.data);
       } else {
         setError("Paciente no encontrado");
-        toast.error("Paciente no encontrado");
+        toastCustom.error("Paciente no encontrado");
       }
     } catch {
       setError("Error al buscar paciente");
-      toast.error("Error al buscar paciente");
+      toastCustom.error("Error al buscar paciente");
     } finally {
       setSearching(false);
     }
@@ -104,12 +104,12 @@ export default function InterconsultasView({ doctorId }: Props) {
     e.preventDefault();
     if (!pacienteSeleccionado) {
       setError("Debe seleccionar un paciente");
-      toast.error("Debe seleccionar un paciente");
+      toastCustom.error("Debe seleccionar un paciente");
       return;
     }
     if (!formData.especialidadDestino || !formData.motivo) {
       setError("Complete los campos obligatorios");
-      toast.error("Complete los campos obligatorios");
+      toastCustom.error("Complete los campos obligatorios");
       return;
     }
 
@@ -141,12 +141,12 @@ export default function InterconsultasView({ doctorId }: Props) {
       setTabActiva("enviadas");
       await cargarInterconsultas();
       // alert("✅ Interconsulta creada exitosamente");
-      toast.success("✅ Interconsulta creada exitosamente");
+      toastCustom.success("Interconsulta creada exitosamente");
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Error al crear interconsulta";
       setError(errorMessage);
-      toast.error(errorMessage);
+      toastCustom.error(errorMessage);
     } finally {
       setCreando(false);
     }
@@ -160,12 +160,12 @@ export default function InterconsultasView({ doctorId }: Props) {
       );
       await cargarInterconsultas();
       // alert("✅ Interconsulta aceptada");
-      toast.success("✅ Interconsulta aceptada");
+      toastCustom.success("Interconsulta aceptada");
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Error al aceptar";
       // alert("❌ " + errorMessage);
-      toast.error(`❌ ${errorMessage}`);
+      toastCustom.error(errorMessage);
     }
   };
 

@@ -12,7 +12,7 @@ interface AccionConfig {
   descripcion: string;
   view: ViewMode;
   icono: React.ReactNode;
-  estilo?: React.CSSProperties;
+  variant?: 'emergency' | 'warning';
 }
 
 const ACCIONES_DISPONIBLES: Record<string, AccionConfig> = {
@@ -22,7 +22,7 @@ const ACCIONES_DISPONIBLES: Record<string, AccionConfig> = {
     descripcion: 'Atención inmediata 24/7 - Buscar o registrar paciente',
     view: 'register-emergency',
     icono: <path d="M22 12h-4l-3 9L9 3l-3 9H2" />,
-    estilo: { background: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)' },
+    variant: 'emergency',
   },
   'registrar-encuentro': {
     id: 'registrar-encuentro',
@@ -56,7 +56,7 @@ const ACCIONES_DISPONIBLES: Record<string, AccionConfig> = {
     descripcion: 'Monitoree pacientes en atención de emergencia',
     view: 'pacientes-emergencia',
     icono: <path d="M22 12h-4l-3 9L9 3l-3 9H2" />,
-    estilo: { background: 'linear-gradient(135deg, var(--color-warning) 0%, rgba(245, 158, 11, 0.8) 100%)' },
+    variant: 'warning',
   },
   'search-patient': {
     id: 'search-patient',
@@ -132,11 +132,16 @@ function AccionButton({
   config: AccionConfig;
   onClick: () => void;
 }) {
+  const variantClass = config.variant === 'emergency'
+    ? styles['action-btn-emergency']
+    : config.variant === 'warning'
+    ? styles['action-btn-warning']
+    : '';
+
   return (
     <button
-      className={styles["action-btn"]}
+      className={`${styles["action-btn"]} ${variantClass}`}
       onClick={onClick}
-      style={config.estilo}
     >
       <svg
         className={styles.icon}

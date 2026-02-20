@@ -525,3 +525,190 @@ select:focus {
     opacity: 1;
   }
 }
+
+/* ============================================================================
+   SONNER TOAST - GLASSMORPHISM CUSTOMIZATION
+   ============================================================================ */
+
+/* Contenedor principal de Sonner */
+.sonner-toaster {
+  --toast-background: rgba(15, 23, 42, 0.35);
+  --toast-border: rgba(255, 255, 255, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Cada notificación toast individual */
+.sonner-toast {
+  background: rgba(15, 23, 42, 0.35) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  padding: 1rem !important;
+  gap: 0.75rem !important;
+  line-height: 1.5;
+  animation: slideInRight 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+  color: #ffffff !important;
+}
+
+/* Animación de entrada */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Animación de salida */
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.sonner-toast[data-state='exit'] {
+  animation: slideOutRight 0.3s ease-out forwards !important;
+}
+
+/* Toast de ÉXITO - Turquesa brillante */
+.sonner-toast.sonner-success {
+  --toast-text: #20e7c1;
+  --toast-accent: rgba(32, 231, 193, 0.2);
+  border-color: rgba(32, 231, 193, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(32, 231, 193, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.sonner-toast.sonner-success [data-icon] {
+  color: #20e7c1 !important;
+  font-weight: 700;
+  min-width: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.sonner-toast.sonner-success [data-content] {
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.sonner-toast.sonner-success [data-description] {
+  color: #e2e8f0 !important;
+  font-size: 0.85rem;
+}
+
+/* Toast de ERROR - Rojo brillante */
+.sonner-toast.sonner-error {
+  --toast-text: #ff6b6b;
+  --toast-accent: rgba(255, 107, 107, 0.2);
+  border-color: rgba(255, 107, 107, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(255, 107, 107, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.sonner-toast.sonner-error [data-icon] {
+  color: #ff6b6b !important;
+  font-weight: 700;
+  min-width: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.sonner-toast.sonner-error [data-content] {
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.sonner-toast.sonner-error [data-description] {
+  color: #e2e8f0 !important;
+  font-size: 0.85rem;
+}
+
+/* Toast de INFO - Turquesa brillante suave */
+.sonner-toast.sonner-info {
+  --toast-text: #20e7c1;
+  --toast-accent: rgba(32, 231, 193, 0.15);
+  border-color: rgba(32, 231, 193, 0.35) !important;
+  box-shadow: 0 8px 32px rgba(32, 231, 193, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.sonner-toast.sonner-info [data-icon] {
+  color: #20e7c1 !important;
+  font-weight: 600;
+  min-width: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.sonner-toast.sonner-info [data-content] {
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.sonner-toast.sonner-info [data-description] {
+  color: #e2e8f0 !important;
+  font-size: 0.85rem;
+}
+
+/* Toast de WARNING - Amarillo claro */
+.sonner-toast.sonner-warning {
+  --toast-text: #fcd34d;
+  --toast-accent: rgba(252, 211, 77, 0.15);
+  border-color: rgba(252, 211, 77, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(252, 211, 77, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.sonner-toast.sonner-warning [data-icon] {
+  color: #fcd34d !important;
+  font-weight: 700;
+  min-width: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.sonner-toast.sonner-warning [data-content] {
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.sonner-toast.sonner-warning [data-description] {
+  color: #e2e8f0 !important;
+  font-size: 0.85rem;
+}
+
+/* Botón de cerrar en los toasts (pequeño ícono X) */
+.sonner-toast [data-close-button] {
+  background: transparent !important;
+  border: none !important;
+  color: #94a3b8 !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: color 0.2s ease !important;
+  opacity: 0.8;
+}
+
+.sonner-toast [data-close-button]:hover {
+  color: #ffffff !important;
+  opacity: 1;
+}

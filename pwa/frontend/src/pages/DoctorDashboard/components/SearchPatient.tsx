@@ -5,7 +5,7 @@ import { useState } from "react";
 import styles from "../DoctorDashboard.module.css";
 import type { PatientBasic } from "../interfaces";
 import { API_BASE_URL } from "@/utils/constants";
-import { toast } from "sonner";
+import { toastCustom } from "@/utils/toastCustom";
 
 interface Props {
   onViewHistory: (patient: PatientBasic) => void;
@@ -24,7 +24,6 @@ export default function SearchPatient({
   const [searchHistoria, setSearchHistoria] = useState("");
   const [searching, setSearching] = useState(false);
   const [paciente, setPaciente] = useState<PatientBasic | null>(null);
-  const [error, setError] = useState("");
   const [ciErrors, setCIErrors] = useState<{[key: string]: string}>({});
 
   // Validar números de cédula (7-9 dígitos)
@@ -43,6 +42,18 @@ export default function SearchPatient({
       setSearchCINumeros(value)
       setCIErrors({...ciErrors, searchCINumeros: ''})
     }
+  }
+
+  // Auto-formato historia: XX-XX-XX (solo dígitos, guiones automáticos)
+  const formatHistoria = (raw: string): string => {
+    const digits = raw.replace(/\D/g, '').slice(0, 6)
+    if (digits.length <= 2) return digits
+    if (digits.length <= 4) return `${digits.slice(0, 2)}-${digits.slice(2)}`
+    return `${digits.slice(0, 2)}-${digits.slice(2, 4)}-${digits.slice(4)}`
+  }
+
+  const handleHistoriaChange = (value: string) => {
+    setSearchHistoria(formatHistoria(value))
   }
 
   const buscarPaciente = async () => {
@@ -65,14 +76,13 @@ export default function SearchPatient({
       searchValue = `${searchCITipo}-${searchCINumeros}`;
     } else {
       if (!searchHistoria.trim()) {
-        setError("Ingrese un número de historia");
+        toastCustom.error("Ingrese un número de historia");
         return;
       }
       searchValue = searchHistoria;
     }
 
     setSearching(true);
-    setError("");
     setPaciente(null);
 
     try {
@@ -86,12 +96,10 @@ export default function SearchPatient({
       if (result.success && result.data) {
         setPaciente(result.data);
       } else {
-        setError("Paciente no encontrado");
-        toast.error("Paciente no encontrado");
+        toastCustom.error("Paciente no encontrado");
       }
     } catch {
-      setError("Error al buscar paciente");
-      toast.error("Error al buscar paciente");
+      toastCustom.error("Error al buscar paciente");
     } finally {
       setSearching(false);
     }
@@ -128,7 +136,6 @@ export default function SearchPatient({
                 setSearchType("ci");
                 setSearchHistoria("");
                 setPaciente(null);
-                setError("");
                 setCIErrors({});
               }}
             />
@@ -144,7 +151,6 @@ export default function SearchPatient({
                 setSearchType("historia");
                 setSearchCINumeros("");
                 setPaciente(null);
-                setError("");
                 setCIErrors({});
               }}
             />
@@ -181,10 +187,11 @@ export default function SearchPatient({
             <>
               <input
                 type="text"
-                placeholder="Ej: 25-11-01"
+                placeholder="25-11-01"
                 value={searchHistoria}
-                onChange={(e) => setSearchHistoria(e.target.value)}
+                onChange={(e) => handleHistoriaChange(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && buscarPaciente()}
+                maxLength={8}
               />
               <button onClick={buscarPaciente} disabled={searching}>
                 {searching ? "Buscando..." : "Buscar"}
@@ -194,7 +201,6 @@ export default function SearchPatient({
         </div>
 
         {ciErrors.searchCINumeros && searchType === "ci" && <p className={styles["error-text"]}>{ciErrors.searchCINumeros}</p>}
-        {error && <p className={styles["error-text"]}>{error}</p>}
 
         {paciente && (
           <div className={styles["patient-result"]}>

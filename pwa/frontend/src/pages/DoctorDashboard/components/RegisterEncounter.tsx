@@ -8,7 +8,7 @@ import { API_BASE_URL } from "@/utils/constants";
 import { getTodayVenezuelaISO, getCurrentTimeVenezuela } from "@/utils/dateUtils";
 import { encuentrosService } from "@/services";
 import { obtenerEspecialidadPorId, type CampoFormulario } from "@/config/especialidades.config";
-import { toast } from "sonner";
+import { toastCustom } from "@/utils/toastCustom";
 
 interface Props {
   patient: PatientBasic | null;
@@ -36,7 +36,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
   const [paciente, setPaciente] = useState<PatientBasic | null>(patient);
   const [searching, setSearching] = useState(false);
   const [guardando, setGuardando] = useState(false);
-  const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({});
   
@@ -116,7 +115,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
 
     const fullCI = `${ciTipo}-${ciNumeros}`;
     setSearching(true);
-    setError("");
     try {
       const response = await fetch(
         `${API_BASE_URL}/pacientes/search?ci=${fullCI}`
@@ -126,12 +124,10 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
         setPaciente(result.data);
         setStep(2);
       } else {
-        toast.error('Paciente no encontrado')
-        setError("Paciente no encontrado");
+        toastCustom.error('Paciente no encontrado')
       }
     } catch (err) {
-      setError("Error al buscar paciente");
-      toast.error("Error al buscar paciente");
+      toastCustom.error("Error al buscar paciente");
     } finally {
       setSearching(false);
     }
@@ -141,19 +137,16 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
     e.preventDefault();
 
     if (!paciente) {
-      toast.error('Debe seleccionar un paciente')
-      setError("Debe seleccionar un paciente");
+      toastCustom.error('Debe seleccionar un paciente')
       return;
     }
 
     if (!formData.motivoConsulta) {
-      toast.error('El motivo de consulta es obligatorio')
-      setError("El motivo de consulta es obligatorio");
+      toastCustom.error('El motivo de consulta es obligatorio')
       return;
     }
 
     setGuardando(true);
-    setError("");
     setSuccessMessage("");
 
     try {
@@ -292,7 +285,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
       }
 
       setSuccessMessage("Encuentro registrado exitosamente");
-      toast.success("Encuentro registrado exitosamente");
+      toastCustom.success("Encuentro registrado exitosamente");
 
       // Limpiar formulario después de éxito
       setTimeout(() => {
@@ -316,8 +309,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Error al guardar el encuentro";
-      setError(errorMessage);
-      toast.error(errorMessage)
+      toastCustom.error(errorMessage)
     } finally {
       setGuardando(false);
     }
@@ -328,15 +320,15 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
       <div className={styles["section-header"]}>
         <h2>Registrar Nuevo Encuentro</h2>
         <p className={styles["section-subtitle"]}>
-          {especialidad?.nombre || "Especialidad"} - Documente atenciones médicas
+          Documente atenciones médicas
         </p>
       </div>
 
       {!formularioConfig ? (
         <div className={styles["form-card"]}>
-          <p style={{ color: 'var(--error-color)' }}>
-            Configuración de formulario no disponible para esta especialidad
-          </p>
+          <div className={styles['error-alert']}>
+            ⚠️ Configuración de formulario no disponible para esta especialidad
+          </div>
         </div>
       ) : (
         <>
@@ -398,7 +390,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
                 </button>
               </div>
               {fieldErrors.ciNumeros && <p className={styles["error-text"]}>{fieldErrors.ciNumeros}</p>}
-              {error && <p className={styles["error-text"]}>{error}</p>}
             </div>
           )}
 
@@ -443,9 +434,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
                     styles={styles}
                   />
 
-                  {error && paso.numero === formularioConfig.pasos.length && (
-                    <div className={styles["error-alert"]}>{error}</div>
-                  )}
                   {successMessage && (
                     <div className={styles["success-alert"]}>{successMessage}</div>
                   )}

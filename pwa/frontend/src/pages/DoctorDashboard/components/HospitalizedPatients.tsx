@@ -231,6 +231,7 @@ export default function HospitalizedPatientsView({}: Props) {
                   </div>
                   <div className={styles["expanded-actions"]}>
                     <button
+                      className={styles["action-btn-secondary"]}
                       onClick={() =>
                         alert("Próximamente: Ver Historia Completa")
                       }
@@ -238,6 +239,7 @@ export default function HospitalizedPatientsView({}: Props) {
                       📋 Historia Clínica
                     </button>
                     <button
+                      className={styles["action-btn-secondary"]}
                       onClick={() => alert("Próximamente: Registrar Alta")}
                     >
                       ✅ Alta Médica

@@ -131,9 +131,11 @@ export default function DashboardStats({}: Props) {
         return (
           <div key={metricaId} className={styles.card}>
             <h2>{metrica.titulo}</h2>
-            <div className={styles["stat-value"]}>
-              {loading ? "..." : stats[metrica.key]}
-            </div>
+            {loading ? (
+              <div className={styles["stat-value-loading"]} />
+            ) : (
+              <div className={styles["stat-value"]}>{stats[metrica.key]}</div>
+            )}
             <span className={styles["stat-label"]}>{metrica.label}</span>
           </div>
         );

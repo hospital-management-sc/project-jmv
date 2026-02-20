@@ -72,7 +72,12 @@ export default function TodayEncounters({}: Props) {
       <div className={styles["form-card"]}>
         {encuentros.length === 0 ? (
           <div className={styles["empty-state"]}>
-            <span className={styles["empty-icon"]}>📋</span>
+            <div className={styles["empty-icon"]}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+              </svg>
+            </div>
             <h3>No hay atenciones registradas hoy</h3>
             <p>Los encuentros médicos aparecerán aquí cuando se registren</p>
           </div>

@@ -8,7 +8,7 @@ import type { Cita } from "@/services";
 import type { PatientBasic } from "../interfaces";
 import * as citasService from '@/services/citas.service'
 import { formatDateLongLocal, formatTimeVenezuela, getTodayVenezuelaISO } from "@/utils/dateUtils";
-import { toast } from "sonner";
+import { toastCustom } from "@/utils/toastCustom";
 
 type FilterType = 'TODAS' | 'PASADAS' | 'FUTURAS'
 
@@ -24,9 +24,13 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filterType, setFilterType] = useState<FilterType>('TODAS') // Por defecto mostrar todas (pasadas + futuras)
+  const [lastRefreshTime, setLastRefreshTime] = useState<number | null>(null) // Para rate limiting
 
   // Validar que doctorId sea un número válido
   const validDoctorId = typeof doctorId === 'number' && doctorId > 0 ? doctorId : null
+
+  // Rate limiting: máximo 1 refresh cada 5 minutos
+  const REFRESH_COOLDOWN_MS = 5 * 60 * 1000 // 5 minutos en milisegundos
 
   // TODO: Obtener ID del médico actual del contexto de autenticación
   // const medicoId = 1 // Temporal
@@ -48,10 +52,30 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Error desconocido'
       setError(errorMsg)
-      toast.error('❌ Error al cargar las citas')
+      toastCustom.error('Error al cargar las citas')
     } finally {
       setLoading(false)
     }
+  }
+
+  // Manejador para el botón de actualizar con rate limiting
+  const handleRefreshClick = async () => {
+    const now = Date.now()
+    
+    // Validar cooldown: ¿Puede hacer refresh?
+    if (lastRefreshTime && now - lastRefreshTime < REFRESH_COOLDOWN_MS) {
+      const remainingSeconds = Math.ceil((REFRESH_COOLDOWN_MS - (now - lastRefreshTime)) / 1000)
+      const remainingMinutes = Math.ceil(remainingSeconds / 60)
+      
+      toastCustom.info(`Espera ${remainingMinutes} min para actualizar de nuevo`)
+      return
+    }
+    
+    // Proceder con la actualización
+    setLoading(true)
+    await cargarCitas()
+    setLastRefreshTime(now)
+    toastCustom.success('Citas actualizadas')
   }
 
   const getEstadoLabel = (estado: string) => {
@@ -97,6 +121,10 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
   // Obtener la fecha de hoy en zona horaria de Venezuela (YYYY-MM-DD)
   const hoyVE = getTodayVenezuelaISO()
 
+  // Conteos pre-calculados para las etiquetas de los tabs de filtro
+  const countFuturas = citas.filter(c => String(c.fechaCita || c.fechaHora || '').split('T')[0] >= hoyVE).length
+  const countPasadas = citas.filter(c => String(c.fechaCita || c.fechaHora || '').split('T')[0] < hoyVE).length
+
   // Filtrar citas según el tipo seleccionado y ordenar en orden descendente (más recientes primero)
   const citasFiltradas = citas
     .filter(cita => {
@@ -140,10 +168,8 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
           <h2>Mis Citas</h2>
         </div>
         <div className={styles['form-card']}>
-          <div style={{ padding: '2rem', backgroundColor: '#fee2e2', borderRadius: '0.5rem', textAlign: 'center' }}>
-            <p style={{ color: '#dc2626', fontWeight: 'bold' }}>
-              ⚠️ {error}
-            </p>
+          <div className={styles['error-alert']}>
+            {error}
           </div>
         </div>
       </section>
@@ -153,71 +179,41 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
   return (
     <section className={styles['view-section']}>
       <div className={styles['section-header']}>
-        <h2>Mis Citas</h2>
+        <h2>
+          Mis Citas
+          <button className={styles['refresh-btn']} onClick={handleRefreshClick} title="Actualizar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+              <path d="M21 3v5h-5"/>
+              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+              <path d="M8 16H3v5"/>
+            </svg>
+            <span className={styles['refresh-btn-label']}>Actualizar</span>
+          </button>
+        </h2>
       </div>
 
       <div className={styles['form-card']}>
         {/* Botones de filtro */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+        <div className={styles['tabs-container']}>
           <button
-            className={styles['btn-small']}
+            type="button"
+            className={`${styles.tab} ${filterType === 'FUTURAS' ? styles.active : ''}`}
             onClick={() => setFilterType('FUTURAS')}
-            style={{
-              backgroundColor: filterType === 'FUTURAS' ? '#3b82f6' : '#d1d5db',
-              color: filterType === 'FUTURAS' ? 'white' : '#374151',
-              padding: '0.4rem 0.8rem',
-              borderRadius: '0.375rem',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: filterType === 'FUTURAS' ? 'bold' : 'normal',
-              fontSize: '0.8rem',
-              flex: '1 1 auto',
-              minWidth: '120px',
-            }}
           >
-            Futuras ({citas.filter(c => {
-              const fechaStr = String(c.fechaCita || c.fechaHora || '').split('T')[0]
-              return fechaStr >= hoyVE
-            }).length})
+            Futuras ({countFuturas})
           </button>
-          
           <button
-            className={styles['btn-small']}
+            type="button"
+            className={`${styles.tab} ${styles['tab-pasadas']} ${filterType === 'PASADAS' ? styles.active : ''}`}
             onClick={() => setFilterType('PASADAS')}
-            style={{
-              backgroundColor: filterType === 'PASADAS' ? '#ef4444' : '#d1d5db',
-              color: filterType === 'PASADAS' ? 'white' : '#374151',
-              padding: '0.4rem 0.8rem',
-              borderRadius: '0.375rem',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: filterType === 'PASADAS' ? 'bold' : 'normal',
-              fontSize: '0.8rem',
-              flex: '1 1 auto',
-              minWidth: '120px',
-            }}
           >
-            Pasadas ({citas.filter(c => {
-              const fechaStr = String(c.fechaCita || c.fechaHora || '').split('T')[0]
-              return fechaStr < hoyVE
-            }).length})
+            Pasadas ({countPasadas})
           </button>
-          
           <button
-            className={styles['btn-small']}
+            type="button"
+            className={`${styles.tab} ${styles['tab-todas']} ${filterType === 'TODAS' ? styles.active : ''}`}
             onClick={() => setFilterType('TODAS')}
-            style={{
-              backgroundColor: filterType === 'TODAS' ? '#8b5cf6' : '#d1d5db',
-              color: filterType === 'TODAS' ? 'white' : '#374151',
-              padding: '0.4rem 0.8rem',
-              borderRadius: '0.375rem',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: filterType === 'TODAS' ? 'bold' : 'normal',
-              fontSize: '0.8rem',
-              flex: '1 1 auto',
-              minWidth: '90px',
-            }}
           >
             Todas ({citas.length})
           </button>
@@ -240,7 +236,15 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
 
         {citasFiltradas.length === 0 ? (
           <div className={styles['empty-state']}>
-            <span className={styles['empty-icon']}>📅</span>
+            <div className={styles['empty-icon']}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+                <line x1="9" y1="16" x2="15" y2="16"/>
+              </svg>
+            </div>
             <h3>No hay citas en el rango seleccionado</h3>
             <p>Tus citas asignadas aparecerán aquí</p>
           </div>
@@ -291,7 +295,7 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
                     </button>
                   )}
                   {(cita as any).estado === 'COMPLETADA' && (
-                    <span className={styles['completed-label']}>✅ Encuentro registrado</span>
+                    <span className={styles['completed-label']}>Encuentro registrado</span>
                   )}
                 </div>
               </div>
@@ -300,11 +304,7 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
         )}
       </div>
 
-      <div className={styles['section-footer']}>
-        <button className={styles['refresh-btn']} onClick={cargarCitas}>
-          Actualizar
-        </button>
-      </div>
+
     </section>
   )
 }
