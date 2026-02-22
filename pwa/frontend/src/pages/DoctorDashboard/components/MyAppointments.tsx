@@ -267,9 +267,8 @@ export default function MyAppointments({ doctorId, onRegisterEncounter, refreshK
                 </div>
                 <div className={styles['appointment-body']}>
                   <p><strong>Paciente:</strong> {cita.paciente?.apellidosNombres || 'N/A'}</p>
-                  <p><strong>CI:</strong> {cita.paciente?.ci || 'N/A'}</p>
-                  <p><strong>Especialidad:</strong> {cita.especialidad || 'N/A'}</p>
-                  <p><strong>Motivo:</strong> {cita.motivo || 'No especificado'}</p>
+                  <p style={{ fontWeight: 500, color: 'var(--color-turquoise)' }}><strong>Motivo:</strong> {cita.motivo || 'No especificado'}</p>
+                  <p style={{ opacity: 0.7, fontSize: '0.85em' }}><strong>CI:</strong> {cita.paciente?.ci || 'N/A'}</p>
                   {cita.horaLlegada && (
                     <p><strong>Hora llegada:</strong> {formatTimeVenezuela(cita.horaLlegada)}</p>
                   )}

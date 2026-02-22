@@ -2,6 +2,7 @@
 // COMPONENTE: Atenciones del Día
 // ==========================================
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import styles from "../DoctorDashboard.module.css";
 import {
   encuentrosService,
@@ -111,7 +112,6 @@ export default function TodayEncounters({}: Props) {
                     <th>Hora</th>
                     <th>Paciente</th>
                     <th>Tipo</th>
-                    <th>Médico</th>
                     <th>Motivo</th>
                     <th>Acciones</th>
                   </tr>
@@ -136,7 +136,6 @@ export default function TodayEncounters({}: Props) {
                           {getTipoLabel(enc.tipo)}
                         </span>
                       </td>
-                      <td>{enc.createdBy?.nombre || "N/A"}</td>
                       <td>
                         {enc.motivoConsulta?.substring(0, 50) || "N/A"}...
                       </td>
@@ -145,7 +144,7 @@ export default function TodayEncounters({}: Props) {
                           className={styles["btn-small"]}
                           onClick={() => setSelectedEncuentro(enc)}
                         >
-                          Ver
+                          Ver Detalle
                         </button>
                       </td>
                     </tr>
@@ -157,12 +156,14 @@ export default function TodayEncounters({}: Props) {
         )}
       </div>
 
-      {selectedEncuentro && (
-        <EncuentroDetailModal
-          encuentro={selectedEncuentro}
-          onClose={() => setSelectedEncuentro(null)}
-        />
-      )}
+      {selectedEncuentro &&
+        createPortal(
+          <EncuentroDetailModal
+            encuentro={selectedEncuentro}
+            onClose={() => setSelectedEncuentro(null)}
+          />,
+          document.body
+        )}
     </section>
   );
 }

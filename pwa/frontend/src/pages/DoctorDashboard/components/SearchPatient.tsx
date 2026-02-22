@@ -223,27 +223,12 @@ export default function SearchPatient({
               <div className={styles["info-item"]}>
                 <strong>Sexo:</strong>
                 <span>
-                  {paciente.sexo === "M" ? "♂ Masculino" : "♀ Femenino"}
+                  {paciente.sexo === "M" ? "Masculino" : "Femenino"}
                 </span>
               </div>
               <div className={styles["info-item"]}>
                 <strong>Teléfono:</strong>
                 <span>{paciente.telefono || "N/A"}</span>
-              </div>
-            </div>
-
-            <div className={styles["patient-stats"]}>
-              <div className={styles["stat-item"]}>
-                <span className={styles["stat-number"]}>
-                  {paciente.admisiones?.length || 0}
-                </span>
-                <span className={styles["stat-label"]}>Admisiones</span>
-              </div>
-              <div className={styles["stat-item"]}>
-                <span className={styles["stat-number"]}>
-                  {paciente.encuentros?.length || 0}
-                </span>
-                <span className={styles["stat-label"]}>Encuentros</span>
               </div>
             </div>
 

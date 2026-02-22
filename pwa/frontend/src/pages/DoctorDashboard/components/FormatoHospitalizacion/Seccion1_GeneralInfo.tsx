@@ -138,7 +138,7 @@ export default function Seccion1_GeneralInfo({ formato, admision }: Props) {
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Sexo:</span>
             <span className={styles.infoValue}>
-              {admision.paciente?.sexo === 'M' ? '♂ Masculino' : admision.paciente?.sexo === 'F' ? '♀ Femenino' : 'N/A'}
+              {admision.paciente?.sexo === 'M' ? 'Masculino' : admision.paciente?.sexo === 'F' ? 'Femenino' : 'N/A'}
             </span>
           </div>
           <div className={styles.infoItem}>

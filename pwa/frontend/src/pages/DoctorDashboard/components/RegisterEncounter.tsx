@@ -36,7 +36,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
   const [paciente, setPaciente] = useState<PatientBasic | null>(patient);
   const [searching, setSearching] = useState(false);
   const [guardando, setGuardando] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({});
   
   // FormData dinámico: inicializar todos los campos de la configuración
@@ -147,7 +146,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
     }
 
     setGuardando(true);
-    setSuccessMessage("");
 
     try {
       // Construir objeto de signos vitales solo si hay datos
@@ -284,7 +282,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
         await encuentrosService.crearEncuentro(encuentroData);
       }
 
-      setSuccessMessage("Encuentro registrado exitosamente");
       toastCustom.success("Encuentro registrado exitosamente");
 
       // Limpiar formulario después de éxito
@@ -299,7 +296,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
           ciNumeros: "",
           ...initializeFormDataFromConfig(formularioConfig),
         });
-        setSuccessMessage("");
         setFieldErrors({});
         // Llamar callback para refresco de citas
         if (onEncounterRegistered) {
@@ -433,10 +429,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
                     handleFieldChange={handleFieldChange}
                     styles={styles}
                   />
-
-                  {successMessage && (
-                    <div className={styles["success-alert"]}>{successMessage}</div>
-                  )}
 
                   <div className={styles["form-actions"]}>
                     {paso.numero > 1 && (
