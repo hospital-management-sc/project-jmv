@@ -379,6 +379,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
                     onChange={(e) => handleCINumerosChange(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && buscarPaciente()}
                     maxLength={9}
+                    inputMode="numeric"
                   />
                 </div>
                 <button onClick={buscarPaciente} disabled={searching}>

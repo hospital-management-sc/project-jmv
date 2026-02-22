@@ -10,34 +10,29 @@ import { useAuth } from '@/contexts/AuthContext'
 import styles from './Login.module.css'
 
 // Mensajes de error mejorados para login
-const ERROR_MESSAGES: Record<string, { title: string; description: string; icon: string; suggestion?: string }> = {
+const ERROR_MESSAGES: Record<string, { title: string; description: string; suggestion?: string }> = {
   INVALID_CREDENTIALS: {
     title: 'Credenciales Incorrectas',
     description: 'El correo electrónico o la contraseña que ingresaste no son correctos.',
-    icon: '🔐',
     suggestion: 'Verifica que tu correo esté bien escrito y que la contraseña sea la correcta. Recuerda que las contraseñas distinguen entre mayúsculas y minúsculas.',
   },
   NETWORK_ERROR: {
     title: 'Error de Conexión',
     description: 'No se pudo conectar con el servidor.',
-    icon: '🌐',
     suggestion: 'Verifica tu conexión a internet e intenta nuevamente. Si el problema persiste, el servidor podría estar en mantenimiento.',
   },
   SERVER_ERROR: {
     title: 'Error del Servidor',
     description: 'Ocurrió un error interno en el servidor.',
-    icon: '⚠️',
     suggestion: 'Por favor, intenta nuevamente en unos minutos. Si el problema continúa, contacta al soporte técnico.',
   },
   VALIDATION_ERROR: {
     title: 'Datos Incompletos',
     description: 'Por favor, completa todos los campos requeridos.',
-    icon: '📝',
   },
   DEFAULT: {
     title: 'Error al Iniciar Sesión',
     description: 'Ocurrió un error inesperado.',
-    icon: '❌',
     suggestion: 'Por favor, intenta nuevamente. Si el problema persiste, contacta al soporte técnico.',
   },
 }
@@ -167,19 +162,19 @@ export default function Login() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Hospital Militar "Dr. José María Vargas"</h1>
+      <h1 className={styles.up_title}>Hospital Militar</h1>
+      <h1 className={styles.title}>"Dr. José María Vargas"</h1>
       <p className={styles.subtitle}>Inicia sesión en tu cuenta</p>
 
       {/* Mensaje de error estilizado */}
       {errorInfo && (
         <div className={styles.errorAlert}>
-          <div className={styles.alertIcon}>{errorInfo.icon}</div>
           <div className={styles.alertContent}>
             <h3 className={styles.alertTitle}>{errorInfo.title}</h3>
             <p className={styles.alertDescription}>{errorInfo.description}</p>
             {errorInfo.suggestion && (
               <p className={styles.alertSuggestion}>
-                <strong>💡 Sugerencia:</strong> {errorInfo.suggestion}
+                <strong>Sugerencia:</strong> {errorInfo.suggestion}
               </p>
             )}
           </div>
@@ -231,7 +226,7 @@ export default function Login() {
         </Link>
       </p>
 
-      <div className={styles.divider}>o</div>
+      <div className={styles.divider}>———————</div>
 
       <p className={styles.registerLink}>
         ¿No tienes cuenta?{' '}

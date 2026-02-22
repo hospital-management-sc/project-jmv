@@ -9,25 +9,32 @@ import { authService } from '@services/auth';
 import styles from './ForgotPassword.module.css';
 import { toast } from 'sonner';
 
-const forgotPasswordSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email es requerido')
-    .email('Email inválido'),
-  ci: z
-    .string()
-    .min(1, 'Cédula es requerida')
-    .regex(/^[VEPJvepj]-?\d{6,9}$/, 'Formato de cédula inválido (Ej: V12345678)'),
-  newPassword: z
-    .string()
-    .min(6, 'La contraseña debe tener al menos 6 caracteres'),
-  confirmPassword: z
-    .string()
-    .min(1, 'Debes confirmar la contraseña'),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Las contraseñas no coinciden',
-  path: ['confirmPassword'],
-});
+const forgotPasswordSchema = z
+  .object({
+    email: z
+      .string()
+      .min(1, 'Email es requerido')
+      .email('Email inválido'),
+    ciTipo: z
+      .string()
+      .min(1, 'Tipo de cédula es requerido'),
+    ciNumeros: z
+      .string()
+      .regex(
+        /^\d{7,9}$/,
+        'C.I. debe tener 7-9 dígitos (Ej: 12345678)'
+      ),
+    newPassword: z
+      .string()
+      .min(6, 'La contraseña debe tener al menos 6 caracteres'),
+    confirmPassword: z
+      .string()
+      .min(1, 'Debes confirmar la contraseña'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Las contraseñas no coinciden',
+    path: ['confirmPassword'],
+  });
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
@@ -47,9 +54,10 @@ export default function ForgotPassword() {
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
+      const ciCompleta = `${data.ciTipo}${data.ciNumeros}`
       await authService.forgotPassword({
         email: data.email,
-        ci: data.ci,
+        ci: ciCompleta.toUpperCase(),
         newPassword: data.newPassword,
       });
 
@@ -73,18 +81,16 @@ export default function ForgotPassword() {
   if (isSuccess) {
     return (
       <div className={styles.container}>
-        <div className={styles.card}>
-          <div className={styles.successMessage}>
-            <div className={styles.successIcon}>✅</div>
-            <h2>¡Contraseña Restablecida!</h2>
-            <p>Tu contraseña ha sido actualizada correctamente.</p>
-            <p className={styles.redirectMessage}>
-              Serás redirigido al inicio de sesión en unos segundos...
-            </p>
-            <Link to="/login" className={styles.loginLink}>
-              Ir al login ahora →
-            </Link>
-          </div>
+        <div className={styles.successMessage}>
+          <div className={styles.successIcon}></div>
+          <h2>¡Contraseña Restablecida!</h2>
+          <p>Tu contraseña ha sido actualizada correctamente.</p>
+          <p className={styles.redirectMessage}>
+            Serás redirigido al inicio de sesión en unos segundos...
+          </p>
+          <Link to="/login" className={styles.loginLink}>
+            Ir al login ahora
+          </Link>
         </div>
       </div>
     );
@@ -92,13 +98,12 @@ export default function ForgotPassword() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <h1>🔐 Recuperar Contraseña</h1>
-          <p className={styles.subtitle}>
-            Ingresa tu correo y cédula para restablecer tu contraseña
-          </p>
-        </div>
+      <div className={styles.header}>
+        <h1>Recuperar Contraseña</h1>
+        <p className={styles.subtitle}>
+          Ingresa tu correo y cédula para restablecer tu contraseña
+        </p>
+      </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <FormInput
@@ -109,16 +114,32 @@ export default function ForgotPassword() {
             {...register('email')}
           />
 
-          <FormInput
-            label="Cédula de Identidad"
-            type="text"
-            placeholder="V12345678"
-            error={errors.ci?.message}
-            hint="Formato: V12345678 o V-12345678"
-            {...register('ci')}
-          />
+          <div className={styles.formGroup}>
+            <label htmlFor="ciTipo">C.I. (Cédula de Identidad)</label>
+            <div className={styles["dual-input-group"]}>
+              <select
+                id="ciTipo"
+                {...register('ciTipo')}
+                className={errors.ciTipo ? styles.inputError : ''}
+              >
+                <option value="V">V</option>
+                <option value="E">E</option>
+                <option value="P">P</option>
+              </select>
+              <input
+                type="text"
+                id="ciNumeros"
+                placeholder="10200300"
+                maxLength={9}
+                {...register('ciNumeros')}
+                className={errors.ciNumeros ? styles.inputError : ''}
+              />
+            </div>
+            {errors.ciTipo?.message && <span className={styles.error}>{errors.ciTipo.message}</span>}
+            {errors.ciNumeros?.message && <span className={styles.error}>{errors.ciNumeros.message}</span>}
+          </div>
 
-          <div className={styles.passwordGroup}>
+          <div style={{ position: 'relative' }}>
             <FormInput
               label="Nueva Contraseña"
               type={showPassword ? 'text' : 'password'}
@@ -132,7 +153,7 @@ export default function ForgotPassword() {
             />
           </div>
 
-          <div className={styles.passwordGroup}>
+          <div style={{ position: 'relative' }}>
             <FormInput
               label="Confirmar Nueva Contraseña"
               type={showConfirmPassword ? 'text' : 'password'}
@@ -163,13 +184,13 @@ export default function ForgotPassword() {
 
           <div className={styles.links}>
             <Link to="/login" className={styles.backLink}>
-              ← Volver al inicio de sesión
+              Volver al inicio de sesión
             </Link>
           </div>
 
           <div className={styles.infoBox}>
             <p>
-              <strong>⚠️ Nota de Seguridad:</strong>
+              <strong>Nota de Seguridad:</strong>
             </p>
             <p>
               Para tu seguridad, necesitamos verificar tu identidad con tu correo
@@ -177,7 +198,6 @@ export default function ForgotPassword() {
             </p>
           </div>
         </form>
-      </div>
     </div>
   );
 }

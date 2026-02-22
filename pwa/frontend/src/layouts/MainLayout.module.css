@@ -203,7 +203,7 @@
 .main {
   flex: 1;
   max-width: 1400px;
-  margin: 0 auto;
+  margin: 2rem auto;
   padding: var(--spacing-2xl) var(--spacing-lg);
   width: 100%;
 }
@@ -214,7 +214,7 @@
   text-align: center;
   padding: 2rem var(--spacing-lg);
   color: var(--text-tertiary);
-  margin-top: auto;
+  margin-top: 3rem;
   font-size: 0.9rem;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
 }

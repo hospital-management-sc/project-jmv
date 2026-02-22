@@ -10,41 +10,34 @@ import { authService } from '@services/auth'
 import styles from './Register.module.css'
 
 // Códigos de error del sistema de whitelist
-const ERROR_MESSAGES: Record<string, { title: string; description: string; icon: string }> = {
+const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
   NOT_IN_WHITELIST: {
     title: 'Acceso No Autorizado',
     description: 'Su cédula no se encuentra en la lista de personal autorizado del hospital.',
-    icon: '🚫',
   },
   ALREADY_REGISTERED: {
     title: 'Usuario Ya Registrado',
     description: 'Ya existe una cuenta registrada con esta cédula. Si olvidó su contraseña, utilice la opción de recuperación en la pantalla de inicio de sesión.',
-    icon: '⚠️',
   },
   NOT_ACTIVE: {
     title: 'Autorización Inactiva',
     description: 'Su autorización de acceso no está activa actualmente.',
-    icon: '⏸️',
   },
   AUTHORIZATION_EXPIRED: {
     title: 'Autorización Vencida',
     description: 'Su autorización de acceso ha expirado.',
-    icon: '📅',
   },
   NAME_MISMATCH: {
     title: 'Nombre No Coincide',
     description: 'El nombre proporcionado no coincide con nuestros registros. Por favor, ingrese su nombre exactamente como aparece en su documento de identidad.',
-    icon: '📝',
   },
   ROLE_NOT_AUTHORIZED: {
     title: 'Rol No Autorizado',
     description: 'No está autorizado para registrarse con el rol seleccionado. Por favor, seleccione el rol que le fue asignado por el hospital.',
-    icon: '👤',
   },
   DEFAULT: {
     title: 'Error de Registro',
     description: 'Ocurrió un error al procesar su solicitud. Por favor, intente nuevamente o contacte al soporte técnico.',
-    icon: '❌',
   },
 }
 
@@ -160,16 +153,16 @@ export default function Register() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Hospital Militar "Dr. José María Vargas"</h1>
+      <h1 className={styles.up_title}>Hospital Militar</h1>
+      <h1 className={styles.title}>"Dr. José María Vargas"</h1>
       <p className={styles.subtitle}>
         Registro en el sistema
       </p>
 
       {/* Mensaje de advertencia sobre sistema cerrado */}
       <div className={styles.securityNotice}>
-        <span className={styles.securityIcon}>🔒</span>
         <p>
-          Este es un sistema cerrado. Solo el personal previamente autorizado por
+          <strong>Sistema Cerrado:</strong> Solo el personal previamente autorizado por
           el hospital puede crear una cuenta.
         </p>
       </div>
@@ -177,7 +170,6 @@ export default function Register() {
       {/* Mensaje de éxito */}
       {showSuccessMessage && (
         <div className={styles.successAlert}>
-          <div className={styles.alertIcon}>✅</div>
           <div className={styles.alertContent}>
             <h3 className={styles.alertTitle}>¡Registro Exitoso!</h3>
             <p className={styles.alertDescription}>
@@ -190,7 +182,6 @@ export default function Register() {
       {/* Mensaje de error detallado */}
       {errorInfo && (
         <div className={styles.errorAlert}>
-          <div className={styles.alertIcon}>{errorInfo.icon}</div>
           <div className={styles.alertContent}>
             <h3 className={styles.alertTitle}>{errorInfo.title}</h3>
             <p className={styles.alertDescription}>{errorInfo.description}</p>

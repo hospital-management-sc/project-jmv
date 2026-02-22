@@ -220,6 +220,7 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
                   onKeyDown={(e) => e.key === 'Enter' && buscarPaciente()}
                   disabled={buscando}
                   maxLength={8}
+                  inputMode="numeric"
                 />
                 <button onClick={buscarPaciente} disabled={buscando}>
                   {buscando ? '🔍 Buscando...' : '🔍 Buscar'}
