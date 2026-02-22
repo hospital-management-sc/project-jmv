@@ -1,7 +1,7 @@
 // ==========================================
 // COMPONENTE: Historia del Paciente
 // ==========================================
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../DoctorDashboard.module.css";
 import type { PatientBasic } from "../interfaces";
 import {
@@ -95,7 +95,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
         tipo: "REGISTRO",
         fecha: fechaRegistro,
         hora: null,
-        icono: "📋",
+        icono: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>),
         titulo: "Registro en el Sistema",
         descripcion: `Paciente registrado en el sistema hospitalario.`,
         color: "#10b981",
@@ -129,7 +129,9 @@ export default function PatientHistory({ patient, onBack }: Props) {
             tipo: "ADMISION",
             fecha: admision.fechaAdmision || admision.createdAt,
             hora: admision.horaAdmision || admision.createdAt,
-            icono: tipoAdmision === "EMERGENCIA" ? "🚨" : "🏥",
+            icono: tipoAdmision === "EMERGENCIA"
+              ? (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>)
+              : (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>),
             titulo: `Admisión: ${tipoAdmision}`,
             descripcion: `Servicio: ${servicioAdmision}. Estado: ${estadoAdmision}`,
             detalles: admision,
@@ -160,7 +162,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
               tipo: "FORMATO_EMERGENCIA",
               fecha: formato.createdAt || admision.fechaAdmision,
               hora: formato.createdAt || admision.horaAdmision,
-              icono: "📋",
+              icono: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>),
               titulo: "Formato de Emergencia Completado",
               descripcion: resumenDatos.length > 0 ? resumenDatos.join(" • ") : "Información clínica de emergencia registrada",
               detalles: formato,
@@ -190,7 +192,7 @@ export default function PatientHistory({ patient, onBack }: Props) {
               tipo: "FORMATO_HOSPITALIZACION",
               fecha: formato.createdAt || admision.fechaAdmision,
               hora: formato.createdAt || admision.horaAdmision,
-              icono: "📊",
+              icono: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>),
               titulo: "Formato de Hospitalización Completado",
               descripcion: resumenDatos.length > 0 ? resumenDatos.join(" • ") : "Documentación clínica de hospitalización registrada",
               detalles: formato,
@@ -204,17 +206,17 @@ export default function PatientHistory({ patient, onBack }: Props) {
     // Eventos: Encuentros médicos
     if (encuentros && encuentros.length > 0) {
       encuentros.forEach((encuentro: any) => {
-        let icono = "⚕️";
+        let icono: React.ReactNode = (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>);
         let color = "#8b5cf6";
 
         if (encuentro.tipo === "EMERGENCIA") {
-          icono = "🚨";
+          icono = (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>);
           color = "#ef4444";
         } else if (encuentro.tipo === "HOSPITALIZACION") {
-          icono = "🛏️";
+          icono = (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>);
           color = "#3b82f6";
         } else if (encuentro.tipo === "CONSULTA") {
-          icono = "🩺";
+          icono = (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>);
           color = "#10b981";
         }
 
@@ -256,12 +258,12 @@ export default function PatientHistory({ patient, onBack }: Props) {
         const especialidad = cita.especialidad || "No especificado";
         const motivo = cita.motivo ? ` - ${cita.motivo}` : "";
 
-        let icono = "📅";
+        let icono: React.ReactNode = (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>);
         let color = "#f59e0b";
         let estadoTexto = "Programada";
 
         if (estadoCita === "COMPLETADA") {
-          icono = "✅";
+          icono = (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>);
           color = "#10b981";
           estadoTexto = "Completada";
         }
@@ -422,128 +424,88 @@ export default function PatientHistory({ patient, onBack }: Props) {
       <div className={styles["section-header"]}>
         <h2>Historia Clínica Completa</h2>
         <button className={styles["back-link"]} onClick={onBack}>
-          ← Volver a búsqueda
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Volver a búsqueda
         </button>
       </div>
 
-      {/* Información del paciente */}
-      <div
-        style={{
-          backgroundColor: "var(--bg-tertiary)",
-          padding: "1.5rem",
-          borderRadius: "0.5rem",
-          marginBottom: "2rem",
-          border: "1px solid var(--border-color)",
-        }}
-      >
-        <h3 style={{ marginTop: 0, marginBottom: "1.5rem" }}>
-          Datos del Paciente
-        </h3>
-
-        {/* Sección 1: Identificación */}
-        <div style={{ marginBottom: "1.5rem" }}>
-          <h4
-            style={{
-              fontSize: "0.95rem",
-              fontWeight: "600",
-              color: "var(--text-secondary)",
-              marginBottom: "1rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-            }}
-          >
-            Identificación
-          </h4>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-              gap: "1.5rem",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Nro. Historia Clínica:
-              </strong>
-              <span style={{ fontSize: "1rem" }}>
-                {datosCompletos?.nroHistoria || "N/A"}
+      {/* ── Datos del Paciente ── */}
+      <div className={styles["history-patient-card"]}>
+        {/* Hero: avatar + nombre + badges */}
+        <div className={styles["history-patient-hero"]}>
+          <div className={styles["history-patient-avatar"]}>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(45,212,191,0.65)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div className={styles["history-patient-identity"]}>
+            <h3 className={styles["history-patient-name"]}>
+              {datosCompletos?.apellidosNombres || "N/A"}
+            </h3>
+            <div className={styles["history-meta-badges"]}>
+              <span className={styles["history-badge-hc"]}>
+                HC: {datosCompletos?.nroHistoria || "N/A"}
               </span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Nombre Completo:
-              </strong>
-              <span style={{ fontSize: "1rem", fontWeight: "500" }}>
-                {datosCompletos?.apellidosNombres || "N/A"}
-              </span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Cédula de Identidad:
-              </strong>
-              <span style={{ fontSize: "1rem" }}>
+              {datosCompletos?.tipoPaciente && (
+                <span className={styles["history-badge-type"]}>
+                  {datosCompletos.tipoPaciente}
+                </span>
+              )}
+              <span className={styles["history-badge-ci"]}>
                 {datosCompletos?.ci || "N/A"}
               </span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Tipo de Paciente:
-              </strong>
-              <span style={{ fontSize: "1rem" }}>
+          </div>
+        </div>
+
+        {/* Identificación */}
+        <div className={styles["history-section-block"]}>
+          <p className={styles["history-section-label"]}>Identificación</p>
+          <div className={styles["history-data-grid"]}>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Nro. Historia Clínica</span>
+              <span className={styles["history-field-value-highlight"]}>
+                {datosCompletos?.nroHistoria || "N/A"}
+              </span>
+            </div>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Cédula de Identidad</span>
+              <span className={styles["history-field-value"]}>
+                {datosCompletos?.ci || "N/A"}
+              </span>
+            </div>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Tipo de Paciente</span>
+              <span className={styles["history-field-value"]}>
                 {datosCompletos?.tipoPaciente || "N/A"}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Sección 2: Información Personal */}
-        <div
-          style={{
-            marginBottom: "1.5rem",
-            paddingTop: "1rem",
-            borderTop: "1px solid var(--border-color)",
-          }}
-        >
-          <h4
-            style={{
-              fontSize: "0.95rem",
-              fontWeight: "600",
-              color: "var(--text-secondary)",
-              marginBottom: "1rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-            }}
-          >
-            Información Personal
-          </h4>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-              gap: "1.5rem",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Fecha de Nacimiento:
-              </strong>
-              <span style={{ fontSize: "1rem" }}>
+        {/* Información Personal */}
+        <div className={styles["history-section-block"]}>
+          <p className={styles["history-section-label"]}>Información Personal</p>
+          <div className={styles["history-data-grid"]}>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Fecha de Nacimiento</span>
+              <span className={styles["history-field-value"]}>
                 {formatDateLocal(datosCompletos?.fechaNacimiento)}
               </span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Edad:
-              </strong>
-              <span style={{ fontSize: "1rem", fontWeight: "500" }}>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Edad</span>
+              <span className={styles["history-field-value-highlight"]}>
                 {calculateAge(datosCompletos?.fechaNacimiento)} años
               </span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Sexo:
-              </strong>
-              <span style={{ fontSize: "1rem" }}>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Sexo</span>
+              <span className={styles["history-field-value"]}>
                 {datosCompletos?.sexo === "M"
                   ? "Masculino"
                   : datosCompletos?.sexo === "F"
@@ -551,102 +513,52 @@ export default function PatientHistory({ patient, onBack }: Props) {
                   : "N/A"}
               </span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Nacionalidad:
-              </strong>
-              <span style={{ fontSize: "1rem" }}>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Nacionalidad</span>
+              <span className={styles["history-field-value"]}>
                 {datosCompletos?.nacionalidad || "N/A"}
               </span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Lugar de Nacimiento:
-              </strong>
-              <span style={{ fontSize: "1rem" }}>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Lugar de Nacimiento</span>
+              <span className={styles["history-field-value"]}>
                 {datosCompletos?.lugarNacimiento || "N/A"}
               </span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Estado de Residencia:
-              </strong>
-              <span style={{ fontSize: "1rem" }}>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Estado de Residencia</span>
+              <span className={styles["history-field-value"]}>
                 {datosCompletos?.estado || "N/A"}
               </span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Religión:
-              </strong>
-              <span style={{ fontSize: "1rem" }}>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Religión</span>
+              <span className={styles["history-field-value"]}>
                 {datosCompletos?.religion || "N/A"}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Sección 3: Información de Contacto */}
-        <div
-          style={{
-            marginBottom: "0",
-            paddingTop: "1rem",
-            borderTop: "1px solid var(--border-color)",
-          }}
-        >
-          <h4
-            style={{
-              fontSize: "0.95rem",
-              fontWeight: "600",
-              color: "var(--text-secondary)",
-              marginBottom: "1rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-            }}
-          >
-            Información de Contacto
-          </h4>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-              gap: "1.5rem",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Teléfono Principal:
-              </strong>
-              <span style={{ fontSize: "1rem", fontWeight: "500" }}>
+        {/* Información de Contacto */}
+        <div className={styles["history-section-block"]}>
+          <p className={styles["history-section-label"]}>Información de Contacto</p>
+          <div className={styles["history-data-grid"]}>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Teléfono Principal</span>
+              <span className={styles["history-field-value-highlight"]}>
                 {datosCompletos?.telefono || "N/A"}
               </span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Teléfono de Emergencia:
-              </strong>
-              <span
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: "500",
-                  color: "#ef4444",
-                }}
-              >
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Teléfono de Emergencia</span>
+              <span className={styles["history-field-emergency"]}>
                 {datosCompletos?.telefonoEmergencia || "No registrado"}
               </span>
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.5rem",
-                gridColumn: "1 / -1",
-              }}
-            >
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Dirección Completa:
-              </strong>
-              <span style={{ fontSize: "1rem" }}>
+            <div className={`${styles["history-field"]} ${styles["history-field-full"]}`}>
+              <span className={styles["history-field-label"]}>Dirección Completa</span>
+              <span className={styles["history-field-value"]}>
                 {datosCompletos?.direccion || "N/A"}
               </span>
             </div>
@@ -654,62 +566,39 @@ export default function PatientHistory({ patient, onBack }: Props) {
         </div>
       </div>
 
-      {/* Datos Militares */}
+      {/* ── Datos Militares ── */}
       {(datosCompletos?.personalMilitar || datosCompletos?.grado) && (
-        <div
-          style={{
-            backgroundColor: "rgba(124, 58, 237, 0.1)",
-            padding: "1.5rem",
-            borderRadius: "0.5rem",
-            marginBottom: "2rem",
-            border: "1px solid rgba(124, 58, 237, 0.3)",
-          }}
-        >
-          <h3 style={{ marginTop: 0, marginBottom: "1.5rem", color: "#8888ff" }}>
+        <div className={styles["history-military-card"]}>
+          <h3 className={styles["history-military-title"]}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
             Datos Militares
           </h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-              gap: "1.5rem",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Grado:
-              </strong>
-              <span>
-                {(datosCompletos?.personalMilitar || datosCompletos)?.grado ||
-                  "N/A"}
+          <div className={styles["history-data-grid"]}>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Grado</span>
+              <span className={styles["history-field-value-highlight"]}>
+                {(datosCompletos?.personalMilitar || datosCompletos)?.grado || "N/A"}
               </span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Componente:
-              </strong>
-              <span>
-                {(datosCompletos?.personalMilitar || datosCompletos)
-                  ?.componente || "N/A"}
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Componente</span>
+              <span className={styles["history-field-value"]}>
+                {(datosCompletos?.personalMilitar || datosCompletos)?.componente || "N/A"}
               </span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Unidad:
-              </strong>
-              <span>
-                {(datosCompletos?.personalMilitar || datosCompletos)?.unidad ||
-                  "N/A"}
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Unidad</span>
+              <span className={styles["history-field-value"]}>
+                {(datosCompletos?.personalMilitar || datosCompletos)?.unidad || "N/A"}
               </span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              <strong style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                Estado Militar:
-              </strong>
-              <span>
+            <div className={styles["history-field"]}>
+              <span className={styles["history-field-label"]}>Estado Militar</span>
+              <span className={styles["history-field-value"]}>
                 {(() => {
-                  const estado = (datosCompletos?.personalMilitar || datosCompletos)
-                    ?.estadoMilitar;
+                  const estado = (datosCompletos?.personalMilitar || datosCompletos)?.estadoMilitar;
                   if (!estado) return "N/A";
                   if (estado === "activo") return "Activo";
                   if (estado === "disponible") return "Disponible";
@@ -722,377 +611,161 @@ export default function PatientHistory({ patient, onBack }: Props) {
         </div>
       )}
 
-      {/* Timeline de eventos */}
-      <div>
-        <h3 style={{ marginBottom: "1.5rem" }}>
-          Línea de Tiempo (Más Reciente Primero)
+      {/* ── Línea de Tiempo ── */}
+      <div className={styles["timeline-wrapper"]}>
+        <h3 className={styles["timeline-heading"]}>
+          Línea de Tiempo
+          <span style={{ fontSize: "0.75rem", fontWeight: 400, color: "rgba(255,255,255,0.32)" }}>
+            (Más reciente primero)
+          </span>
         </h3>
 
-        {/* Buscador de eventos */}
-        <div
-          style={{
-            backgroundColor: "var(--bg-tertiary)",
-            padding: "1.5rem",
-            borderRadius: "0.5rem",
-            marginBottom: "1.5rem",
-            border: "1px solid var(--border-color)",
-          }}
-        >
-          {/* Campo de búsqueda */}
-          <div style={{ marginBottom: "1.5rem" }}>
-            <label
-              htmlFor="buscar-eventos"
-              style={{
-                display: "block",
-                fontSize: "0.9rem",
-                fontWeight: "600",
-                color: "var(--text-secondary)",
-                marginBottom: "0.5rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.5px",
-              }}
-            >
-              Buscar eventos
-            </label>
+        {/* Search & Filter Panel */}
+        <div className={styles["timeline-search-panel"]}>
+          <div className={styles["timeline-search-field"]}>
+            <svg className={styles["timeline-search-icon"]} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
             <input
               id="buscar-eventos"
               type="text"
-              placeholder="Busca por nombre, especialidad, doctor, fecha o hora..."
+              className={styles["timeline-search-input"]}
+              placeholder="Busca por nombre, especialidad, doctor, fecha u hora..."
               value={filtroTexto}
               onChange={(e) => setFiltroTexto(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.75rem",
-                fontSize: "1rem",
-                border: "1px solid var(--border-color)",
-                borderRadius: "0.375rem",
-                backgroundColor: "var(--bg-secondary)",
-                color: "var(--text-primary)",
-                boxSizing: "border-box",
-              }}
             />
           </div>
-
-          {/* Filtros por tipo de evento */}
-          <div>
-            <h4
-              style={{
-                fontSize: "0.9rem",
-                fontWeight: "600",
-                color: "var(--text-secondary)",
-                marginBottom: "1rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.5px",
-                margin: "0 0 1rem 0",
-              }}
-            >
-              Filtrar por tipo
-            </h4>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "1rem",
-              }}
-            >
-              {[
-                { key: "REGISTRO", label: "Registro en el Sistema" },
-                { key: "ADMISION", label: "Admisiones" },
-                { key: "FORMATO_EMERGENCIA", label: "Formato de Emergencia" },
-                {
-                  key: "FORMATO_HOSPITALIZACION",
-                  label: "Formato de Hospitalización",
-                },
-                { key: "ENCUENTRO", label: "Encuentros Médicos" },
-                { key: "CITA", label: "Citas Médicas" },
-              ].map(({ key, label }) => (
-                <label
-                  key={key}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    cursor: "pointer",
-                    gap: "0.5rem",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={filtrosTipo[key as keyof typeof filtrosTipo]}
-                    onChange={(e) =>
-                      setFiltrosTipo((prev) => ({
-                        ...prev,
-                        [key]: e.target.checked,
-                      }))
-                    }
-                    style={{
-                      cursor: "pointer",
-                      width: "1rem",
-                      height: "1rem",
-                    }}
-                  />
-                  <span style={{ fontSize: "0.95rem" }}>{label}</span>
-                </label>
-              ))}
-            </div>
+          <p className={styles["timeline-filter-label"]}>Filtrar por tipo</p>
+          <div className={styles["timeline-filter-chips"]}>
+            {[
+              { key: "REGISTRO", label: "Registro" },
+              { key: "ADMISION", label: "Admisiones" },
+              { key: "FORMATO_EMERGENCIA", label: "Formato Emergencia" },
+              { key: "FORMATO_HOSPITALIZACION", label: "Formato Hospitalización" },
+              { key: "ENCUENTRO", label: "Encuentros Médicos" },
+              { key: "CITA", label: "Citas Médicas" },
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                className={`${styles["timeline-chip"]} ${
+                  filtrosTipo[key as keyof typeof filtrosTipo] ? styles["timeline-chip--active"] : ""
+                }`}
+                onClick={() =>
+                  setFiltrosTipo((prev) => ({
+                    ...prev,
+                    [key]: !prev[key as keyof typeof filtrosTipo],
+                  }))
+                }
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Información de resultados */}
+        {/* Results count */}
         {timeline.length > 0 && (
-          <div
-            style={{
-              marginBottom: "1.5rem",
-              fontSize: "0.9rem",
-              color: "var(--text-secondary)",
-            }}
-          >
+          <p className={styles["timeline-result-count"]}>
             Mostrando <strong>{eventosFiltrados.length}</strong> de{" "}
             <strong>{timeline.length}</strong> eventos
-          </div>
+          </p>
         )}
 
+        {/* List */}
         {timeline.length === 0 ? (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "3rem",
-              backgroundColor: "var(--bg-tertiary)",
-              borderRadius: "0.5rem",
-              border: "1px solid var(--border-color)",
-            }}
-          >
-            <p style={{ color: "var(--text-secondary)" }}>
-              No hay eventos registrados en la historia clínica
-            </p>
+          <div className={styles["timeline-empty"]}>
+            No hay eventos registrados en la historia clínica
           </div>
         ) : eventosFiltrados.length === 0 ? (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "3rem",
-              backgroundColor: "var(--bg-tertiary)",
-              borderRadius: "0.5rem",
-              border: "1px solid var(--border-color)",
-            }}
-          >
-            <p style={{ color: "var(--text-secondary)" }}>
-              No se encontraron eventos
-            </p>
+          <div className={styles["timeline-empty"]}>
+            No se encontraron eventos con los filtros aplicados
           </div>
         ) : (
-          <div style={{ position: "relative" }}>
-            {/* Línea vertical del timeline */}
-            <div
-              style={{
-                position: "absolute",
-                left: "2rem",
-                top: "1rem",
-                bottom: "1rem",
-                width: "2px",
-                backgroundColor: "var(--border-color)",
-              }}
-            />
-
+          <div className={styles["timeline-list"]}>
+            <div className={styles["timeline-list-line"]} />
             {eventosFiltrados.map((evento, index) => (
-              <div
-                key={index}
-                style={{
-                  position: "relative",
-                  paddingLeft: "5rem",
-                  paddingBottom: "2rem",
-                }}
-              >
-                {/* Icono del evento */}
+              <div key={index} className={styles["timeline-item"]}>
+                {/* Colored circle icon */}
                 <div
-                  style={{
-                    position: "absolute",
-                    left: "0.75rem",
-                    top: "0",
-                    width: "2.5rem",
-                    height: "2.5rem",
-                    backgroundColor: evento.color,
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "1.2rem",
-                    border: "3px solid var(--bg-primary)",
-                    zIndex: 1,
-                  }}
+                  className={styles["timeline-item-icon"]}
+                  style={{ backgroundColor: evento.color }}
                 >
                   {evento.icono}
                 </div>
 
-                {/* Contenido del evento */}
+                {/* Card body with colored left border */}
                 <div
-                  style={{
-                    backgroundColor: "var(--bg-tertiary)",
-                    padding: "1.25rem",
-                    borderRadius: "0.5rem",
-                    border: "1px solid var(--border-color)",
-                    borderLeft: `4px solid ${evento.color}`,
-                  }}
+                  className={styles["timeline-item-body"]}
+                  style={{ borderLeft: `3px solid ${evento.color}` }}
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "start",
-                      marginBottom: "0.75rem",
-                    }}
-                  >
-                    <h4
-                      style={{
-                        margin: 0,
-                        fontSize: "1.1rem",
-                        color: "var(--text-primary)",
-                      }}
-                    >
-                      {evento.titulo}
-                    </h4>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-end",
-                        gap: "0.25rem",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: "0.85rem",
-                          color: "var(--text-secondary)",
-                          backgroundColor: "var(--bg-secondary)",
-                          padding: "0.25rem 0.75rem",
-                          borderRadius: "1rem",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {evento.tipo === 'CITA' || evento.tipo === 'ADMISION' || evento.tipo === 'ADMISION_INICIAL' || evento.tipo === 'ENCUENTRO' || evento.tipo === 'REGISTRO'
+                  <div className={styles["timeline-item-header"]}>
+                    <h4 className={styles["timeline-item-title"]}>{evento.titulo}</h4>
+                    <div className={styles["timeline-item-dates"]}>
+                      <span className={styles["timeline-date-badge"]}>
+                        {evento.tipo === "CITA" ||
+                        evento.tipo === "ADMISION" ||
+                        evento.tipo === "ENCUENTRO" ||
+                        evento.tipo === "REGISTRO"
                           ? formatDateLocal(evento.fecha)
-                          : formatDateVenezuela(evento.fecha)
-                        }
+                          : formatDateVenezuela(evento.fecha)}
                       </span>
-                      <span
-                        style={{
-                          fontSize: "0.85rem",
-                          color: "var(--text-secondary)",
-                          backgroundColor: "var(--bg-secondary)",
-                          padding: "0.25rem 0.75rem",
-                          borderRadius: "1rem",
-                          whiteSpace: "nowrap",
-                          fontWeight: "600",
-                          fontFamily: "monospace",
-                        }}
-                      >
+                      <span className={styles["timeline-time-badge"]}>
                         {formatTimeMilitaryVenezuela(evento.hora)}
                       </span>
                     </div>
                   </div>
+
                   {evento.tipo !== "ENCUENTRO" && (
-                    <p
-                      style={{
-                        margin: "0 0 0.5rem 0",
-                        color: "var(--text-secondary)",
-                        fontSize: "0.95rem",
-                      }}
-                    >
-                      {evento.descripcion}
-                    </p>
+                    <p className={styles["timeline-item-desc"]}>{evento.descripcion}</p>
                   )}
 
-                  {/* Detalles adicionales según tipo de evento */}
+                  {/* Encuentro — Ver detalle button */}
                   {evento.detalles && evento.tipo === "ENCUENTRO" && (
-                    <div
-                      style={{
-                        marginTop: "1rem",
-                        paddingTop: "1rem",
-                        borderTop: "1px solid var(--border-color)",
-                      }}
-                    >
+                    <div className={styles["timeline-detail-section"]}>
                       <button
-                        onClick={() =>
-                          handleVerDetalleEncuentro(evento.detalles)
-                        }
-                        style={{
-                          padding: "0.5rem 1rem",
-                          backgroundColor: "#3b82f6",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "0.375rem",
-                          cursor: "pointer",
-                          fontSize: "0.875rem",
-                          fontWeight: "500",
-                        }}
+                        className={styles["timeline-btn-detail"]}
+                        onClick={() => handleVerDetalleEncuentro(evento.detalles)}
                       >
-                        Ver detalle completo del encuentro →
+                        Ver detalle completo del encuentro
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="5" y1="12" x2="19" y2="12"/>
+                          <polyline points="12 5 19 12 12 19"/>
+                        </svg>
                       </button>
                     </div>
                   )}
+
+                  {/* Admisión — extra details */}
                   {evento.detalles &&
-                    (evento.tipo === "ADMISION" ||
-                      evento.tipo === "ADMISION_INICIAL") && (
-                      <div
-                        style={{
-                          marginTop: "1rem",
-                          paddingTop: "1rem",
-                          borderTop: "1px solid var(--border-color)",
-                          display: "grid",
-                          gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-                          gap: "0.75rem",
-                          fontSize: "0.85rem",
-                        }}
-                      >
-                        <div>
-                          <strong style={{ color: "var(--text-secondary)" }}>
-                            Forma Ingreso:
-                          </strong>
-                          <span style={{ marginLeft: "0.5rem" }}>
+                    (evento.tipo === "ADMISION" || evento.tipo === "ADMISION_INICIAL") && (
+                      <div className={styles["timeline-detail-section"]}>
+                        <div className={styles["timeline-detail-grid"]}>
+                          <div>
+                            <strong>Forma Ingreso: </strong>
                             {evento.detalles.formaIngreso || "N/A"}
-                          </span>
-                        </div>
-                        {evento.detalles.habitacion && (
-                          <div>
-                            <strong style={{ color: "var(--text-secondary)" }}>
-                              Habitación:
-                            </strong>
-                            <span style={{ marginLeft: "0.5rem" }}>
+                          </div>
+                          {evento.detalles.habitacion && (
+                            <div>
+                              <strong>Habitación: </strong>
                               {evento.detalles.habitacion}
-                            </span>
-                          </div>
-                        )}
-                        {evento.detalles.cama && (
-                          <div>
-                            <strong style={{ color: "var(--text-secondary)" }}>
-                              Cama:
-                            </strong>
-                            <span style={{ marginLeft: "0.5rem" }}>
+                            </div>
+                          )}
+                          {evento.detalles.cama && (
+                            <div>
+                              <strong>Cama: </strong>
                               {evento.detalles.cama}
-                            </span>
-                          </div>
-                        )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
 
-                  {/* Información de auditoría - Quién registró el evento (aparece al final) */}
+                  {/* Audit trail */}
                   {evento.registradoPor && (
-                    <div
-                      style={{
-                        marginTop: "1rem",
-                        paddingTop: "1rem",
-                        borderTop: "1px solid var(--border-color)",
-                        fontSize: "0.85rem",
-                        color: "var(--text-secondary)",
-                        display: "flex",
-                        gap: "0.5rem",
-                        flexWrap: "wrap",
-                        alignItems: "center",
-                      }}
-                    >
+                    <div className={styles["timeline-audit"]}>
                       <span style={{ fontStyle: "italic" }}>Registrado por:</span>
-                      <strong style={{ color: "var(--text-primary)" }}>
-                        {evento.registradoPor.nombre}
-                      </strong>
+                      <strong>{evento.registradoPor.nombre}</strong>
                       {evento.registradoPor.cargo && (
                         <span>
                           • {evento.registradoPor.cargo}

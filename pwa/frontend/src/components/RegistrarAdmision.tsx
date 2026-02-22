@@ -244,7 +244,8 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
 
           <div className={styles.actions}>
             <button onClick={onBack} className={styles.cancelBtn}>
-              ← Volver
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              Volver
             </button>
           </div>
         </>
@@ -413,7 +414,8 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
                   }}
                   className={styles.cancelBtn}
                 >
-                  ← Volver a búsqueda
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  Volver a búsqueda
                 </button>
                 <button type="submit" className={styles.submitBtn} disabled={submitting}>
                   {submitting ? 'Creando admisión...' : 'Crear Admisión de Hospitalización'}
