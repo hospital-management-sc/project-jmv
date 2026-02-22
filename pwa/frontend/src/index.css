@@ -51,6 +51,7 @@ body {
   min-height: 100vh;
   background: #0f172a;
   overflow-x: hidden;
+  overscroll-behavior: none;
 }
 
 a {
