@@ -55,9 +55,9 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
-  height: 100dvh;
-  height: 100vh;  /* Fallback para navegadores antiguos */
+  /* Bloquear solo scroll horizontal, permitir vertical */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
@@ -69,18 +69,17 @@ body {
   background-color: var(--bg-primary);
   line-height: 1.5;
   transition: var(--transition);
-  overflow: hidden;
-  height: 100dvh;
-  height: 100vh;  /* Fallback para navegadores antiguos */
+  /* Bloquear solo scroll horizontal, permitir vertical */
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Para iOS: smooth scrolling */
+  -webkit-overflow-scrolling: touch;
 }
 
 #root {
-  min-height: 100dvh;
-  min-height: 100vh;  /* Fallback para navegadores antiguos */
-  overflow-y: auto;
+  min-height: auto;
+  /* Bloquear solo scroll horizontal en elementos internos */
   overflow-x: hidden;
-  /* Para iOS: evitar bounce scroll */
-  -webkit-overflow-scrolling: touch;
 }
 
 /* Typography */
