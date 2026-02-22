@@ -55,6 +55,9 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100dvh;
+  height: 100vh;  /* Fallback para navegadores antiguos */
 }
 
 body {
@@ -66,10 +69,18 @@ body {
   background-color: var(--bg-primary);
   line-height: 1.5;
   transition: var(--transition);
+  overflow: hidden;
+  height: 100dvh;
+  height: 100vh;  /* Fallback para navegadores antiguos */
 }
 
 #root {
-  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100vh;  /* Fallback para navegadores antiguos */
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Para iOS: evitar bounce scroll */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Typography */
