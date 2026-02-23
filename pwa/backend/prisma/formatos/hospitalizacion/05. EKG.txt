@@ -1,7 +1,0 @@
-EKG -----
-
-FECHA:
-HORA:
-
-Px:
-Edad:

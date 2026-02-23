@@ -1,1 +1,0 @@
-export { PatientTypeSelector } from './PatientTypeSelector';
