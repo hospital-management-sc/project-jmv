@@ -1,0 +1,7 @@
+export { apiService } from './api'
+export { authService } from './auth'
+export { encuentrosService } from './encuentros.service'
+export { pacientesService } from './pacientes.service'
+export * from './interconsultas.service'
+export * from './citas.service'
+export * from './admisiones.service'

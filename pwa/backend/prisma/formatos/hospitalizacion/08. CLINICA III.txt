@@ -1,0 +1,28 @@
+CLINICA III -----
+
+FECHA:
+HORA:
+
+Px: 
+Edad:
+
+EXAMEN FISICO
+SV: 
+P.A. (mm/Hg): 
+F.C. (Lpm): 
+F.R. (Rpm): 
+Temp (*C): 
+SPO2 (%):
+Peso (kg): 
+Talla (cm):
+PIEL:
+CABEZA:
+OJOS:
+OIDOS:
+BOCA:
+CUELLO:
+C/P:
+ABDOMEN:
+GENITALES:
+EXTREMIDADES:
+NEUROLOGICO:

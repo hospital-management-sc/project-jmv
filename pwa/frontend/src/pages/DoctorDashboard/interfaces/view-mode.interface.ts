@@ -1,0 +1,12 @@
+export type ViewMode = 
+  | 'main' 
+  | 'register-emergency'
+  | 'hospitalized-patients' 
+  | 'register-encounter' 
+  | 'search-patient' 
+  | 'patient-history'
+  | 'today-encounters'
+  | 'my-appointments'
+  | 'interconsultas'
+  | 'pacientes-emergencia'
+  | 'registrar-alta'

@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+/**
+ * Database Configuration Script
+ * 
+ * Configure Prisma seed runner in package.json:
+ * "prisma": {
+ *   "seed": "ts-node prisma/seeds/seed.ts"
+ * }
+ */
+
+import { execSync } from 'child_process';
+
+// This script can be enhanced with additional configuration logic
+console.log('🔧 Prisma configuration loaded');

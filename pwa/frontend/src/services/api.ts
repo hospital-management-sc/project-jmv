@@ -1,0 +1,109 @@
+import { API_BASE_URL, STORAGE_KEYS } from '@/utils/constants'
+
+interface RequestOptions extends RequestInit {
+  headers?: Record<string, string>
+}
+
+async function request<T>(
+  endpoint: string,
+  options: RequestOptions = {}
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`
+
+  // Get token from localStorage
+  const token = localStorage.getItem(STORAGE_KEYS.TOKEN)
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  }
+
+  // Add authorization header if token exists
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
+  // console.log('[API] Starting request:', { url, method: options.method || 'GET', timestamp: new Date().toISOString() })
+
+  try {
+    // console.log('[API] Sending fetch to:', url)
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      mode: 'cors',
+      credentials: 'include',
+    })
+
+    // console.log('[API] Response received', {
+    //   status: response.status,
+    //   statusText: response.statusText,
+    //   contentType: response.headers.get('content-type'),
+    // })
+
+    if (!response.ok) {
+      let errorData
+      try {
+        errorData = await response.json()
+      } catch {
+        errorData = { message: response.statusText }
+      }
+      console.error('[API] Error response:', { status: response.status, errorData })
+      
+      // Si es error de autenticación (401), solo limpiar si es un endpoint protegido
+      // NO redirigir aquí para permitir que el componente maneje el error (ej: login)
+      if (response.status === 401) {
+        // Solo limpiar tokens si NO es un endpoint de autenticación
+        const isAuthEndpoint = url.includes('/auth/login') || url.includes('/auth/register') || url.includes('/auth/forgot-password')
+        
+        if (!isAuthEndpoint) {
+          // console.warn('[API] Token inválido o expirado, limpiando sesión')
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          // Redirigir al login solo para endpoints protegidos
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login'
+          }
+        }
+      }
+      
+      throw new Error(errorData.message || `API Error: ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    // console.log('[API] Response parsed successfully:', data)
+    return data
+  } catch (error: unknown) {
+    // console.error('[API] Fetch failed:', {
+    //   error: error instanceof Error ? error.message : String(error),
+    //   url,
+    //   method: options.method || 'GET',
+    //   timestamp: new Date().toISOString(),
+    // })
+    throw error
+  }
+}
+
+export const apiService = {
+  get: <T,>(endpoint: string) => request<T>(endpoint, { method: 'GET' }),
+
+  post: <T,>(endpoint: string, data: unknown) =>
+    request<T>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  put: <T,>(endpoint: string, data: unknown) =>
+    request<T>(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  patch: <T,>(endpoint: string, data: unknown) =>
+    request<T>(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  delete: <T,>(endpoint: string) =>
+    request<T>(endpoint, { method: 'DELETE' }),
+}

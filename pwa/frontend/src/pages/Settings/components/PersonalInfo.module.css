@@ -1,0 +1,149 @@
+.personalInfoContainer {
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: 12px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  margin-bottom: 2rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.infoCard {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.infoCard:hover {
+  border-color: var(--color-turquoise);
+  background: rgba(45, 212, 191, 0.05);
+  transform: translateY(-2px);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  color: var(--color-turquoise);
+}
+
+.icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cardHeader label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cardValue {
+  font-size: 1rem;
+  color: var(--text-primary);
+  word-break: break-word;
+  font-weight: 500;
+}
+
+.loading,
+.error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.error {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+@media (max-width: 768px) {
+  .personalInfoContainer {
+    padding: 1.25rem;
+  }
+
+  .infoGrid {
+    /* 2 cards per row on mobile — mirrors DoctorDashboard metric cards */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .infoCard {
+    padding: 0.9rem 0.75rem;
+  }
+
+  .cardHeader {
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .icon svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .cardHeader label {
+    font-size: 0.75rem;
+  }
+
+  .cardValue {
+    font-size: 0.875rem;
+  }
+
+  .header h3 {
+    font-size: 1.2rem;
+  }
+}
+
+/* Very small phones: keep 2 columns but tighter */
+@media (max-width: 380px) {
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+}

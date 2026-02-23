@@ -1,0 +1,17 @@
+SIGNOS VITALES -----
+
+FECHA:
+HORA:
+CAMA:
+
+Px:
+Edad:
+
+FECHA
+HORA
+T.A.
+TAM
+FC
+FR
+SPO2
+OBSERVACIÓN

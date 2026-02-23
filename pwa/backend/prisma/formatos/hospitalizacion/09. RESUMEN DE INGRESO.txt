@@ -1,0 +1,64 @@
+RESUMEN DE INGRESO -----
+
+FECHA:
+HORA:
+
+Px:
+Edad
+
+M.C.:
+E.A.:
+
+
+ANTECEDENTES PERSONALES
+Patologia de Base:
+Alergia a Medicamentos:
+Antecedentes Qx:
+Transfusiones Sanguineas:
+Traumatismos:
+Hospitalizaciones Recientes:
+
+
+ANTECEDENTES FAMILIARES
+Madre:
+Padre:
+Hermanos:
+Femenina(s):
+Masculino(s):
+Hijos:
+Femenina(s):
+Masculino(s):
+
+HABITOS PSICOBIOLOGICOS
+Cafeinicos:
+Tabaquicos:
+IPA:
+Alcoholicos:
+Drogas:
+Adiccion a Medicamentos:
+
+
+EXAMEN FISICO -----
+Examen Fisico:
+SV: 
+P.A. (mm/Hg): 
+F.C. (Lpm): 
+F.R. (Rpm): 
+Temp (*C): 
+SPO2 (%):
+Peso (kg): 
+Talla (cm):
+PIEL:
+CABEZA:
+OJOS:
+OIDOS:
+BOCA:
+CUELLO:
+C/P:
+ABDOMEN:
+GENITALES:
+EXTREMIDADES:
+NEUROLOGICO:
+
+
+IDx:

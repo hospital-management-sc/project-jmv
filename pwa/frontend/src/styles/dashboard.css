@@ -1,0 +1,172 @@
+/* Estilos base para dashboards */
+
+.dashboard-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.dashboard-header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.5rem;
+  color: var(--text-primary);
+}
+
+.dashboard-header .subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.dashboard-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Estadísticas y Cards */
+.quick-info,
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+/* Secciones */
+.main-actions,
+.management-section,
+.recent-patients,
+.recent-activity {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.main-actions h2,
+.management-section h2,
+.recent-patients h2,
+.recent-activity h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+/* Grillas de acciones */
+.action-grid,
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.action-btn,
+.admin-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background: white;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.action-btn:hover,
+.admin-btn:hover {
+  border-color: var(--color-primary);
+  background-color: var(--bg-secondary);
+  color: var(--color-primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.action-btn .icon,
+.admin-btn .icon {
+  font-size: 1.8rem;
+}
+
+/* Placeholders para tablas y listas */
+.table-placeholder,
+.activity-placeholder {
+  background-color: var(--bg-secondary);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+  color: var(--text-secondary);
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-placeholder p,
+.activity-placeholder p {
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-header h1 {
+    font-size: 2rem;
+  }
+
+  .quick-info,
+  .dashboard-stats,
+  .action-grid,
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .main-actions,
+  .management-section,
+  .recent-patients,
+  .recent-activity {
+    padding: 1.5rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+  }
+}
