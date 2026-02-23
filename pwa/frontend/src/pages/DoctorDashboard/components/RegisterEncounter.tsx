@@ -323,7 +323,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
       {!formularioConfig ? (
         <div className={styles["form-card"]}>
           <div className={styles['error-alert']}>
-            ⚠️ Configuración de formulario no disponible para esta especialidad
+            Configuración de formulario no disponible para esta especialidad
           </div>
         </div>
       ) : (

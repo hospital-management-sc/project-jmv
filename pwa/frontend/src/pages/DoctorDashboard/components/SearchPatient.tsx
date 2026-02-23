@@ -177,6 +177,7 @@ export default function SearchPatient({
                   onChange={(e) => handleCINumerosChange(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && buscarPaciente()}
                   maxLength={9}
+                  inputMode="numeric"
                 />
               </div>
               <button onClick={buscarPaciente} disabled={searching}>
@@ -192,6 +193,7 @@ export default function SearchPatient({
                 onChange={(e) => handleHistoriaChange(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && buscarPaciente()}
                 maxLength={8}
+                inputMode="numeric"
               />
               <button onClick={buscarPaciente} disabled={searching}>
                 {searching ? "Buscando..." : "Buscar"}
