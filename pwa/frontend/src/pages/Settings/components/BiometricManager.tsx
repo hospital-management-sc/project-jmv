@@ -29,20 +29,6 @@ function LockIcon() {
   );
 }
 
-function GearIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
-      <path
-        d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm8.2 3.5c0-.4 0-.8-.1-1.1l2-1.5-1.9-3.3-2.4 1a8.6 8.6 0 0 0-1.9-1.1l-.4-2.5h-3.8l-.4 2.5c-.7.2-1.3.6-1.9 1.1l-2.4-1L1.9 9.4l2 1.5c-.1.3-.1.7-.1 1.1 0 .4 0 .8.1 1.1l-2 1.5 1.9 3.3 2.4-1c.6.5 1.2.9 1.9 1.1l.4 2.5h3.8l.4-2.5c.7-.2 1.3-.6 1.9-1.1l2.4 1 1.9-3.3-2-1.5c.1-.3.1-.7.1-1.1Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function WarningIcon() {
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
