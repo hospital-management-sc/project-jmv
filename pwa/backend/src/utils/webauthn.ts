@@ -12,7 +12,12 @@ import {
 
 export const RP_ID = process.env.WEBAUTHN_RP_ID || 'localhost';
 export const RP_NAME = 'Hospital Management System';
-export const ORIGIN = process.env.WEBAUTHN_ORIGIN || 'http://localhost:5173';
+// Support comma-separated list of origins for multi-environment deployments
+export const ORIGIN: string | string[] = process.env.WEBAUTHN_ORIGIN
+  ? process.env.WEBAUTHN_ORIGIN.includes(',')
+    ? process.env.WEBAUTHN_ORIGIN.split(',').map((o) => o.trim())
+    : process.env.WEBAUTHN_ORIGIN.trim()
+  : 'http://localhost:5173';
 
 /**
  * Generate registration options for a new biometric credential

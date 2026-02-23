@@ -7,6 +7,7 @@ import FormInput from '@components/FormInput'
 import PasswordToggle from '@components/PasswordToggle'
 import { authService } from '@services/auth'
 import { useAuth } from '@/contexts/AuthContext'
+import { API_BASE_URL } from '@/utils/constants'
 import {
   isWebAuthnSupported,
   isPlatformAuthenticatorAvailable,
@@ -145,7 +146,7 @@ export default function Login() {
     setBiometricLoading(true)
     try {
       // 1. Get challenge from server
-      const initiateRes = await fetch('/api/biometric/authenticate/initiate', {
+      const initiateRes = await fetch(`${API_BASE_URL}/biometric/authenticate/initiate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       })
@@ -164,7 +165,7 @@ export default function Login() {
       }
 
       // 3. Verify with server
-      const verifyRes = await fetch('/api/biometric/authenticate/verify', {
+      const verifyRes = await fetch(`${API_BASE_URL}/biometric/authenticate/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

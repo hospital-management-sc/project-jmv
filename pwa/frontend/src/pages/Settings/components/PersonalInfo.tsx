@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { API_BASE_URL } from '@/utils/constants';
 import styles from './PersonalInfo.module.css';
 
 // --- Field icons ---
@@ -79,7 +80,7 @@ export default function PersonalInfo() {
       return;
     }
     const token = localStorage.getItem('token');
-    fetch('/api/auth/me', {
+    fetch(`${API_BASE_URL}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())

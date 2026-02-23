@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { API_BASE_URL } from '@/utils/constants';
 import {
   isWebAuthnSupported,
   isPlatformAuthenticatorAvailable,
@@ -136,7 +137,7 @@ export default function BiometricManager({
 
       setLoading(true);
       try {
-        const response = await fetch('/api/biometric/credentials', {
+        const response = await fetch(`${API_BASE_URL}/biometric/credentials`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -181,7 +182,7 @@ export default function BiometricManager({
 
     try {
       // Step 1: Initiate registration (get challenge)
-      const initiateResponse = await fetch('/api/biometric/register/initiate', {
+      const initiateResponse = await fetch(`${API_BASE_URL}/biometric/register/initiate`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -209,7 +210,7 @@ export default function BiometricManager({
       const transports = getTransportsFromCredential(attestationResponse);
 
       // Step 4: Verify credential with backend
-      const verifyResponse = await fetch('/api/biometric/register/verify', {
+      const verifyResponse = await fetch(`${API_BASE_URL}/biometric/register/verify`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -256,7 +257,7 @@ export default function BiometricManager({
     if (!newName.trim()) return;
 
     try {
-      const response = await fetch(`/api/biometric/credentials/${credentialId}`, {
+      const response = await fetch(`${API_BASE_URL}/biometric/credentials/${credentialId}`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -288,7 +289,7 @@ export default function BiometricManager({
 
     setDeleting(deviceId);
     try {
-      const response = await fetch(`/api/biometric/credentials/${credentialId}`, {
+      const response = await fetch(`${API_BASE_URL}/biometric/credentials/${credentialId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
