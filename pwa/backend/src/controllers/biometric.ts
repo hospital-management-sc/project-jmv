@@ -18,6 +18,12 @@ import {
 import { generateToken } from '../services/auth';
 import { ValidationError, AppError } from '../types/responses';
 import logger from '../utils/logger';
+import {
+  setRegistrationChallenge,
+  popRegistrationChallenge,
+  setAuthChallenge,
+  popAuthChallenge,
+} from '../utils/challengeStore';
 
 /**
  * GET /api/biometric/credentials
@@ -66,13 +72,8 @@ export const initiateBiometricRegistration = async (req: AuthRequest, res: Respo
 
     const options = await generateRegistrationChallenge(req.user.id, req.user.email || '');
 
-    // Store challenge in session or temporary storage
-    // In production, use Redis or similar with TTL
-    const session = req.session as any;
-    session.webauthn = {
-      challenge: options.challenge,
-      timestamp: Date.now(),
-    };
+    // Store challenge in memory (cross-domain sessions don't work)
+    setRegistrationChallenge(req.user.id, options.challenge);
 
     res.status(200).json({
       success: true,
@@ -113,9 +114,8 @@ export const verifyBiometricCredential = async (req: AuthRequest, res: Response)
       throw new ValidationError('Credential response and device name are required');
     }
 
-    // Get stored challenge from session
-    const session = req.session as any;
-    const storedChallenge = session?.webauthn?.challenge;
+    // Get stored challenge from memory store
+    const storedChallenge = popRegistrationChallenge(req.user.id);
     if (!storedChallenge) {
       throw new ValidationError('No registration challenge found. Please initiate registration again.');
     }
@@ -129,11 +129,6 @@ export const verifyBiometricCredential = async (req: AuthRequest, res: Response)
       deviceType || 'platform',
       transports || []
     );
-
-    // Clear challenge from session
-    if (session) {
-      session.webauthn = null;
-    }
 
     res.status(201).json({
       success: true,
@@ -252,18 +247,12 @@ export const initiateAuthentication = async (_req: any, res: Response): Promise<
   try {
     const options = await generateAuthenticationChallenge();
 
-    // Store challenge in session or temporary storage
-    const session = _req.session;
-    if (session) {
-      session.webauthn = {
-        challenge: options.challenge,
-        timestamp: Date.now(),
-      };
-    }
+    // Store challenge in memory and return opaque token for the client
+    const challengeToken = setAuthChallenge(options.challenge);
 
     res.status(200).json({
       success: true,
-      data: options,
+      data: { ...options, challengeToken },
       message: 'Authentication initiated',
     });
   } catch (error) {
@@ -282,15 +271,14 @@ export const initiateAuthentication = async (_req: any, res: Response): Promise<
  */
 export const verifyAuthentication = async (req: any, res: Response): Promise<void> => {
   try {
-    const { credentialId, assertionResponse } = req.body;
+    const { credentialId, assertionResponse, challengeToken } = req.body;
 
     if (!credentialId || !assertionResponse) {
       throw new ValidationError('Credential ID and assertion response are required');
     }
 
-    // Get stored challenge from session
-    const session = req.session;
-    const storedChallenge = session?.webauthn?.challenge;
+    // Retrieve and consume challenge from memory store
+    const storedChallenge = challengeToken ? popAuthChallenge(challengeToken) : null;
     if (!storedChallenge) {
       throw new ValidationError('No authentication challenge found. Please initiate authentication again.');
     }
@@ -312,11 +300,6 @@ export const verifyAuthentication = async (req: any, res: Response): Promise<voi
       ipAddress,
       userAgent || 'Unknown'
     );
-
-    // Clear challenge from session
-    if (session) {
-      session.webauthn = null;
-    }
 
     // Generate JWT token for the authenticated user
     const u = result.user as any;

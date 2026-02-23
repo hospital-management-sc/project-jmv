@@ -155,11 +155,12 @@ export default function Login() {
       }
       const initiateData = await initiateRes.json()
       const authOptions = initiateData.data
+      const { challengeToken, ...webAuthnOptions } = authOptions
 
       // 2. Browser prompts for biometrics
       let assertionResponse
       try {
-        assertionResponse = await startWebAuthnAuthentication(authOptions)
+        assertionResponse = await startWebAuthnAuthentication(webAuthnOptions)
       } catch (webAuthnErr) {
         throw new Error(getWebAuthnErrorMessage(webAuthnErr))
       }
@@ -171,6 +172,7 @@ export default function Login() {
         body: JSON.stringify({
           credentialId: assertionResponse.id,
           assertionResponse,
+          challengeToken,
         }),
       })
       const verifyData = await verifyRes.json()
