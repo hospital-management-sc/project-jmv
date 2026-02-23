@@ -186,27 +186,21 @@ export const verifyBiometricAuthentication = async (
     );
 
     if (!verification.verified) {
-      // Update last verification error
       await prisma.biometricCredential.update({
         where: { credentialId },
-        data: {
-          lastVerificationError: 'Authentication verification failed',
-        },
+        data: { lastVerificationError: 'Authentication verification failed' },
       });
       throw new Error('Authentication verification failed');
     }
 
-    // Check sign count to detect potential cloning
-    if ((verification.authenticationInfo?.newCounter || 0) <= credential.signCount) {
-      logger.warn(
-        `Potential biometric cloning detected for credential ${credentialId}`
-      );
-      // Update last verification error
+    // Sign count check: synced passkeys (iCloud Keychain, Google Password Manager, etc.)
+    // legitimately use counter = 0. Only flag if BOTH old and new are > 0 and new ≤ old.
+    const newCounter = verification.authenticationInfo?.newCounter ?? 0;
+    if (newCounter > 0 && newCounter <= credential.signCount) {
+      logger.warn(`Potential biometric cloning detected for credential ${credentialId}`);
       await prisma.biometricCredential.update({
         where: { credentialId },
-        data: {
-          lastVerificationError: 'Sign count mismatch - possible cloning attempt',
-        },
+        data: { lastVerificationError: 'Sign count mismatch - possible cloning attempt' },
       });
       throw new Error('Sign count validation failed - possible cloning attempt');
     }
