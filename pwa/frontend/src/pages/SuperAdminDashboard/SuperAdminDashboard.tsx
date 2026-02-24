@@ -533,7 +533,10 @@ export default function SuperAdminDashboard() {
 
             {/* Tabla */}
             {loading ? (
-              <div className={styles.loading}>Cargando...</div>
+              <div className={styles.loading}>
+                <div className="spinner" aria-hidden="true" />
+                <p className="loading-text">Cargando...</p>
+              </div>
             ) : personalFiltrado.length === 0 ? (
               <div className={styles.emptyState}>
                 <p>No se encontró personal con los filtros aplicados</p>

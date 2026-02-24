@@ -2732,7 +2732,7 @@
 .timeline-chip {
   padding: 0.3rem 0.8rem;
   border-radius: 2rem;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.04);
@@ -2767,7 +2767,7 @@
 /* ── Timeline List ── */
 .timeline-list {
   position: relative;
-  padding-left: 4.5rem;
+  padding-left: 3rem;
 }
 
 .timeline-list-line {
@@ -2871,6 +2871,25 @@
   line-height: 1.5;
 }
 
+.timeline-cita-info {
+  margin: 0 0 0.25rem;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.timeline-cita-info p {
+  margin: 0 0 0.25rem;
+}
+
+.timeline-cita-info p:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-cita-info strong {
+  color: rgba(255, 255, 255, 0.78);
+}
+
 .timeline-audit {
   margin-top: 0.875rem;
   padding-top: 0.75rem;
@@ -2878,13 +2897,25 @@
   font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.38);
   display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
 }
 
 .timeline-audit strong {
   color: rgba(255, 255, 255, 0.65);
+}
+
+.timeline-audit-label {
+  font-style: italic;
+}
+
+.timeline-audit-name {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.timeline-audit-meta {
+  color: rgba(255, 255, 255, 0.46);
 }
 
 .timeline-detail-section {

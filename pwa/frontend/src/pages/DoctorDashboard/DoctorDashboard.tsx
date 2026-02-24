@@ -3,7 +3,7 @@
  * Vista especializada para atención médica y gestión de pacientes
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import styles from "./DoctorDashboard.module.css";
 import type { PatientBasic, ViewMode } from "./interfaces";
 import {
@@ -72,6 +72,16 @@ export default function DoctorDashboard() {
     setViewMode("search-patient");
     setSelectedPatient(null);
   };
+
+  useEffect(() => {
+    const handleGoMain = () => {
+      setViewMode("main");
+      setSelectedPatient(null);
+    };
+
+    window.addEventListener("dashboard:go-main", handleGoMain);
+    return () => window.removeEventListener("dashboard:go-main", handleGoMain);
+  }, []);
 
   return (
     <div className={styles["dashboard-container"]}>

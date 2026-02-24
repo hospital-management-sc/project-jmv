@@ -10,7 +10,8 @@ export type EstadoCita = 'PROGRAMADA' | 'COMPLETADA';
 export interface Cita {
   id: number;
   pacienteId: number;
-  medicoId: number;
+  medicoId?: number | null;
+  createdById?: number | null; // Quién agendó la cita
   servicio?: string;
   especialidad: string;
   fechaHora?: string; // Campo alternativo
@@ -37,7 +38,16 @@ export interface Cita {
     nombre: string;
     apellido?: string;
     especialidad?: string | null;
-  };
+    cargo?: string;
+    role?: string;
+  } | null;
+  createdBy?: {
+    id: number;
+    nombre: string;
+    cargo?: string;
+    especialidad?: string;
+    role?: string;
+  } | null;
   encuentro?: {
     id: number;
     tipo: string;
@@ -47,10 +57,13 @@ export interface Cita {
 
 export interface CrearCitaDTO {
   pacienteId: number;
-  medicoId: number;
-  servicio: string;
+  medicoId?: number | null;
+  createdById?: number | null; // Quién agendó la cita
+  servicio?: string;
   especialidad: string;
-  fechaHora: string;
+  fechaHora?: string;
+  fechaCita?: string; // Alternativa a fechaHora
+  horaCita?: string;
   motivo: string;
   notas?: string;
 }

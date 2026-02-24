@@ -74,6 +74,33 @@ export default function PatientHistory({ patient, onBack }: Props) {
     setEncuentroSeleccionado(null);
   };
 
+  const crearAuditTrail = (
+    source: any,
+    fallback: { nombre: string; cargo: string; especialidad?: string } = {
+      nombre: "Sistema",
+      cargo: "Registro automático",
+    }
+  ) => {
+    const nombreCompuesto = [source?.firstName, source?.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    return {
+      nombre: source?.nombre || nombreCompuesto || fallback.nombre,
+      cargo: source?.cargo || fallback.cargo,
+      especialidad: source?.especialidad || fallback.especialidad,
+      role: source?.role,
+    };
+  };
+
+  const formatearNombreDoctor = (medico?: any) => {
+    if (!medico) return "Médico por asignar";
+    const nombreCompleto = `${medico.nombre || ""} ${medico.apellido || ""}`.trim();
+    if (!nombreCompleto) return "Médico por asignar";
+    return /^dr\.?/i.test(nombreCompleto) ? nombreCompleto : `Dr. ${nombreCompleto}`;
+  };
+
   // Construir timeline de eventos (misma lógica que PatientHistoryView.tsx)
   const construirTimeline = () => {
     if (!historiaCompleta) return [];
@@ -100,14 +127,10 @@ export default function PatientHistory({ patient, onBack }: Props) {
         descripcion: `Paciente registrado en el sistema hospitalario.`,
         color: "#10b981",
         // Auditoría - Quién registró
-        registradoPor: usuarioRegistrador
-          ? {
-              nombre: usuarioRegistrador.nombre || "Administrativo",
-              cargo: usuarioRegistrador.cargo || "Administrativo",
-              especialidad: usuarioRegistrador.especialidad,
-              role: usuarioRegistrador.role,
-            }
-          : null,
+        registradoPor: crearAuditTrail(usuarioRegistrador, {
+          nombre: "Administrativo",
+          cargo: "Coordinador Administrativo",
+        }),
       });
     }
 
@@ -137,14 +160,10 @@ export default function PatientHistory({ patient, onBack }: Props) {
             detalles: admision,
             color: tipoAdmision === "EMERGENCIA" ? "#ef4444" : "#3b82f6",
             // Auditoría - Quién creó la admisión
-            registradoPor: admision.createdBy
-              ? {
-                  nombre: admision.createdBy.nombre || "Usuario desconocido",
-                  cargo: admision.createdBy.cargo || "No especificado",
-                  especialidad: admision.createdBy.especialidad,
-                  role: admision.createdBy.role,
-                }
-              : null,
+            registradoPor: crearAuditTrail(admision.createdBy || usuarioRegistrador, {
+              nombre: "Usuario administrativo",
+              cargo: "Admisión",
+            }),
           });
 
           // Eventos: Información completada en Formato de Emergencia
@@ -167,6 +186,10 @@ export default function PatientHistory({ patient, onBack }: Props) {
               descripcion: resumenDatos.length > 0 ? resumenDatos.join(" • ") : "Información clínica de emergencia registrada",
               detalles: formato,
               color: "#ec4899",
+              registradoPor: crearAuditTrail(admision.createdBy || usuarioRegistrador, {
+                nombre: "Equipo de Emergencia",
+                cargo: "Registro clínico",
+              }),
             });
           }
 
@@ -197,6 +220,10 @@ export default function PatientHistory({ patient, onBack }: Props) {
               descripcion: resumenDatos.length > 0 ? resumenDatos.join(" • ") : "Documentación clínica de hospitalización registrada",
               detalles: formato,
               color: "#06b6d4",
+              registradoPor: crearAuditTrail(admision.createdBy || usuarioRegistrador, {
+                nombre: "Equipo de Hospitalización",
+                cargo: "Registro clínico",
+              }),
             });
           }
         }
@@ -239,14 +266,10 @@ export default function PatientHistory({ patient, onBack }: Props) {
           color: color,
           diagnostico: diagnostico,
           // Auditoría - Médico que realizó el encuentro
-          registradoPor: encuentro.createdBy
-            ? {
-                nombre: encuentro.createdBy.nombre || "Médico no registrado",
-                cargo: encuentro.createdBy.cargo || "Médico",
-                especialidad: encuentro.createdBy.especialidad,
-                role: encuentro.createdBy.role,
-              }
-            : null,
+          registradoPor: crearAuditTrail(encuentro.createdBy, {
+            nombre: "Médico tratante",
+            cargo: "Médico",
+          }),
         });
       });
     }
@@ -256,7 +279,17 @@ export default function PatientHistory({ patient, onBack }: Props) {
       historiaCompleta.citas.forEach((cita: any) => {
         const estadoCita = cita.estado || "PROGRAMADA";
         const especialidad = cita.especialidad || "No especificado";
-        const motivo = cita.motivo ? ` - ${cita.motivo}` : "";
+        const motivoConsulta = cita.motivo || "No especificado";
+        
+        // Información del médico agendado (puede estar vacío si aún no se asigna)
+        const doctorAgendado = formatearNombreDoctor(cita.medico);
+        const especialidadDoctor = cita.medico?.especialidad || especialidad;
+        
+        const descripcionCita = [
+          `Especialidad: ${especialidad}`,
+          `Motivo de la Consulta: ${motivoConsulta}`,
+          `Agendado con: ${doctorAgendado}`,
+        ].join("\n");
 
         let icono: React.ReactNode = (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>);
         let color = "#f59e0b";
@@ -268,15 +301,22 @@ export default function PatientHistory({ patient, onBack }: Props) {
           estadoTexto = "Completada";
         }
 
+        // Usar createdBy si está disponible (quién agendó), otherwise default fallback
+        const agendadoPor = crearAuditTrail(cita.createdBy, {
+          nombre: "Coordinador Administrativo",
+          cargo: "Administración",
+        });
+
         eventos.push({
           tipo: "CITA",
           fecha: cita.fechaCita,
           hora: cita.horaCita,
           icono: icono,
           titulo: `Cita Médica (${estadoTexto})`,
-          descripcion: `Especialidad: ${especialidad}${motivo}`,
+          descripcion: descripcionCita,
           detalles: cita,
           color: color,
+          registradoPor: agendadoPor,
         });
       });
     }
@@ -408,10 +448,9 @@ export default function PatientHistory({ patient, onBack }: Props) {
   if (loading) {
     return (
       <section className={styles["view-section"]}>
-        <div style={{ textAlign: "center", padding: "3rem" }}>
-          <p style={{ fontSize: "1.2rem", color: "var(--text-secondary)" }}>
-            Cargando historia clínica...
-          </p>
+        <div className={styles["loading-container"]}>
+          <div className="spinner" aria-hidden="true" />
+          <p className="loading-text">Cargando historia clínica...</p>
         </div>
       </section>
     );
@@ -716,7 +755,16 @@ export default function PatientHistory({ patient, onBack }: Props) {
                     </div>
                   </div>
 
-                  {evento.tipo !== "ENCUENTRO" && (
+                  {evento.tipo === "CITA" ? (
+                    <div className={styles["timeline-cita-info"]}>
+                      <p><strong>Especialidad:</strong> {evento.detalles?.especialidad || "No especificado"}</p>
+                      <p><strong>Motivo de la Consulta:</strong> {evento.detalles?.motivo || "No especificado"}</p>
+                      <p>
+                        <strong>Agendado con:</strong>{" "}
+                        {formatearNombreDoctor(evento.detalles?.medico)}
+                      </p>
+                    </div>
+                  ) : evento.tipo !== "ENCUENTRO" && (
                     <p className={styles["timeline-item-desc"]}>{evento.descripcion}</p>
                   )}
 
@@ -762,19 +810,16 @@ export default function PatientHistory({ patient, onBack }: Props) {
                     )}
 
                   {/* Audit trail */}
-                  {evento.registradoPor && (
-                    <div className={styles["timeline-audit"]}>
-                      <span style={{ fontStyle: "italic" }}>Registrado por:</span>
-                      <strong>{evento.registradoPor.nombre}</strong>
-                      {evento.registradoPor.cargo && (
-                        <span>
-                          • {evento.registradoPor.cargo}
-                          {evento.registradoPor.especialidad &&
-                            ` (${evento.registradoPor.especialidad})`}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                  <div className={styles["timeline-audit"]}>
+                    <span className={styles["timeline-audit-label"]}>Registrado por:</span>
+                    <strong className={styles["timeline-audit-name"]}>{evento.registradoPor?.nombre || "Sistema"}</strong>
+                    <span className={styles["timeline-audit-meta"]}>
+                      • {evento.registradoPor?.cargo || "Registro automático"}
+                      {evento.registradoPor?.especialidad
+                        ? ` (${evento.registradoPor.especialidad})`
+                        : ""}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}

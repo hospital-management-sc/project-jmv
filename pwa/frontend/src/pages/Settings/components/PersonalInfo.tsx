@@ -130,7 +130,8 @@ export default function PersonalInfo() {
   if (loading) {
     return (
       <div className={styles.loading}>
-        <p>Cargando información...</p>
+        <div className="spinner" aria-hidden="true" />
+        <p className="loading-text">Cargando...</p>
       </div>
     );
   }

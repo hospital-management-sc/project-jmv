@@ -30,7 +30,7 @@ function convertBigIntToString(obj: any): any {
  */
 export const crearCita = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { pacienteId, medicoId, fechaCita, horaCita, especialidad, motivo, notas } = req.body
+    const { pacienteId, medicoId, fechaCita, horaCita, especialidad, motivo, notas, createdById } = req.body
 
     // Validar campos requeridos
     if (!pacienteId || !fechaCita || !especialidad) {
@@ -92,6 +92,7 @@ export const crearCita = async (req: Request, res: Response): Promise<void> => {
       data: {
         pacienteId: Number(pacienteId),
         medicoId: medicoId ? Number(medicoId) : null,
+        createdById: createdById ? Number(createdById) : null,
         fechaCita: new Date(fechaCita), // PostgreSQL Date type
         horaCita: horaCita || null, // Ahora es String, no necesita conversión
         especialidad,
@@ -113,6 +114,17 @@ export const crearCita = async (req: Request, res: Response): Promise<void> => {
             id: true,
             nombre: true,
             email: true,
+            cargo: true,
+            especialidad: true,
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            nombre: true,
+            cargo: true,
+            especialidad: true,
+            role: true,
           },
         },
       },

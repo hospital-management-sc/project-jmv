@@ -8,6 +8,7 @@ import { SearchableSelect } from '@/components/SearchableSelect'
 import { API_BASE_URL } from '@/utils/constants'
 import { getTodayVenezuelaISO, formatTimeMilitaryVenezuela, formatDateLocal } from '@/utils/dateUtils'
 import { obtenerNombresEspecialidades } from '@/config/especialidades.config'
+import { useAuth } from '@/contexts/AuthContext'
 import styles from '../AdminDashboard.module.css'
 
 interface CreateAppointmentFormProps {
@@ -15,6 +16,7 @@ interface CreateAppointmentFormProps {
 }
 
 export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentFormProps = {}) {
+  const { user } = useAuth() // Obtener usuario actual para saber quién agendó la cita
   const [searchCITipo, setSearchCITipo] = useState('V')
   const [searchCINumeros, setSearchCINumeros] = useState('')
   const [selectedPatient, setSelectedPatient] = useState<any>(preSelectedPatient || null)
@@ -272,6 +274,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       const citaData = {
         pacienteId: selectedPatient.id,
         medicoId: Number(appointmentData.medico), // REQUERIDO
+        createdById: user?.id ? Number(user.id) : null, // Quién agendó la cita - asegurar que sea número
         fechaCita: appointmentData.fecha, // YYYY-MM-DD
         horaCita: horaFinal, // HH:MM - Solo referencia
         especialidad: appointmentData.especialidad,
@@ -511,7 +514,10 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
               {appointmentData.especialidad ? (
                 <>
                   {loadingMedicos ? (
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>⏳ Cargando médicos disponibles...</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', padding: '0.35rem 0' }}>
+                      <div className="spinner" aria-hidden="true" style={{ transform: 'scale(0.55)', marginBottom: '0' }} />
+                      <p className="loading-text" style={{ fontSize: '0.82rem' }}>Cargando médicos disponibles...</p>
+                    </div>
                   ) : medicosDisponibles.length > 0 ? (
                     <>
                       <select

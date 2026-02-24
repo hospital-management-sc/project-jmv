@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import styles from './MainLayout.module.css'
 
@@ -27,9 +27,20 @@ const UserIcon = () => (
 
 export default function MainLayout() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, logout, isAuthenticated } = useAuth()
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const tooltipRef = useRef<HTMLDivElement>(null)
+
+  const handleLogoClick = () => {
+    const dashboardPath = user?.role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/medico'
+
+    if (location.pathname === dashboardPath) {
+      window.dispatchEvent(new CustomEvent('dashboard:go-main'))
+    }
+
+    navigate(dashboardPath)
+  }
 
   const handleLogout = () => {
     logout()
@@ -61,7 +72,7 @@ export default function MainLayout() {
       <header className={styles.header}>
         <div className={styles.container}>
           <button
-            onClick={() => navigate(user?.role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/medico')}
+            onClick={handleLogoClick}
             className={styles.logoLink}
             aria-label="Hospital JMV — Inicio"
             type="button"

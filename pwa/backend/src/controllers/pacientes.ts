@@ -399,6 +399,26 @@ export const obtenerPaciente = async (
           },
         },
         citas: {
+          include: {
+            medico: {
+              select: {
+                id: true,
+                nombre: true,
+                cargo: true,
+                especialidad: true,
+                role: true,
+              },
+            },
+            createdBy: {
+              select: {
+                id: true,
+                nombre: true,
+                cargo: true,
+                especialidad: true,
+                role: true,
+              },
+            },
+          },
           orderBy: {
             fechaCita: 'desc',
           },

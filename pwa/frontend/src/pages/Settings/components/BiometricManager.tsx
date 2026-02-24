@@ -388,7 +388,8 @@ export default function BiometricManager({
 
       {loading ? (
         <div className={styles.loading}>
-          <p>Cargando dispositivos...</p>
+          <div className="spinner" aria-hidden="true" />
+          <p className="loading-text">Cargando...</p>
         </div>
       ) : devices.length === 0 ? (
         <div className={styles.empty}>
@@ -445,18 +446,12 @@ export default function BiometricManager({
               <div className={styles.deviceDetails}>
                 <div className={styles.detailRow}>
                   <span className={styles.label}>Registrado:</span>
-                  <span>{formatDate(device.createdAt)}</span>
+                  <span className={styles.detailValue}>{formatDate(device.createdAt)}</span>
                 </div>
                 <div className={styles.detailRow}>
                   <span className={styles.label}>Último acceso:</span>
-                  <span>{formatDate(device.lastAccessedAt)}</span>
+                  <span className={styles.detailValue}>{formatDate(device.lastAccessedAt)}</span>
                 </div>
-                {device.transports && device.transports.length > 0 && (
-                  <div className={styles.detailRow}>
-                    <span className={styles.label}>Transportes:</span>
-                    <span>{device.transports.join(', ')}</span>
-                  </div>
-                )}
                 <div className={styles.detailRow}>
                   <span className={styles.label}>Estado:</span>
                   <span className={device.isActive ? styles.active : styles.inactive}>

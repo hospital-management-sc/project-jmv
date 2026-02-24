@@ -148,7 +148,8 @@ model Usuario {
   admisionesCreadas         Admision[]           @relation("AdmisionesCreadas")
   encuentros                Encuentro[]
   auditorias                AuditLog[]
-  citas                     Cita[]               @relation("CitasMedico")
+  citas                     Cita[]               @relation("CitasMedico")        // Citas donde es el médico agendado
+  citasCreadas              Cita[]               @relation("CitasCreadas")        // Citas que este usuario agendó
   laboratorios              Laboratorio[]
   estudiosEspeciales        EstudioEspecial[]
   electrocardiogramas       Electrocardiograma[]
@@ -401,6 +402,7 @@ model Cita {
   id                  Int    @id @default(autoincrement())
   pacienteId          Int
   medicoId            Int?
+  createdById         Int?   // Quién agendó la cita (coordinador, administrativo, etc.)
   fechaCita           DateTime  @db.Date
   horaCita            String?   @db.VarChar(8) // Formato: HH:MM:SS o HH:MM
   especialidad        String    @db.VarChar(100)
@@ -414,10 +416,12 @@ model Cita {
   // Relaciones
   paciente Paciente @relation("CitasPaciente", fields: [pacienteId], references: [id], onDelete: Cascade)
   medico   Usuario? @relation("CitasMedico", fields: [medicoId], references: [id])
+  createdBy Usuario? @relation("CitasCreadas", fields: [createdById], references: [id])
 
   @@index([pacienteId])
   @@index([fechaCita])
   @@index([estado])
+  @@index([createdById])
 }
 
 // ============================================
