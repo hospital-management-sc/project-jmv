@@ -50,7 +50,7 @@ Se ha configurado completamente la PWA para que se instale correctamente en **An
 <!-- Meta tags PWA activados -->
 <link rel="manifest" href="/manifest.json" />
 <meta name="theme-color" content="#7c3aed" />
-<meta name="description" content="Hospital JMV - Sistema de Gestión Hospitalaria" />
+<meta name="description" content="Hospital JMV - Sistema de Gestión Clínica y Administrativa" />
 
 <!-- Meta tags para iOS (Apple) -->
 <meta name="apple-mobile-web-app-capable" content="yes" />

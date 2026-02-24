@@ -66,6 +66,233 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
     },
+    formularioEspecializado: {
+      pasos: [
+        {
+          numero: 1,
+          titulo: "Buscar Paciente",
+          campos: [
+            {
+              id: "ciTipo",
+              tipo: "select",
+              label: "Tipo de Cédula",
+              requerido: true,
+              opciones: [
+                { valor: "V", etiqueta: "V (Venezolano)" },
+                { valor: "E", etiqueta: "E (Extranjero)" },
+                { valor: "P", etiqueta: "P (Pasaporte)" }
+              ]
+            },
+            {
+              id: "ciNumeros",
+              tipo: "input",
+              label: "Número de Cédula",
+              placeholder: "12345678",
+              requerido: true
+            }
+          ]
+        },
+        {
+          numero: 2,
+          titulo: "Datos del Encuentro e Historia",
+          campos: [
+            {
+              id: "tipo",
+              tipo: "select",
+              label: "Tipo de Encuentro",
+              requerido: true,
+              grupo: "encuentro",
+              opciones: [
+                { valor: "CONSULTA", etiqueta: "Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "Otro" }
+              ]
+            },
+            {
+              id: "fecha",
+              tipo: "date",
+              label: "Fecha",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "hora",
+              tipo: "time",
+              label: "Hora",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "motivoConsulta",
+              tipo: "textarea",
+              label: "Motivo de Consulta",
+              placeholder: "Describa el motivo de consulta...",
+              requerido: true,
+              rows: 3,
+              grupo: "principal"
+            },
+            {
+              id: "enfermedadActual",
+              tipo: "textarea",
+              label: "Enfermedad Actual",
+              placeholder: "Describa la enfermedad actual...",
+              rows: 4,
+              grupo: "principal"
+            },
+            {
+              id: "antecedentesPersonales",
+              tipo: "textarea",
+              label: "Antecedentes Personales",
+              placeholder: "Antecedentes personales relevantes...",
+              rows: 3,
+              grupo: "antecedentes"
+            },
+            {
+              id: "antecedentesQuirurgicos",
+              tipo: "textarea",
+              label: "Antecedentes Quirúrgicos",
+              placeholder: "Cirugías previas, fechas y complicaciones...",
+              rows: 3,
+              grupo: "antecedentes"
+            },
+            {
+              id: "habitosPsicobiologicos",
+              tipo: "textarea",
+              label: "Hábitos Psicobiológicos",
+              placeholder: "Sueño, alimentación, hábitos y otras observaciones...",
+              rows: 3,
+              grupo: "antecedentes"
+            }
+          ]
+        },
+        {
+          numero: 3,
+          titulo: "Examen Físico",
+          campos: [
+            {
+              id: "examenGeneral",
+              tipo: "textarea",
+              label: "General",
+              placeholder: "Hallazgos generales del examen físico...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "piel",
+              tipo: "textarea",
+              label: "Piel",
+              placeholder: "Hallazgos en piel...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "cabeza",
+              tipo: "textarea",
+              label: "Cabeza",
+              placeholder: "Hallazgos en cabeza...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "ojos",
+              tipo: "textarea",
+              label: "Ojos",
+              placeholder: "Hallazgos en ojos...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "oidos",
+              tipo: "textarea",
+              label: "Oídos",
+              placeholder: "Hallazgos en oídos...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "nariz",
+              tipo: "textarea",
+              label: "Nariz",
+              placeholder: "Hallazgos en nariz...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "cuelloTorax",
+              tipo: "textarea",
+              label: "Cuello / Tórax",
+              placeholder: "Hallazgos en cuello y tórax...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "abdomen",
+              tipo: "textarea",
+              label: "Abdomen",
+              placeholder: "Hallazgos abdominales...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "extremidades",
+              tipo: "textarea",
+              label: "Extremidades",
+              placeholder: "Hallazgos en extremidades...",
+              rows: 2,
+              grupo: "examenFisico"
+            },
+            {
+              id: "neurologico",
+              tipo: "textarea",
+              label: "Neurológico",
+              placeholder: "Hallazgos neurológicos...",
+              rows: 2,
+              grupo: "examenFisico"
+            }
+          ]
+        },
+        {
+          numero: 4,
+          titulo: "Diagnóstico y Conducta",
+          campos: [
+            {
+              id: "diagnostico",
+              tipo: "textarea",
+              label: "Diagnóstico",
+              placeholder: "Describa el diagnóstico...",
+              requerido: true,
+              rows: 3,
+              grupo: "diagnostico"
+            },
+            {
+              id: "plan",
+              tipo: "textarea",
+              label: "Plan",
+              placeholder: "Plan terapéutico y estudios complementarios...",
+              rows: 4,
+              grupo: "tratamiento"
+            },
+            {
+              id: "tratamiento",
+              tipo: "textarea",
+              label: "Tratamiento",
+              placeholder: "Indique tratamiento y recomendaciones...",
+              rows: 4,
+              grupo: "tratamiento"
+            },
+            {
+              id: "observaciones",
+              tipo: "textarea",
+              label: "Observaciones",
+              placeholder: "Observaciones adicionales...",
+              rows: 2,
+              grupo: "tratamiento"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     id: 'medicina-paliativa',
@@ -1573,6 +1800,189 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
       metricas: ['pacientesHospitalizados', 'pacientesEnEmergencia', 'encuentrosHoy', 'citasHoy', 'altasPendientes'],
       acciones: ['registrar-emergency', 'registrar-encuentro', 'hospitalized-patients', 'pacientes-emergencia', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas', 'registrar-alta'],
     },
+    formularioEspecializado: {
+      pasos: [
+        {
+          numero: 1,
+          titulo: "Buscar Paciente",
+          campos: [
+            {
+              id: "ciTipo",
+              tipo: "select",
+              label: "Tipo de Cédula",
+              requerido: true,
+              opciones: [
+                { valor: "V", etiqueta: "V (Venezolano)" },
+                { valor: "E", etiqueta: "E (Extranjero)" },
+                { valor: "P", etiqueta: "P (Pasaporte)" }
+              ]
+            },
+            {
+              id: "ciNumeros",
+              tipo: "input",
+              label: "Número de Cédula",
+              placeholder: "12345678",
+              requerido: true
+            }
+          ]
+        },
+        {
+          numero: 2,
+          titulo: "Datos del Paciente",
+          campos: [
+            {
+              id: "tipo",
+              tipo: "select",
+              label: "Tipo de Encuentro",
+              requerido: true,
+              grupo: "encuentro",
+              opciones: [
+                { valor: "CONSULTA", etiqueta: "Consulta" },
+                { valor: "EMERGENCIA", etiqueta: "Emergencia" },
+                { valor: "HOSPITALIZACION", etiqueta: "Evolución Hospitalización" },
+                { valor: "OTRO", etiqueta: "Otro" }
+              ]
+            },
+            {
+              id: "fecha",
+              tipo: "date",
+              label: "Fecha",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "hora",
+              tipo: "time",
+              label: "Hora",
+              requerido: true,
+              grupo: "encuentro"
+            },
+            {
+              id: "nombreApellido",
+              tipo: "input",
+              label: "Nombre y Apellido",
+              placeholder: "Nombre completo",
+              grupo: "datosPaciente"
+            },
+            {
+              id: "cedula",
+              tipo: "input",
+              label: "Cédula",
+              placeholder: "V-12345678",
+              grupo: "datosPaciente"
+            },
+            {
+              id: "edad",
+              tipo: "number",
+              label: "Edad",
+              placeholder: "45",
+              grupo: "datosPaciente"
+            },
+            {
+              id: "peso",
+              tipo: "number",
+              label: "Peso (kg)",
+              placeholder: "70",
+              step: "0.1",
+              grupo: "datosPaciente"
+            },
+            {
+              id: "talla",
+              tipo: "number",
+              label: "Talla (cm)",
+              placeholder: "170",
+              step: "0.1",
+              grupo: "datosPaciente"
+            },
+            {
+              id: "ocupacion",
+              tipo: "input",
+              label: "Ocupación",
+              placeholder: "Profesión u oficio",
+              grupo: "datosPaciente"
+            }
+          ]
+        },
+        {
+          numero: 3,
+          titulo: "Historia Clínica",
+          campos: [
+            {
+              id: "antecedentesPersonales",
+              tipo: "textarea",
+              label: "Antecedentes Personales",
+              placeholder: "Describa antecedentes personales relevantes...",
+              rows: 3,
+              grupo: "antecedentes"
+            },
+            {
+              id: "motivoConsulta",
+              tipo: "textarea",
+              label: "Motivo de Consulta",
+              placeholder: "Describa el motivo de la consulta...",
+              requerido: true,
+              rows: 3,
+              grupo: "principal"
+            },
+            {
+              id: "enfermedadActual",
+              tipo: "textarea",
+              label: "Enfermedad Actual",
+              placeholder: "Describa la evolución de la enfermedad...",
+              rows: 4,
+              grupo: "principal"
+            },
+            {
+              id: "examenFisicoRelevante",
+              tipo: "textarea",
+              label: "Examen Físico Relevante",
+              placeholder: "Hallazgos del examen físico relacionados con la patología...",
+              rows: 4,
+              grupo: "examenFisico"
+            }
+          ]
+        },
+        {
+          numero: 4,
+          titulo: "Evaluación y Plan",
+          campos: [
+            {
+              id: "examenesParaclínicos",
+              tipo: "textarea",
+              label: "Exámenes Paraclínicos",
+              placeholder: "Resultados de laboratorio, imagenología u otros exámenes relevantes...",
+              rows: 3,
+              grupo: "examenes"
+            },
+            {
+              id: "planTratamiento",
+              tipo: "textarea",
+              label: "Plan de Tratamiento",
+              placeholder: "Plan terapéutico incluyendo terapia física, farmacología, etc...",
+              requerido: true,
+              rows: 4,
+              grupo: "tratamiento"
+            },
+            {
+              id: "evolucion",
+              tipo: "textarea",
+              label: "Evolución",
+              placeholder: "Notas de seguimiento y evolución del paciente...",
+              rows: 4,
+              grupo: "tratamiento"
+            },
+            {
+              id: "observaciones",
+              tipo: "textarea",
+              label: "Observaciones",
+              placeholder: "Observaciones adicionales o interconsultas...",
+              rows: 2,
+              grupo: "tratamiento"
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     id: 'ginecologia',
