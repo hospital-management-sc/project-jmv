@@ -283,7 +283,6 @@ export default function PatientHistory({ patient, onBack }: Props) {
         
         // Información del médico agendado (puede estar vacío si aún no se asigna)
         const doctorAgendado = formatearNombreDoctor(cita.medico);
-        const especialidadDoctor = cita.medico?.especialidad || especialidad;
         
         const descripcionCita = [
           `Especialidad: ${especialidad}`,
