@@ -28,6 +28,19 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
     setError('')
   }
 
+  // Auto-formato historia: XX-XX-XX (solo dígitos, guiones automáticos)
+  const formatHistoria = (raw: string): string => {
+    const digits = raw.replace(/\D/g, '').slice(0, 6)
+    if (digits.length <= 2) return digits
+    if (digits.length <= 4) return `${digits.slice(0, 2)}-${digits.slice(2)}`
+    return `${digits.slice(0, 2)}-${digits.slice(2, 4)}-${digits.slice(4)}`
+  }
+
+  const handleHistoriaChange = (value: string) => {
+    setSearchHistoria(formatHistoria(value))
+    setError('')
+  }
+
   const handleSearch = async () => {
     let searchParam = ''
     
@@ -169,16 +182,6 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
               <select
                 value={searchCITipo}
                 onChange={(e) => setSearchCITipo(e.target.value)}
-                style={{
-                  padding: '0.75rem',
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '0.375rem',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.95rem',
-                  cursor: 'pointer',
-                  boxSizing: 'border-box',
-                }}
               >
                 <option value="V">V</option>
                 <option value="E">E</option>
@@ -191,45 +194,22 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') handleSearch()
                 }}
-                placeholder="Ej: 12345678"
+                placeholder="12345678"
                 maxLength={8}
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  padding: '0.75rem',
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '0.375rem',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.95rem',
-                  boxSizing: 'border-box',
-                }}
+                inputMode="numeric"
               />
             </div>
           ) : (
             <input
               type="text"
               value={searchHistoria}
-              onChange={(e) => {
-                setSearchHistoria(e.target.value)
-                setError('')
-              }}
+              onChange={(e) => handleHistoriaChange(e.target.value)}
               onKeyPress={(e) => {
                 if (e.key === 'Enter') handleSearch()
               }}
-              placeholder="Ej: 00-00-00"
-              style={{
-                flex: 1,
-                minWidth: 0,
-                width: '100%',
-                padding: '0.75rem',
-                backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '0.375rem',
-                color: 'var(--text-primary)',
-                fontSize: '0.95rem',
-                boxSizing: 'border-box',
-              }}
+              placeholder="00-00-00"
+              maxLength={8}
+              inputMode="numeric"
             />
           )}
 
@@ -239,10 +219,6 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
               onClick={handleSearch}
               disabled={loading}
               className={styles["btn-search"]}
-              style={{
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.6 : 1,
-              }}
             >
               {loading ? 'Buscando...' : 'Buscar Paciente'}
             </button>
@@ -250,7 +226,7 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
         </div>
 
         {error && (
-          <div style={{ color: '#ef4444', marginTop: '0.75rem', padding: '0.75rem', backgroundColor: '#fee2e2', borderRadius: '0.375rem' }}>
+          <div className={styles["error-message"]} style={{ marginTop: '0.75rem', padding: '0.75rem' }}>
             {error}
           </div>
         )}
@@ -258,7 +234,7 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
 
       {patientData && (
         <div className={styles["patient-details"]}>
-          <h3 style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>Paciente Encontrado</h3>
+          <h3 className={styles["form-section-header"]}>Paciente Encontrado</h3>
           <div className={styles["details-grid"]}>
             <div className={styles["detail-item"]}>
               <strong>Nro. Historia:</strong>
@@ -283,7 +259,7 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
               className={styles["btn-primary"]}
               onClick={() => onViewHistory(patientData)}
             >
-              📋 Ver Historia Completa
+              Ver Historia Completa
             </button>
             <button
               className={styles["btn-secondary"]}
@@ -291,13 +267,13 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
               disabled
               title="Funcionalidad en desarrollo"
             >
-              🖨️ Imprimir Resumen
+              Imprimir Resumen
             </button>
             <button
               className={styles["btn-secondary"]}
               onClick={() => onScheduleAppointment(patientData)}
             >
-              📅 Programar Cita
+              Programar Cita
             </button>
           </div>
         </div>

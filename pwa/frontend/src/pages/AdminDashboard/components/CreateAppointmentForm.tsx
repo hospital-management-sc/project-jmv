@@ -340,8 +340,8 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       <p className={styles["form-description"]}>Busque el paciente y programe una cita médica</p>
 
       {/* Búsqueda de Paciente */}
-      <div className={styles["search-patient-box"]} style={{ marginBottom: '2rem' }}>
-        <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>1. Buscar Paciente</h3>
+      <div className={styles["search-patient-box"]}>
+        <h3 className={styles["form-section-header"]}>1. Buscar Paciente</h3>
         <div className={styles["search-input-group"]}>
           {/* Fila 1: CI select + input */}
           <div className={styles["dual-input-group"]}>
@@ -349,17 +349,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
               value={searchCITipo}
               onChange={(e) => setSearchCITipo(e.target.value)}
               disabled={selectedPatient ? true : false}
-              style={{
-                padding: '0.75rem',
-                backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '0.375rem',
-                color: 'var(--text-primary)',
-                fontSize: '0.95rem',
-                cursor: selectedPatient ? 'not-allowed' : 'pointer',
-                opacity: selectedPatient ? 0.6 : 1,
-                boxSizing: 'border-box',
-              }}
             >
               <option value="V">V</option>
               <option value="E">E</option>
@@ -376,18 +365,8 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
               }}
               placeholder="Ej: 12345678"
               maxLength={8}
-              style={{
-                flex: 1,
-                minWidth: 0,
-                padding: '0.75rem',
-                backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '0.375rem',
-                color: 'var(--text-primary)',
-                fontSize: '0.95rem',
-                boxSizing: 'border-box',
-              }}
               disabled={selectedPatient ? true : false}
+              inputMode='numeric'
             />
           </div>
           {/* Fila 2: Botones de acción */}
@@ -396,10 +375,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
               onClick={handleSearchPatient}
               disabled={searchLoading || selectedPatient ? true : false}
               className={styles["btn-search"]}
-              style={{
-                cursor: selectedPatient ? 'not-allowed' : 'pointer',
-                opacity: selectedPatient ? 0.5 : 1,
-              }}
             >
               {searchLoading ? 'Buscando...' : 'Buscar'}
             </button>
@@ -429,15 +404,15 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
         </div>{/* end search-input-group */}
 
         {searchError && (
-          <div style={{ color: '#ef4444', marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#fee2e2', borderRadius: '0.375rem' }}>
+          <div className={styles["error-message"]} style={{ padding: '0.75rem', marginBottom: '1rem' }}>
             {searchError}
           </div>
         )}
 
         {selectedPatient && (
-          <div style={{ padding: '1rem', backgroundColor: 'var(--bg-tertiary)', borderRadius: '0.5rem', marginBottom: '1rem', border: '1px solid var(--border-color)' }}>
-            <h4 style={{ margin: '0 0 1rem 0', color: 'var(--text-primary)' }}>Paciente Seleccionado</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+          <div className={styles["patient-details"]}>
+            <h4 className={styles["form-section-header"]}>Paciente Seleccionado</h4>
+            <div className={styles["details-grid"]}>
               <div>
                 <strong>CI:</strong> {selectedPatient.ci}
               </div>
@@ -472,7 +447,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                   </div>
                   {cita.medico && (
                     <div style={{ marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                      👨‍⚕️ <strong>Dr(a):</strong> {cita.medico.nombre}
+                      <strong>Dr(a):</strong> {cita.medico.nombre}
                     </div>
                   )}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -491,7 +466,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       {/* Formulario de Cita */}
       {selectedPatient && (
         <form onSubmit={handleSubmit}>
-          <h3 style={{ marginBottom: '1.5rem' }}>2. Datos de la Cita</h3>
+          <h3 className={styles["form-section-header"]}>2. Datos de la Cita</h3>
           <div className={styles["form-grid"]}>
             {/* 1️⃣ ESPECIALIDAD - Primer campo */}
             <div className={styles["form-group"]}>
@@ -551,14 +526,14 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                     </>
                   ) : (
                     <p style={{ color: '#ef4444', fontSize: '0.9rem' }}>
-                      ❌ No hay médicos disponibles para esta especialidad
+                      No hay médicos disponibles para esta especialidad
                     </p>
                   )}
                   {errors.medico && <span className={styles["error-message"]}>{errors.medico}</span>}
                 </>
               ) : (
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  👆 Selecciona una especialidad primero
+                  Selecciona una especialidad primero
                 </p>
               )}
             </div>
@@ -580,7 +555,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
 
             {/* 🆕 FEEDBACK VISUAL DE DISPONIBILIDAD - Después de fecha */}
             {disponibilidadMedico && appointmentData.medico && (
-              <div className="form-group full-width">
+              <div className={`${styles["form-group"]} ${styles["full-width"]}`}>
                 <div style={{
                   padding: '1rem',
                   backgroundColor: disponibilidadMedico.atiendeSeDia ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
@@ -657,7 +632,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
               />
               {errors.hora && <span className={styles["error-message"]}>{errors.hora}</span>}
             </div>
-            <div className="form-group full-width">
+            <div className={`${styles["form-group"]} ${styles["full-width"]}`}>
               <label>Motivo de la Consulta * <span className={styles["required"]}>Requerido</span></label>
               <textarea
                 required
@@ -665,30 +640,19 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                 onChange={(e) => setAppointmentData({...appointmentData, motivo: e.target.value})}
                 placeholder="Describa brevemente el motivo de la consulta"
                 rows={3}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '0.375rem',
-                  color: 'var(--text-primary)',
-                  fontFamily: 'inherit',
-                  fontSize: '0.95rem',
-                  resize: 'vertical',
-                }}
               />
               {errors.motivo && <span className={styles["error-message"]}>{errors.motivo}</span>}
             </div>
           </div>
 
           {submitMessage && (
-            <div style={{ color: '#059669', marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#d1fae5', borderRadius: '0.375rem' }}>
+            <div style={{ color: '#2dd4bf', marginBottom: '1rem', padding: '0.75rem', backgroundColor: 'rgba(45, 212, 191, 0.1)', borderRadius: '0.75rem', border: '1px solid rgba(45, 212, 191, 0.2)' }}>
               {submitMessage}
             </div>
           )}
 
-          <div className="form-actions" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-            <button type="submit" disabled={submitLoading} style={{ opacity: submitLoading ? 0.6 : 1, cursor: submitLoading ? 'not-allowed' : 'pointer' }} className="btn-primary">
+          <div className={styles["form-actions"]}>
+            <button type="submit" disabled={submitLoading} className={styles["btn-primary"]}>
               {submitLoading ? 'Programando...' : 'Programar Cita'}
             </button>
             <button
@@ -706,7 +670,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                 setMedicosDisponibles([])
                 setDisponibilidadMedico(null)
               }}
-              className="btn-secondary"
+              className={styles["btn-secondary"]}
             >
               Limpiar Formulario
             </button>

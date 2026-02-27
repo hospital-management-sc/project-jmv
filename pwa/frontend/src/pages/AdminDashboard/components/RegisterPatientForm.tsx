@@ -416,18 +416,9 @@ export function RegisterPatientForm() {
             <button 
               type="button"
               onClick={() => setSelectedPatientType(null)}
-              className={styles["back-button"]}
-              style={{ 
-                padding: '0.5rem 1rem',
-                background: '#6b7280',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '0.9rem'
-              }}
+              className={styles["back-btn"]}
             >
-              ← Cambiar tipo
+              Cambiar tipo
             </button>
           </div>
           
@@ -506,6 +497,7 @@ export function RegisterPatientForm() {
               value={formData.habitacion}
               onChange={(e) => setFormData({...formData, habitacion: e.target.value})}
               placeholder="Ej: 101, 205"
+              inputMode="numeric"
             />
           </div>
 
@@ -572,6 +564,7 @@ export function RegisterPatientForm() {
                 onChange={(e) => handleCINumerosChange(e.target.value)}
                 placeholder="12345678"
                 maxLength={9}
+                inputMode="numeric"
                 style={ciDuplicateError ? { borderColor: '#ef4444' } : {}}
               />
             </div>
@@ -659,7 +652,7 @@ export function RegisterPatientForm() {
             {errors.religion && <span className={styles["error-message"]}>{errors.religion}</span>}
           </div>
 
-          <div className="form-group full-width">
+          <div className={`${styles["form-group"]} ${styles["full-width"]}`}>
             <label>Dirección *</label>
             <input
               type="text"
@@ -692,6 +685,7 @@ export function RegisterPatientForm() {
                 onChange={(e) => handleTelefonoNumerosChange(e.target.value)}
                 placeholder="1234567"
                 maxLength={7}
+                inputMode="numeric"
               />
             </div>
             {errors.telefonoNumeros && <span className={styles["error-message"]}>{errors.telefonoNumeros}</span>}
@@ -717,6 +711,7 @@ export function RegisterPatientForm() {
                 onChange={(e) => handleTelefonoEmergenciaNumerosChange(e.target.value)}
                 placeholder="1234567"
                 maxLength={7}
+                inputMode="numeric"
               />
             </div>
           </div>
@@ -758,7 +753,7 @@ export function RegisterPatientForm() {
                 />
               </div>
 
-              <div className="form-group full-width">
+              <div className={`${styles["form-group"]} ${styles["full-width"]}`}>
                 <label>Estado Militar *</label>
                 <div className={styles["radio-group-inline"]}>
                   <label className={styles["radio-label"]}>
@@ -809,13 +804,13 @@ export function RegisterPatientForm() {
 
         {/* PNA no tiene sección 3 */}
 
-        <div className="form-actions">
-          <button type="submit" className="btn-primary">
+        <div className={styles["form-actions"]}>
+          <button type="submit" className={styles["btn-primary"]}>
             Registrar Admisión
           </button>
           <button 
             type="button" 
-            className="btn-secondary"
+            className={styles["btn-secondary"]}
             onClick={() => {
               setFormData({
                 nroHistoria: '',

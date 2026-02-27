@@ -51,7 +51,7 @@ export default function AdminDashboard() {
             <div className={styles['patient-count']}>
               {loading ? '...' : stats?.totalPacientes ?? 0}
             </div>
-            <div className={styles['patient-details']}>
+            <div className={styles['patient-details-mini']}>
               {!loading && stats && (
                 <>
                   <div className={styles['detail-row']}>{stats.pacientesMilitares} Militares</div>
@@ -72,7 +72,10 @@ export default function AdminDashboard() {
 
       {/* Sección de Gestión Principal */}
       <section className={styles['management-section']}>
-        <h2>Gestión Principal</h2>
+        <h2>
+          Gestión Principal
+          <span className={styles['admin-role-badge']}>Administrativa</span>
+        </h2>
         <div className={styles['admin-grid']}>
           <button 
             className={styles['admin-btn']}
@@ -139,7 +142,8 @@ export default function AdminDashboard() {
               className={styles['back-btn']}
               onClick={() => setViewMode('main')}
             >
-              ← Volver al Dashboard
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+              <span>Volver al Dashboard</span>
             </button>
           )}
         </div>
