@@ -41,8 +41,14 @@ export default function AdminDashboard() {
       {/* Sección de Estadísticas */}
       <section className={styles['dashboard-stats']}>
         {error && (
-          <div style={{ gridColumn: '1 / -1', color: '#ef4444', padding: '1rem', backgroundColor: '#fee2e2', borderRadius: '0.375rem', marginBottom: '1rem' }}>
-            ⚠️ Error al cargar estadísticas: {error}
+          <div style={{ gridColumn: '1 / -1', color: '#ef4444', padding: '1rem', backgroundColor: '#fee2e2', borderRadius: '0.375rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>Error al cargar estadísticas: {error}</span>
+            <button 
+              onClick={() => window.location.reload()} 
+              style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '0.25rem', cursor: 'pointer', fontSize: '0.875rem' }}
+            >
+              Reintentar
+            </button>
           </div>
         )}
         <div className={styles.card}>

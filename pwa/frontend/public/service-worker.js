@@ -8,7 +8,7 @@ const urlsToCache = [
 ]
 
 // Install event - cache resources
-self.addEventListener('install', (event: ExtendableEvent) => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(urlsToCache)
@@ -17,7 +17,7 @@ self.addEventListener('install', (event: ExtendableEvent) => {
 })
 
 // Fetch event - serve from cache, fallback to network
-self.addEventListener('fetch', (event: FetchEvent) => {
+self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') {
     return
   }
@@ -48,7 +48,7 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 })
 
 // Activate event - clean up old caches
-self.addEventListener('activate', (event: ExtendableEvent) => {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(

@@ -75,6 +75,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
   // 🆕 useEffect: Cargar médicos cuando cambia la especialidad
   useEffect(() => {
     if (appointmentData.especialidad) {
+      setSearchError('') // Limpiar errores previos
       cargarMedicosEspecialidad(appointmentData.especialidad)
     } else {
       setMedicosDisponibles([])
@@ -105,11 +106,9 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
 
       if (result.success) {
         setMedicosDisponibles(result.data || [])
-      } else {
-        setSearchError('No se pudieron cargar los médicos de esta especialidad')
       }
     } catch (err: any) {
-      setSearchError('Error al cargar médicos disponibles')
+      // Error loading doctors - handled by UI showing empty list
     } finally {
       setLoadingMedicos(false)
     }
@@ -125,16 +124,12 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       const diaDelSemana = fechaSeleccionada.getDay() // 0=Domingo, 6=Sábado
       
       if (diaDelSemana === 0 || diaDelSemana === 6) {
-        // Es fin de semana - mostrar advertencia clara
+        // Es fin de semana - mostrar advertencia clara en feedback visual
         setDisponibilidadMedico({
           atiendeSeDia: false,
           esFinDeSemana: true,
           diasDisponibles: []
         })
-        setErrors(prev => ({
-          ...prev,
-          fecha: '❌ Hospital labora solo de lunes a viernes.'
-        }))
         setLoadingDisponibilidad(false)
         return
       }
@@ -147,26 +142,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
 
       if (result.success) {
         setDisponibilidadMedico(result.data)
-        
-        // Validar disponibilidad
-        if (!result.data.atiendeSeDia) {
-          setErrors(prev => ({
-            ...prev,
-            fecha: `El médico no atiende ese día. Días disponibles: ${result.data.diasDisponibles?.map((d: any) => d.dia).join(', ') || 'N/A'}`
-          }))
-        } else if (result.data.espaciosDisponibles <= 0) {
-          setErrors(prev => ({
-            ...prev,
-            fecha: `No hay disponibilidad. Próximas fechas: ${result.data.diasDisponibles?.slice(0, 2).map((d: any) => d.fecha).join(', ') || 'N/A'}`
-          }))
-        } else {
-          // Limpiar errores de fecha si todo está bien
-          setErrors(prev => {
-            const newErrors = { ...prev }
-            delete newErrors.fecha
-            return newErrors
-          })
-        }
       }
     } catch (err: any) {
       // Error checking doctor availability
@@ -569,7 +544,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                   ) : disponibilidadMedico.atiendeSeDia ? (
                     <>
                       <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', color: '#10b981' }}>
-                        ✅ Médico disponible
+                        Médico disponible
                       </p>
                       <p style={{ margin: '0 0 0.5rem 0' }}>
                         <strong>Horario:</strong> {disponibilidadMedico.horaInicio} - {disponibilidadMedico.horaFin}
@@ -579,14 +554,14 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                       </p>
                       {disponibilidadMedico.espaciosDisponibles > 0 && disponibilidadMedico.espaciosDisponibles <= 3 && (
                         <p style={{ margin: '0.5rem 0 0 0', color: '#d97706', fontSize: '0.85rem' }}>
-                          ⚠️ Pocos espacios disponibles
+                          Pocos espacios disponibles
                         </p>
                       )}
                     </>
                   ) : disponibilidadMedico.esFinDeSemana ? (
                     <>
                       <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', color: '#ef4444' }}>
-                        ❌ No disponible
+                        No disponible
                       </p>
                       <p style={{ margin: 0 }}>
                         Hospital labora solo de lunes a viernes.
@@ -595,7 +570,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                   ) : (
                     <>
                       <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', color: '#ef4444' }}>
-                        ❌ No disponible
+                        No disponible
                       </p>
                       <p style={{ margin: '0 0 0.5rem 0' }}>
                         El médico no atiende ese día
