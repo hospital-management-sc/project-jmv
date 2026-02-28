@@ -474,29 +474,10 @@ export default function PatientHistory({ patient, onBack }: Props) {
       <div className={styles["history-patient-card"]}>
         {/* Hero: avatar + nombre + badges */}
         <div className={styles["history-patient-hero"]}>
-          <div className={styles["history-patient-avatar"]}>
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(45,212,191,0.65)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-          </div>
           <div className={styles["history-patient-identity"]}>
             <h3 className={styles["history-patient-name"]}>
               {datosCompletos?.apellidosNombres || "N/A"}
             </h3>
-            <div className={styles["history-meta-badges"]}>
-              <span className={styles["history-badge-hc"]}>
-                HC: {datosCompletos?.nroHistoria || "N/A"}
-              </span>
-              {datosCompletos?.tipoPaciente && (
-                <span className={styles["history-badge-type"]}>
-                  {datosCompletos.tipoPaciente}
-                </span>
-              )}
-              <span className={styles["history-badge-ci"]}>
-                {datosCompletos?.ci || "N/A"}
-              </span>
-            </div>
           </div>
         </div>
 

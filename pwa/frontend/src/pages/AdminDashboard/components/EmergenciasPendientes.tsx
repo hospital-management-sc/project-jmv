@@ -7,6 +7,7 @@
 import { useEffect, useState } from 'react';
 import styles from './EmergenciasPendientes.module.css';
 import { SERVICIOS } from '@/constants';
+import { toastCustom } from '@/utils/toastCustom';
 
 interface Paciente {
   id: number;
@@ -89,7 +90,7 @@ export default function EmergenciasPendientes({ onBack: _ }: EmergenciasPendient
     e.preventDefault();
     
     if (!selectedEmergencia || !servicio || !cama) {
-      alert('Por favor complete servicio y cama');
+      toastCustom.warning('⚠️ Campos requeridos', 'Complete servicio y cama');
       return;
     }
 
@@ -113,11 +114,11 @@ export default function EmergenciasPendientes({ onBack: _ }: EmergenciasPendient
         throw new Error(errorData.error || 'Error al hospitalizar paciente');
       }
 
-      alert('✓ Paciente hospitalizado exitosamente');
+      toastCustom.success('✅ Paciente hospitalizado', 'La admisión se ha registrado correctamente');
       setShowAsignarModal(false);
       cargarEmergenciasPendientes(); // Recargar lista
     } catch (err: any) {
-      alert('Error: ' + err.message);
+      toastCustom.error('❌ Error al hospitalizar', err.message);
       console.error(err);
     } finally {
       setSubmitting(false);

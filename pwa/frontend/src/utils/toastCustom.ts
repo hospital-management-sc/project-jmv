@@ -58,6 +58,7 @@ export const toastCustom = {
   success: (message: string, description?: string) => {
     return toast.success(message, {
       description,
+      closeButton: false,
       style: {
         ...toastStyles.base,
         ...toastStyles.success,
@@ -73,6 +74,7 @@ export const toastCustom = {
   error: (message: string, description?: string) => {
     return toast.error(message, {
       description,
+      closeButton: false,
       style: {
         ...toastStyles.base,
         ...toastStyles.error,
@@ -88,6 +90,7 @@ export const toastCustom = {
   info: (message: string, description?: string) => {
     return toast.info(message, {
       description,
+      closeButton: false,
       style: {
         ...toastStyles.base,
         ...toastStyles.info,
@@ -103,6 +106,7 @@ export const toastCustom = {
   warning: (message: string, description?: string) => {
     return toast.warning(message, {
       description,
+      closeButton: false,
       style: {
         ...toastStyles.base,
         ...toastStyles.warning,
@@ -116,10 +120,48 @@ export const toastCustom = {
    */
   loading: (message: string) => {
     return toast.loading(message, {
+      closeButton: false,
       style: {
         ...toastStyles.base,
         ...toastStyles.info,
       },
     });
+  },
+};
+/**
+ * Normalizadores de Datos
+ * Funciones para estandarizar entrada de datos
+ */
+export const normalizeData = {
+  /**
+   * Normaliza nombres y apellidos a MAYÚSCULAS
+   * Elimina espacios extra y aplica trim
+   */
+  toUpperCaseName: (name: string): string => {
+    if (!name) return '';
+    return name
+      .toUpperCase()
+      .replace(/\s+/g, ' ') // Reemplaza múltiples espacios por uno solo
+      .trim();
+  },
+
+  /**
+   * Normaliza nombres a Title Case (Primera letra mayúscula)
+   * Útil para nombres propios
+   */
+  toTitleCaseName: (name: string): string => {
+    if (!name) return '';
+    return name
+      .toLowerCase()
+      .replace(/(?:^|\s)\w/g, (match) => match.toUpperCase())
+      .trim();
+  },
+
+  /**
+   * Limpia y normaliza los espacios
+   */
+  trimSpaces: (text: string): string => {
+    if (!text) return '';
+    return text.replace(/\s+/g, ' ').trim();
   },
 };

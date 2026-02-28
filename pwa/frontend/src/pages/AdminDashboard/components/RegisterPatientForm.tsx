@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { API_BASE_URL } from '@/utils/constants'
 import { getTodayVenezuelaISO, getCurrentTimeVenezuela } from '@/utils/dateUtils'
 import { ESTADOS_VENEZUELA, NACIONALIDADES, RELIGIONES, GRADOS_MILITARES, COMPONENTES_MILITARES } from '@/constants/venezuela'
+import { toastCustom, normalizeData } from '@/utils/toastCustom'
 import styles from '../AdminDashboard.module.css'
 
 export function RegisterPatientForm() {
@@ -130,7 +131,7 @@ export function RegisterPatientForm() {
         
         if (result.exists) {
           // Paciente ya existe
-          setCiDuplicateError(`⚠️ Ya existe un paciente registrado con esta cédula (${ciCompleta})`)
+          setCiDuplicateError(`Ya existe un paciente registrado con esta cédula (${ciCompleta})`)
         } else {
           // Paciente no existe - CI válida
           setCiDuplicateError(null)
@@ -215,13 +216,13 @@ export function RegisterPatientForm() {
     
     // VALIDACIÓN CRÍTICA: Verificar que no haya CI duplicada
     if (ciDuplicateError) {
-      alert(`❌ ${ciDuplicateError}\n\nNo se puede registrar el paciente.`)
+      toastCustom.error('No se puede registrar', ciDuplicateError)
       return
     }
 
     // Esperar a que termine la validación de duplicados
     if (checkingCIDuplicate) {
-      alert('⏳ Por favor, espere a que termine la validación de la cédula...')
+      toastCustom.warning('Validando cédula', 'Por favor espere...')
       return
     }
     
@@ -285,7 +286,7 @@ export function RegisterPatientForm() {
       // La admisión será una admisión INICIAL (tipo: null, servicio: null)
       // Las admisiones específicas (HOSPITALIZACION, EMERGENCIA, etc.) se crean después
       createdById: user?.id, // Quién registra el paciente
-      apellidosNombres: formData.apellidosNombres,
+      apellidosNombres: normalizeData.toUpperCaseName(formData.apellidosNombres),
       ci: ciCompleta,
       ciTipo: formData.ciTipo,
       fechaNacimiento: formData.fechaNacimiento,
@@ -317,7 +318,7 @@ export function RegisterPatientForm() {
       datosRegistro.afiliadoData = {
         nroCarnet: afiliadoData.nroCarnet,
         parentesco: afiliadoData.parentesco,
-        titularNombre: afiliadoData.titularNombre,
+        titularNombre: normalizeData.toUpperCaseName(afiliadoData.titularNombre),
         titularCi: titularCiCompleta,
         titularGrado: afiliadoData.titularGrado,
         titularComponente: afiliadoData.titularComponente,
@@ -341,8 +342,11 @@ export function RegisterPatientForm() {
         throw new Error(result.message || 'Error al registrar el paciente')
       }
 
-      // Éxito - mostrar mensaje y limpiar formulario
-      alert(`✅ Paciente registrado exitosamente\nNro. Historia: ${result.data.nroHistoria}\nCI: ${result.data.ci}`)
+      // Éxito - mostrar mensaje con toast
+      toastCustom.success(
+        'Paciente registrado exitosamente',
+        `Nro. Historia: ${result.data.nroHistoria} | CI: ${result.data.ci}`
+      )
       
       // Limpiar formulario SOLO si el registro fue exitoso
       setFormData({
@@ -394,7 +398,7 @@ export function RegisterPatientForm() {
     } catch (error: any) {
       console.error('Error:', error)
       // Mostrar error SIN limpiar el formulario
-      alert(`❌ Error: ${error.message}\n\nLos datos del formulario se han mantenido. Por favor, verifique los errores marcados en rojo.`)
+      toastCustom.error('Error al registrar', error.message)
       // NO limpiar formData - mantener los datos ingresados
     }
   }

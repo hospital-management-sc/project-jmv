@@ -6,9 +6,10 @@
 import { useState, useEffect } from 'react'
 import { SearchableSelect } from '@/components/SearchableSelect'
 import { API_BASE_URL } from '@/utils/constants'
-import { getTodayVenezuelaISO, formatTimeMilitaryVenezuela, formatDateLocal } from '@/utils/dateUtils'
+import { getTodayVenezuelaISO, getCurrentTimeVenezuela, formatTimeMilitaryVenezuela, formatDateLocal } from '@/utils/dateUtils'
 import { obtenerNombresEspecialidades } from '@/config/especialidades.config'
 import { useAuth } from '@/contexts/AuthContext'
+import { toastCustom } from '@/utils/toastCustom'
 import styles from '../AdminDashboard.module.css'
 
 interface CreateAppointmentFormProps {
@@ -42,7 +43,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
 
   const [errors, setErrors] = useState<{[key: string]: string}>({})
   const [submitLoading, setSubmitLoading] = useState(false)
-  const [submitMessage, setSubmitMessage] = useState('')
 
   const handleSearchCINumerosChange = (value: string) => {
     // Solo permitir dígitos, extraer solo los números del paste
@@ -191,7 +191,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
         motivo: '',
       })
       setErrors({})
-      setSubmitMessage('')
     } catch (err: any) {
       setSearchError(err.message || 'Error al buscar paciente')
       setSelectedPatient(null)
@@ -238,8 +237,25 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       return
     }
 
+    // 🆕 Validación: No permitir agendar citas con fecha/hora menor a la actual (Venezuela)
+    const hoyVenezuela = getTodayVenezuelaISO()
+    const horaActualVenezuela = getCurrentTimeVenezuela()
+    
+    if (appointmentData.fecha < hoyVenezuela) {
+      newErrors.fecha = 'No puede agendar una cita en el pasado'
+    } else if (appointmentData.fecha === hoyVenezuela && appointmentData.hora) {
+      // Si es hoy, validar que la hora no sea menor a la actual
+      if (appointmentData.hora < horaActualVenezuela) {
+        newErrors.hora = 'La hora debe ser mayor a la hora actual'
+      }
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+
     setSubmitLoading(true)
-    setSubmitMessage('')
 
     try {
       // OPCIÓN A: Hora es solo referencia/sugerencia
@@ -280,9 +296,13 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       }
 
       // Obtener nombre del médico seleccionado
-      const medicoNombre = medicosDisponibles.find(m => String(m.id) === appointmentData.medico)?.nombre || 'Médico'
-
-      setSubmitMessage(`✅ Cita programada exitosamente con ${medicoNombre} para ${formatDateLocal(appointmentData.fecha)}`)
+      const medicoNombre = medicosDisponibles.find(m => String(m.id) === appointmentData.medico)?.nombre || 'Médico';
+      
+      // Mostrar notificación con toast
+      toastCustom.success(
+        'Cita programada exitosamente',
+        `Dr(a). ${medicoNombre} - ${formatDateLocal(appointmentData.fecha)}`
+      )
       
       // Limpiar formulario
       setAppointmentData({
@@ -300,10 +320,8 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       if (citasResult.success) {
         setCitasExistentes(citasResult.data || [])
       }
-
-      setTimeout(() => setSubmitMessage(''), 5000)
     } catch (error: any) {
-      alert(`❌ Error: ${error.message}`)
+      toastCustom.error('Error', error.message)
     } finally {
       setSubmitLoading(false)
     }
@@ -338,7 +356,7 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                   handleSearchPatient()
                 }
               }}
-              placeholder="Ej: 12345678"
+              placeholder="12345678"
               maxLength={8}
               disabled={selectedPatient ? true : false}
               inputMode='numeric'
@@ -620,12 +638,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
             </div>
           </div>
 
-          {submitMessage && (
-            <div style={{ color: '#2dd4bf', marginBottom: '1rem', padding: '0.75rem', backgroundColor: 'rgba(45, 212, 191, 0.1)', borderRadius: '0.75rem', border: '1px solid rgba(45, 212, 191, 0.2)' }}>
-              {submitMessage}
-            </div>
-          )}
-
           <div className={styles["form-actions"]}>
             <button type="submit" disabled={submitLoading} className={styles["btn-primary"]}>
               {submitLoading ? 'Programando...' : 'Programar Cita'}
@@ -641,7 +653,6 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
                   motivo: '',
                 })
                 setErrors({})
-                setSubmitMessage('')
                 setMedicosDisponibles([])
                 setDisponibilidadMedico(null)
               }}
