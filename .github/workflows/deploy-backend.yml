@@ -1,0 +1,46 @@
+name: Deploy Backend to DigitalOcean
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'pwa/backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Droplet via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            echo "Iniciando despliegue automático..."
+            cd ~/project-jmv
+            
+            echo "Trayendo últimos cambios de Git..."
+            git reset --hard HEAD
+            git pull origin main
+            
+            cd pwa/backend
+            
+            echo "Compilando nueva imagen de Docker..."
+            docker build -t hospital-backend .
+            
+            echo "Reiniciando contenedor de Docker..."
+            docker stop hospital-backend || true
+            docker rm hospital-backend || true
+            
+            docker run -d \
+              --name hospital-backend \
+              -p 5000:5000 \
+              --env-file .env \
+              --restart unless-stopped \
+              hospital-backend
+              
+            echo "¡Despliegue completado con éxito!"
