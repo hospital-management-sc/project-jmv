@@ -74,16 +74,30 @@ export default function InterconsultasView({ doctorId }: Props) {
   };
 
   const buscarPaciente = async () => {
-    if (!searchCI.trim()) {
+    let ciQuery = searchCI.trim();
+    if (!ciQuery) {
       setError("Ingrese un número de cédula");
       toastCustom.error("Ingrese un número de cédula");
       return;
     }
+
+    // Normalizar la entrada para búsquedas robustas
+    if (/^\d+$/.test(ciQuery)) {
+      // Si son solo números, por defecto anteponer "V-" (Venezolano)
+      ciQuery = `V-${ciQuery}`;
+    } else if (/^[vepVEP]\d+$/.test(ciQuery)) {
+      // Si puso la letra pero olvidó el guión (ej: V20200200)
+      ciQuery = `${ciQuery.charAt(0).toUpperCase()}-${ciQuery.slice(1)}`;
+    } else if (/^[vepVEP]-\d+$/.test(ciQuery)) {
+      // Si puso la letra en minúscula con guión (ej: v-20200200), normalizar
+      ciQuery = `${ciQuery.charAt(0).toUpperCase()}-${ciQuery.slice(2)}`;
+    }
+
     setSearching(true);
     setError("");
     try {
       const response = await fetch(
-        `${API_BASE_URL}/pacientes/search?ci=${searchCI}`
+        `${API_BASE_URL}/pacientes/search?ci=${ciQuery}`
       );
       const result = await response.json();
       if (result.success && result.data) {

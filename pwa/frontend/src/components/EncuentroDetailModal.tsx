@@ -410,30 +410,34 @@ const EncuentroDetailModal = ({ encuentro, onClose }: EncuentroDetailModalProps)
                   </h3>
                   <div className={styles.infoGrid}>
                     {Object.entries(encuentro.examenFisico)
-                      .filter(([key]) => !key.startsWith('__')) // Excluir metadata
-                      .map(([key, value]) => (
-                        <div key={key} className={styles.infoItem}>
-                          <span className={styles.label}>
-                            {/* Convertir camelCase a palabras legibles */}
-                            {key.replace(/([A-Z])/g, ' $1')
-                               .replace(/^./, str => str.toUpperCase())
-                               .trim()}:
-                          </span>
-                          <span className={styles.value}>
-                            {typeof value === 'object' ? (
-                              <div className={styles.textContent}>
-                                {JSON.stringify(value, null, 2)}
-                              </div>
-                            ) : typeof value === 'string' && value.length > 100 ? (
-                              <div className={styles.textContent}>
-                                {renderizarValor(value)}
-                              </div>
-                            ) : (
-                              renderizarValor(value)
-                            )}
-                          </span>
-                        </div>
-                      ))}
+                      .filter(([key]) => !key.startsWith('__') && key !== 'taSistolica' && key !== 'taDiastolica' && key !== 'pulso' && key !== 'temperatura' && key !== 'fr' && key !== 'saturacionO2')
+                      .map(([key, value]) => {
+                        const customLabels = (encuentro.examenFisico as any)?.['__campos_personalizados'] || {};
+                        const labelText = customLabels[key] || 
+                          key.replace(/^custom_/, '')
+                             .replace(/_/g, ' ')
+                             .replace(/([A-Z])/g, ' $1')
+                             .replace(/^./, str => str.toUpperCase())
+                             .trim();
+                        return (
+                          <div key={key} className={styles.infoItem}>
+                            <span className={styles.label}>{labelText}:</span>
+                            <span className={styles.value}>
+                              {typeof value === 'object' ? (
+                                <div className={styles.textContent}>
+                                  {JSON.stringify(value, null, 2)}
+                                </div>
+                              ) : typeof value === 'string' && value.length > 100 ? (
+                                <div className={styles.textContent}>
+                                  {renderizarValor(value)}
+                                </div>
+                              ) : (
+                                renderizarValor(value)
+                              )}
+                            </span>
+                          </div>
+                        );
+                      })}
                   </div>
                   {!especialidad && (
                     <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(255, 193, 7, 0.1)', borderRadius: '0.375rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>

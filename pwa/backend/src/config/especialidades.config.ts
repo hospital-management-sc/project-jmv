@@ -131,7 +131,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     color: '#FBBF24',
     vistaDashboard: {
       metricas: ['citasHoy', 'encuentrosHoy'],
-      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
+      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas'],
     },
   },
   {
@@ -143,7 +143,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     color: '#10B981',
     vistaDashboard: {
       metricas: ['citasHoy', 'encuentrosHoy'],
-      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
+      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas'],
     },
   },
   {
@@ -155,7 +155,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     color: '#F97316',
     vistaDashboard: {
       metricas: ['citasHoy', 'encuentrosHoy'],
-      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
+      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas'],
     },
   },
   {
@@ -215,7 +215,7 @@ export const ESPECIALIDADES_MEDICAS: EspecialidadConfig[] = [
     color: '#8B5CF6',
     vistaDashboard: {
       metricas: ['citasHoy', 'encuentrosHoy'],
-      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments'],
+      acciones: ['registrar-encuentro', 'today-encounters', 'search-patient', 'my-appointments', 'interconsultas'],
     },
   },
 ];

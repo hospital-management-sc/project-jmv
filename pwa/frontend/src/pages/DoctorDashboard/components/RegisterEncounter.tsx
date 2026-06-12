@@ -28,9 +28,102 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
   
   // Obtener configuración de especialidad por ID
   const especialidad = useMemo(() => obtenerEspecialidadPorId(especialidadId), [especialidadId]);
-  const formularioConfig = especialidad?.formularioEspecializado;
+  
+  // Configuración por defecto si no tiene formulario especializado
+  const defaultFormularioConfig = useMemo(() => ({
+    pasos: [
+      {
+        numero: 1,
+        titulo: "Buscar Paciente",
+        campos: [
+          {
+            id: "ciTipo",
+            tipo: "select" as const,
+            label: "Tipo de Cédula",
+            requerido: true,
+            opciones: [
+              { valor: "V", etiqueta: "V (Venezolano)" },
+              { valor: "E", etiqueta: "E (Extranjero)" },
+              { valor: "P", etiqueta: "P (Pasaporte)" }
+            ]
+          },
+          {
+            id: "ciNumeros",
+            tipo: "input" as const,
+            label: "Número de Cédula",
+            placeholder: "12345678",
+            requerido: true
+          }
+        ]
+      },
+      {
+        numero: 2,
+        titulo: "Anamnesis e Historia",
+        campos: [
+          {
+            id: "tipo",
+            tipo: "select" as const,
+            label: "Tipo de Encuentro",
+            requerido: true,
+            opciones: [
+              { valor: "CONSULTA", etiqueta: "Consulta" },
+              { valor: "EMERGENCIA", etiqueta: "Emergencia" },
+              { valor: "HOSPITALIZACION", etiqueta: "Hospitalización" },
+              { valor: "OTRO", etiqueta: "Otro" }
+            ]
+          },
+          { id: "fecha", tipo: "date" as const, label: "Fecha de Atención" },
+          { id: "hora", tipo: "time" as const, label: "Hora de Atención" },
+          {
+            id: "motivoConsulta",
+            tipo: "textarea" as const,
+            label: "Motivo de Consulta *",
+            placeholder: "Escriba la razón de la consulta...",
+            requerido: true
+          },
+          {
+            id: "enfermedadActual",
+            tipo: "textarea" as const,
+            label: "Enfermedad Actual",
+            placeholder: "Detalle la enfermedad actual..."
+          }
+        ]
+      },
+      {
+        numero: 3,
+        titulo: "Signos Vitales y Examen Físico",
+        campos: [
+          { id: "taSistolica", tipo: "number" as const, label: "Tensión Arterial Sistólica (mmHg)", placeholder: "120" },
+          { id: "taDiastolica", tipo: "number" as const, label: "Tensión Arterial Diastólica (mmHg)", placeholder: "80" },
+          { id: "pulso", tipo: "number" as const, label: "Pulso / Frecuencia Cardíaca (lpm)", placeholder: "70" },
+          { id: "temperatura", tipo: "number" as const, label: "Temperatura (°C)", placeholder: "36.5", step: "0.1" },
+          { id: "fr", tipo: "number" as const, label: "Frecuencia Respiratoria (rpm)", placeholder: "18" },
+          { id: "examenGeneral", tipo: "textarea" as const, label: "Examen Físico General", placeholder: "Inspección general del paciente..." }
+        ]
+      },
+      {
+        numero: 4,
+        titulo: "Diagnóstico y Plan",
+        campos: [
+          { id: "codigoCie", tipo: "input" as const, label: "Código CIE-10 (Opcional)", placeholder: "E11.9" },
+          { id: "impresionDx", tipo: "textarea" as const, label: "Impresión Diagnóstica *", placeholder: "Diagnóstico presuntivo o definitivo...", requerido: true },
+          { id: "observaciones", tipo: "textarea" as const, label: "Tratamiento e Indicaciones", placeholder: "Indique las recetas médicas o indicaciones..." }
+        ]
+      }
+    ]
+  }), []);
 
-  // Formulario config may not be available for all specialties
+  const formularioConfig = especialidad?.formularioEspecializado || defaultFormularioConfig;
+
+  interface CampoPersonalizado {
+    id: string;
+    label: string;
+    tipo: 'input' | 'textarea' | 'number';
+    paso: number;
+  }
+  const [camposPersonalizados, setCamposPersonalizados] = useState<CampoPersonalizado[]>([]);
+  const [newFieldName, setNewFieldName] = useState("");
+  const [newFieldType, setNewFieldType] = useState<'input' | 'textarea' | 'number'>("input");
 
   const [step, setStep] = useState(patient ? 2 : 1);
   const [paciente, setPaciente] = useState<PatientBasic | null>(patient);
@@ -48,6 +141,35 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
     fecha: getTodayVenezuelaISO(),
     hora: getCurrentTimeVenezuela(),
   });
+
+  const agregarCampoPersonalizado = (pasoNumero: number) => {
+    if (!newFieldName.trim()) {
+      toastCustom.error("Escriba el nombre del campo");
+      return;
+    }
+    const cleanLabel = newFieldName.trim();
+    const cleanId = `custom_${cleanLabel.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+    
+    const existsInDefault = formularioConfig.pasos.some(p => p.campos.some(c => c.id === cleanId));
+    const existsInCustom = camposPersonalizados.some(c => c.id === cleanId);
+    
+    if (existsInDefault || existsInCustom) {
+      toastCustom.error("Ya existe un campo con este nombre o similar");
+      return;
+    }
+    
+    const nuevoCampo: CampoPersonalizado = {
+      id: cleanId,
+      label: cleanLabel,
+      tipo: newFieldType,
+      paso: pasoNumero
+    };
+    
+    setCamposPersonalizados([...camposPersonalizados, nuevoCampo]);
+    setFormData(prev => ({ ...prev, [cleanId]: "" }));
+    setNewFieldName("");
+    toastCustom.success(`Campo "${cleanLabel}" agregado`);
+  };
 
   // ✅ Scroll automático al cambiar de paso
   useEffect(() => {
@@ -186,7 +308,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
 
       // Construir objeto de examen físico (JSONB) desde campos dinámicos
       // ⚠️ CAPTURAR TODOS LOS PASOS (excepto paso 1 que es búsqueda y pasos que contengan tipo/fecha/hora)
-      const examenFisico: {[key: string]: string | number | undefined} = {};
+      const examenFisico: {[key: string]: any} = {};
       const camposExcluidos = new Set([
         'ciTipo', 'ciNumeros', // Paso 1 - búsqueda
         'tipo', 'fecha', 'hora', 'procedencia', 'nroCama', // Campos que ya están mapeados en encuentroData
@@ -200,11 +322,25 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
         formularioConfig.pasos.forEach(paso => {
           paso.campos.forEach(campo => {
             // Solo incluir si el campo tiene dato y no está en la lista de excluidos
-            if (formData[campo.id] && !camposExcluidos.has(campo.id)) {
+            if (formData[campo.id] !== undefined && formData[campo.id] !== null && formData[campo.id] !== '' && !camposExcluidos.has(campo.id)) {
               examenFisico[campo.id] = formData[campo.id];
             }
           });
         });
+      }
+
+      // Capturar campos personalizados
+      const camposPersonalizadosMetadata: {[key: string]: string} = {};
+      camposPersonalizados.forEach(campo => {
+        const value = formData[campo.id];
+        if (value !== undefined && value !== null && value !== '') {
+          examenFisico[campo.id] = value;
+          camposPersonalizadosMetadata[campo.id] = campo.label;
+        }
+      });
+
+      if (Object.keys(camposPersonalizadosMetadata).length > 0) {
+        examenFisico['__campos_personalizados'] = camposPersonalizadosMetadata;
       }
 
       // ✅ NUEVO: Incluir signos vitales directamente en examenFisico (porque la tabla SignosVitales no existe)
@@ -288,6 +424,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
       setTimeout(() => {
         setStep(1);
         setPaciente(null);
+        setCamposPersonalizados([]);
         setFormData({
           tipo: "CONSULTA",
           fecha: getTodayVenezuelaISO(),
@@ -320,13 +457,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
         </p>
       </div>
 
-      {!formularioConfig ? (
-        <div className={styles["form-card"]}>
-          <div className={styles['error-alert']}>
-            Configuración de formulario no disponible para esta especialidad
-          </div>
-        </div>
-      ) : (
         <>
           {/* Step Indicator Dinámico */}
           <div ref={formTopRef} className={styles["step-indicator"]}>
@@ -431,6 +561,124 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
                     styles={styles}
                   />
 
+                  {/* Renderizar campos personalizados agregados en este paso */}
+                  {camposPersonalizados.filter(c => c.paso === step).length > 0 && (
+                    <div style={{ marginTop: '1.5rem', borderTop: '1px dashed rgba(255, 255, 255, 0.15)', paddingTop: '1.5rem' }}>
+                      <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
+                        📋 Campos Personalizados agregados:
+                      </h4>
+                      <div className={styles["form-grid"]}>
+                        {camposPersonalizados.filter(c => c.paso === step).map(campo => (
+                          <div 
+                            key={campo.id}
+                            className={`${styles["form-group"]} ${
+                              campo.tipo === 'textarea' ? styles["full-width"] : ''
+                            }`}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                              <label style={{ fontWeight: '600' }}>{campo.label}</label>
+                              <button
+                                type="button"
+                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                                onClick={() => {
+                                  setCamposPersonalizados(camposPersonalizados.filter(c => c.id !== campo.id));
+                                  setFormData(prev => {
+                                    const next = { ...prev };
+                                    delete next[campo.id];
+                                    return next;
+                                  });
+                                }}
+                              >
+                                🗑️ Eliminar
+                              </button>
+                            </div>
+                            {campo.tipo === 'textarea' && (
+                              <textarea
+                                rows={3}
+                                value={String(formData[campo.id] || '')}
+                                onChange={(e) => handleFieldChange(campo.id, e.target.value)}
+                              />
+                            )}
+                            {campo.tipo === 'input' && (
+                              <input
+                                type="text"
+                                value={String(formData[campo.id] || '')}
+                                onChange={(e) => handleFieldChange(campo.id, e.target.value)}
+                              />
+                            )}
+                            {campo.tipo === 'number' && (
+                              <input
+                                type="number"
+                                value={String(formData[campo.id] || '')}
+                                onChange={(e) => handleFieldChange(campo.id, e.target.value)}
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Creador de campos personalizados en el paso actual */}
+                  <div style={{ 
+                    marginTop: '2rem', 
+                    padding: '1.25rem', 
+                    backgroundColor: 'rgba(255, 255, 255, 0.02)', 
+                    borderRadius: '0.5rem', 
+                    border: '1px solid rgba(255, 255, 255, 0.08)' 
+                  }}>
+                    <h5 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '500' }}>➕ Agregar Campo Personalizado a este Paso</h5>
+                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                      <input
+                        type="text"
+                        placeholder="Ej. Fondo de Ojo, Presión Intraocular, etc."
+                        value={newFieldName}
+                        onChange={(e) => setNewFieldName(e.target.value)}
+                        style={{ 
+                          flex: 1, 
+                          minWidth: '200px', 
+                          padding: '0.5rem 0.75rem', 
+                          borderRadius: '0.375rem', 
+                          border: '1px solid var(--border-color)', 
+                          backgroundColor: 'var(--bg-secondary)', 
+                          color: 'var(--text-primary)' 
+                        }}
+                      />
+                      <select
+                        value={newFieldType}
+                        onChange={(e) => setNewFieldType(e.target.value as any)}
+                        style={{ 
+                          padding: '0.5rem 0.75rem', 
+                          borderRadius: '0.375rem', 
+                          border: '1px solid var(--border-color)', 
+                          backgroundColor: 'var(--bg-secondary)', 
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <option value="input">Texto Corto</option>
+                        <option value="textarea">Texto Largo</option>
+                        <option value="number">Número</option>
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => agregarCampoPersonalizado(step)}
+                        style={{ 
+                          padding: '0.5rem 1.25rem', 
+                          borderRadius: '0.375rem', 
+                          backgroundColor: '#3B82F6', 
+                          color: '#fff', 
+                          border: 'none', 
+                          cursor: 'pointer', 
+                          fontWeight: '600',
+                          transition: 'background-color 0.2s'
+                        }}
+                      >
+                        Agregar
+                      </button>
+                    </div>
+                  </div>
+
                   <div className={styles["form-actions"]}>
                     {paso.numero > 1 && (
                       <button
@@ -460,7 +708,6 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
             )
           )}
         </>
-      )}
     </section>
   );
 }

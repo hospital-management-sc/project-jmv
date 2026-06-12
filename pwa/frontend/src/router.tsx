@@ -137,6 +137,12 @@ export default function Router() {
             }
           />
         </Route>
+
+        {/* Wildcard Route - Redirige cualquier ruta no existente al login o dashboard */}
+        <Route
+          path="*"
+          element={<Navigate to={user ? "/dashboard" : "/login"} replace />}
+        />
       </Routes>
     </BrowserRouter>
   );
