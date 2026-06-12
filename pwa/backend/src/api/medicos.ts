@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import { getPrismaClient } from '../database/connection'
 import { regenerarHorariosMedico } from '../services/generarHorariosMedico'
+import { authMiddleware } from '../middleware/auth'
+import { requireSuperAdmin } from '../middleware/superAdmin'
 
 const router = Router()
 const prisma = getPrismaClient()
@@ -355,10 +357,389 @@ router.post('/:medicoId/regenerar-horarios', async (req, res) => {
       horariosCreados: resultado.horariosCreados,
     })
   } catch (error: any) {
-    console.error('❌ Error al regenerar horarios:', error)
     return res.status(500).json({
       success: false,
       message: 'Error al regenerar horarios',
+      error: error.message,
+    })
+  }
+})
+
+/**
+ * GET /api/medicos/:medicoId/horarios
+ * Obtiene todos los horarios semanales de un médico
+ */
+router.get('/:medicoId/horarios', authMiddleware as any, requireSuperAdmin as any, async (req, res) => {
+  try {
+    const { medicoId } = req.params
+    const medId = Number(medicoId)
+
+    if (isNaN(medId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de médico inválido',
+      })
+    }
+
+    const medico = await prisma.usuario.findUnique({
+      where: { id: medId },
+      select: { id: true, nombre: true, role: true, especialidad: true },
+    })
+
+    if (!medico) {
+      return res.status(404).json({
+        success: false,
+        message: 'Médico no encontrado',
+      })
+    }
+
+    if (medico.role !== 'MEDICO') {
+      return res.status(400).json({
+        success: false,
+        message: 'El usuario no tiene el rol de médico',
+      })
+    }
+
+    const horarios = await prisma.horarioMedico.findMany({
+      where: { usuarioId: medId },
+      orderBy: { diaSemana: 'asc' },
+    })
+
+    const serialized = horarios.map(h => ({
+      ...h,
+      id: Number(h.id),
+      usuarioId: Number(h.usuarioId),
+    }))
+
+    return res.status(200).json({
+      success: true,
+      data: serialized,
+      especialidad: medico.especialidad,
+    })
+  } catch (error: any) {
+    console.error('❌ Error al obtener horarios del médico:', error)
+    return res.status(500).json({
+      success: false,
+      message: 'Error al obtener horarios',
+      error: error.message,
+    })
+  }
+})
+
+/**
+ * POST /api/medicos/:medicoId/horarios
+ * Agrega un nuevo horario de atención para un médico
+ */
+router.post('/:medicoId/horarios', authMiddleware as any, requireSuperAdmin as any, async (req, res) => {
+  try {
+    const { medicoId } = req.params
+    const medId = Number(medicoId)
+    const { diaSemana, horaInicio, horaFin, capacidadPorDia, activo } = req.body
+
+    if (isNaN(medId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de médico inválido',
+      })
+    }
+
+    const medico = await prisma.usuario.findUnique({
+      where: { id: medId },
+      select: { id: true, nombre: true, role: true, especialidad: true },
+    })
+
+    if (!medico) {
+      return res.status(404).json({
+        success: false,
+        message: 'Médico no encontrado',
+      })
+    }
+
+    if (medico.role !== 'MEDICO') {
+      return res.status(400).json({
+        success: false,
+        message: 'El usuario no es un médico registrado',
+      })
+    }
+
+    if (!medico.especialidad) {
+      return res.status(400).json({
+        success: false,
+        message: 'El médico no tiene una especialidad asignada en su cuenta',
+      })
+    }
+
+    const day = Number(diaSemana)
+    if (isNaN(day) || day < 0 || day > 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'El día de la semana debe ser un número entre 0 (Lunes) y 6 (Domingo)',
+      })
+    }
+
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
+    if (!horaInicio || !timeRegex.test(horaInicio)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Hora de inicio inválida. Formato: HH:MM',
+      })
+    }
+
+    if (!horaFin || !timeRegex.test(horaFin)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Hora de fin inválida. Formato: HH:MM',
+      })
+    }
+
+    const [hInicio, mInicio] = horaInicio.split(':').map(Number)
+    const [hFin, mFin] = horaFin.split(':').map(Number)
+    const totalMinutosInicio = hInicio * 60 + mInicio
+    const totalMinutosFin = hFin * 60 + mFin
+
+    if (totalMinutosInicio >= totalMinutosFin) {
+      return res.status(400).json({
+        success: false,
+        message: 'La hora de inicio debe ser estrictamente menor que la hora de fin',
+      })
+    }
+
+    const cap = Number(capacidadPorDia)
+    if (isNaN(cap) || cap <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'La capacidad por día debe ser un número entero mayor a cero',
+      })
+    }
+
+    const existeHorario = await prisma.horarioMedico.findUnique({
+      where: {
+        usuarioId_especialidad_diaSemana: {
+          usuarioId: medId,
+          especialidad: medico.especialidad,
+          diaSemana: day,
+        },
+      },
+    })
+
+    if (existeHorario) {
+      return res.status(409).json({
+        success: false,
+        message: `Ya existe un horario configurado para este médico el día ${getDayNameInSpanish(day)}`,
+      })
+    }
+
+    const nuevoHorario = await prisma.horarioMedico.create({
+      data: {
+        usuarioId: medId,
+        especialidad: medico.especialidad,
+        diaSemana: day,
+        horaInicio,
+        horaFin,
+        capacidadPorDia: cap,
+        activo: activo !== undefined ? Boolean(activo) : true,
+      },
+    })
+
+    return res.status(201).json({
+      success: true,
+      message: 'Horario creado exitosamente',
+      data: {
+        ...nuevoHorario,
+        id: Number(nuevoHorario.id),
+        usuarioId: Number(nuevoHorario.usuarioId),
+      },
+    })
+  } catch (error: any) {
+    console.error('❌ Error al crear horario del médico:', error)
+    return res.status(500).json({
+      success: false,
+      message: 'Error al crear el horario',
+      error: error.message,
+    })
+  }
+})
+
+/**
+ * PUT /api/medicos/:medicoId/horarios/:horarioId
+ * Modifica un horario de atención de un médico
+ */
+router.put('/:medicoId/horarios/:horarioId', authMiddleware as any, requireSuperAdmin as any, async (req, res) => {
+  try {
+    const { medicoId, horarioId } = req.params
+    const medId = Number(medicoId)
+    const horId = Number(horarioId)
+    const { diaSemana, horaInicio, horaFin, capacidadPorDia, activo } = req.body
+
+    if (isNaN(medId) || isNaN(horId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de médico o de horario inválido',
+      })
+    }
+
+    const horarioExistente = await prisma.horarioMedico.findFirst({
+      where: {
+        id: horId,
+        usuarioId: medId,
+      },
+    })
+
+    if (!horarioExistente) {
+      return res.status(404).json({
+        success: false,
+        message: 'Horario no encontrado para este médico',
+      })
+    }
+
+    const dataUpdate: any = {}
+
+    if (activo !== undefined) {
+      dataUpdate.activo = Boolean(activo)
+    }
+
+    if (capacidadPorDia !== undefined) {
+      const cap = Number(capacidadPorDia)
+      if (isNaN(cap) || cap <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'La capacidad por día debe ser un número entero mayor a cero',
+        })
+      }
+      dataUpdate.capacidadPorDia = cap
+    }
+
+    const nuevoDia = diaSemana !== undefined ? Number(diaSemana) : horarioExistente.diaSemana
+    if (diaSemana !== undefined) {
+      if (isNaN(nuevoDia) || nuevoDia < 0 || nuevoDia > 6) {
+        return res.status(400).json({
+          success: false,
+          message: 'El día de la semana debe ser un número entre 0 y 6',
+        })
+      }
+      dataUpdate.diaSemana = nuevoDia
+    }
+
+    const nuevaHoraInicio = horaInicio !== undefined ? horaInicio : horarioExistente.horaInicio
+    const nuevaHoraFin = horaFin !== undefined ? horaFin : horarioExistente.horaFin
+    const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
+
+    if (horaInicio !== undefined && !timeRegex.test(horaInicio)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Hora de inicio inválida. Formato esperado: HH:MM',
+      })
+    }
+
+    if (horaFin !== undefined && !timeRegex.test(horaFin)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Hora de fin inválida. Formato esperado: HH:MM',
+      })
+    }
+
+    if (horaInicio !== undefined || horaFin !== undefined) {
+      const [hInicio, mInicio] = nuevaHoraInicio.split(':').map(Number)
+      const [hFin, mFin] = nuevaHoraFin.split(':').map(Number)
+      const totalMinutosInicio = hInicio * 60 + mInicio
+      const totalMinutosFin = hFin * 60 + mFin
+
+      if (totalMinutosInicio >= totalMinutosFin) {
+        return res.status(400).json({
+          success: false,
+          message: 'La hora de inicio debe ser estrictamente menor que la hora de fin',
+        })
+      }
+      dataUpdate.horaInicio = nuevaHoraInicio
+      dataUpdate.horaFin = nuevaHoraFin
+    }
+
+    if (diaSemana !== undefined && nuevoDia !== horarioExistente.diaSemana) {
+      const conflicto = await prisma.horarioMedico.findFirst({
+        where: {
+          usuarioId: medId,
+          especialidad: horarioExistente.especialidad,
+          diaSemana: nuevoDia,
+          id: { not: horId },
+        },
+      })
+
+      if (conflicto) {
+        return res.status(409).json({
+          success: false,
+          message: `Ya existe un horario configurado para este médico el día ${getDayNameInSpanish(nuevoDia)}`,
+        })
+      }
+    }
+
+    const horarioActualizado = await prisma.horarioMedico.update({
+      where: { id: horId },
+      data: dataUpdate,
+    })
+
+    return res.status(200).json({
+      success: true,
+      message: 'Horario actualizado exitosamente',
+      data: {
+        ...horarioActualizado,
+        id: Number(horarioActualizado.id),
+        usuarioId: Number(horarioActualizado.usuarioId),
+      },
+    })
+  } catch (error: any) {
+    console.error('❌ Error al actualizar horario del médico:', error)
+    return res.status(500).json({
+      success: false,
+      message: 'Error al actualizar el horario',
+      error: error.message,
+    })
+  }
+})
+
+/**
+ * DELETE /api/medicos/:medicoId/horarios/:horarioId
+ * Elimina un horario de atención de un médico
+ */
+router.delete('/:medicoId/horarios/:horarioId', authMiddleware as any, requireSuperAdmin as any, async (req, res) => {
+  try {
+    const { medicoId, horarioId } = req.params
+    const medId = Number(medicoId)
+    const horId = Number(horarioId)
+
+    if (isNaN(medId) || isNaN(horId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID de médico o de horario inválido',
+      })
+    }
+
+    const horarioExistente = await prisma.horarioMedico.findFirst({
+      where: {
+        id: horId,
+        usuarioId: medId,
+      },
+    })
+
+    if (!horarioExistente) {
+      return res.status(404).json({
+        success: false,
+        message: 'Horario no encontrado para este médico',
+      })
+    }
+
+    await prisma.horarioMedico.delete({
+      where: { id: horId },
+    })
+
+    return res.status(200).json({
+      success: true,
+      message: 'Horario eliminado exitosamente',
+    })
+  } catch (error: any) {
+    console.error('❌ Error al eliminar horario del médico:', error)
+    return res.status(500).json({
+      success: false,
+      message: 'Error al eliminar el horario',
       error: error.message,
     })
   }

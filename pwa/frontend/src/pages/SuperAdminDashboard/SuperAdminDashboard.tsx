@@ -130,11 +130,207 @@ export default function SuperAdminDashboard() {
   const [bajaCI, setBajaCI] = useState<string | null>(null)
   const [motivoBaja, setMotivoBaja] = useState('')
 
+  // Modal de gestión de horarios
+  const [showSchedulesModal, setShowSchedulesModal] = useState(false)
+  const [selectedMedico, setSelectedMedico] = useState<PersonalAutorizado | null>(null)
+  const [schedules, setSchedules] = useState<any[]>([])
+  const [loadingSchedules, setLoadingSchedules] = useState(false)
+  const [schedulesError, setSchedulesError] = useState<string | null>(null)
+  const [schedulesSuccess, setSchedulesSuccess] = useState<string | null>(null)
+  const [editingScheduleId, setEditingScheduleId] = useState<number | null>(null)
+
+  const [newSchedule, setNewSchedule] = useState({
+    diaSemana: 0,
+    horaInicio: '08:00',
+    horaFin: '12:00',
+    capacidadPorDia: 10,
+    activo: true
+  })
+
+  const [editFormData, setEditFormData] = useState({
+    diaSemana: 0,
+    horaInicio: '08:00',
+    horaFin: '12:00',
+    capacidadPorDia: 10,
+    activo: true
+  })
+
+  const getDayNameInSpanish = (dayNumber: number) => {
+    const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+    return days[dayNumber] || 'Desconocido'
+  }
+
   // Headers con autenticación
   const getHeaders = useCallback(() => ({
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${getToken()}`,
   }), [])
+
+  // Cargar horarios de un médico
+  const cargarHorarios = async (usuarioId: number) => {
+    setLoadingSchedules(true)
+    setSchedulesError(null)
+    try {
+      const response = await fetch(`${API_BASE_URL}/medicos/${usuarioId}/horarios`, {
+        headers: getHeaders()
+      })
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al obtener horarios')
+      }
+      setSchedules(result.data || [])
+    } catch (err: any) {
+      setSchedulesError(err.message || 'Error al cargar horarios')
+    } finally {
+      setLoadingSchedules(false)
+    }
+  }
+
+  const handleManageSchedules = (personal: PersonalAutorizado) => {
+    setSelectedMedico(personal)
+    setShowSchedulesModal(true)
+    setSchedulesError(null)
+    setSchedulesSuccess(null)
+    setEditingScheduleId(null)
+    if (personal.usuarioId) {
+      cargarHorarios(personal.usuarioId)
+    }
+    setNewSchedule({
+      diaSemana: 0,
+      horaInicio: '08:00',
+      horaFin: '12:00',
+      capacidadPorDia: 10,
+      activo: true
+    })
+  }
+
+  const handleAddSchedule = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedMedico || !selectedMedico.usuarioId) return
+
+    setLoadingSchedules(true)
+    setSchedulesError(null)
+    setSchedulesSuccess(null)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/medicos/${selectedMedico.usuarioId}/horarios`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(newSchedule)
+      })
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al agregar horario')
+      }
+      setSchedulesSuccess('Horario agregado exitosamente')
+      cargarHorarios(selectedMedico.usuarioId)
+      setNewSchedule({
+        diaSemana: 0,
+        horaInicio: '08:00',
+        horaFin: '12:00',
+        capacidadPorDia: 10,
+        activo: true
+      })
+      setTimeout(() => setSchedulesSuccess(null), 3000)
+    } catch (err: any) {
+      setSchedulesError(err.message || 'Error al guardar horario')
+    } finally {
+      setLoadingSchedules(false)
+    }
+  }
+
+  const handleDeleteSchedule = async (horarioId: number) => {
+    if (!selectedMedico || !selectedMedico.usuarioId) return
+    if (!window.confirm('¿Está seguro de eliminar este horario?')) return
+
+    setLoadingSchedules(true)
+    setSchedulesError(null)
+    setSchedulesSuccess(null)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/medicos/${selectedMedico.usuarioId}/horarios/${horarioId}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      })
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al eliminar horario')
+      }
+      setSchedulesSuccess('Horario eliminado exitosamente')
+      cargarHorarios(selectedMedico.usuarioId)
+      setTimeout(() => setSchedulesSuccess(null), 3000)
+    } catch (err: any) {
+      setSchedulesError(err.message || 'Error al eliminar horario')
+    } finally {
+      setLoadingSchedules(false)
+    }
+  }
+
+  const handleToggleScheduleActive = async (horarioId: number, currentActive: boolean) => {
+    if (!selectedMedico || !selectedMedico.usuarioId) return
+
+    setLoadingSchedules(true)
+    setSchedulesError(null)
+    setSchedulesSuccess(null)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/medicos/${selectedMedico.usuarioId}/horarios/${horarioId}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify({ activo: !currentActive })
+      })
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al actualizar horario')
+      }
+      setSchedulesSuccess(currentActive ? 'Horario desactivado' : 'Horario activado')
+      cargarHorarios(selectedMedico.usuarioId)
+      setTimeout(() => setSchedulesSuccess(null), 3000)
+    } catch (err: any) {
+      setSchedulesError(err.message || 'Error al actualizar horario')
+    } finally {
+      setLoadingSchedules(false)
+    }
+  }
+
+  const startEditSchedule = (horario: any) => {
+    setEditingScheduleId(horario.id)
+    setEditFormData({
+      diaSemana: horario.diaSemana,
+      horaInicio: horario.horaInicio,
+      horaFin: horario.horaFin,
+      capacidadPorDia: horario.capacidadPorDia,
+      activo: horario.activo
+    })
+  }
+
+  const handleSaveEditSchedule = async (horarioId: number) => {
+    if (!selectedMedico || !selectedMedico.usuarioId) return
+
+    setLoadingSchedules(true)
+    setSchedulesError(null)
+    setSchedulesSuccess(null)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/medicos/${selectedMedico.usuarioId}/horarios/${horarioId}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(editFormData)
+      })
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al guardar cambios')
+      }
+      setSchedulesSuccess('Horario actualizado exitosamente')
+      setEditingScheduleId(null)
+      cargarHorarios(selectedMedico.usuarioId)
+      setTimeout(() => setSchedulesSuccess(null), 3000)
+    } catch (err: any) {
+      setSchedulesError(err.message || 'Error al guardar cambios')
+    } finally {
+      setLoadingSchedules(false)
+    }
+  }
 
   // Cargar datos
   const cargarPersonal = useCallback(async () => {
@@ -615,6 +811,15 @@ export default function SuperAdminDashboard() {
                                 🚫
                               </button>
                             )}
+                            {personal.rolAutorizado === 'MEDICO' && personal.registrado && personal.usuarioId && (
+                              <button 
+                                onClick={() => handleManageSchedules(personal)}
+                                className={styles.scheduleBtn}
+                                title="Gestionar Horarios"
+                              >
+                                ⏰
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -796,6 +1001,255 @@ export default function SuperAdminDashboard() {
                 Cancelar
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Gestión de Horarios */}
+      {showSchedulesModal && selectedMedico && (
+        <div className={styles.modalOverlay}>
+          <div className={`${styles.modal} ${styles.schedulesModal}`}>
+            <div className={styles.modalHeader}>
+              <h3>⏰ Horarios de Atención</h3>
+              <button 
+                onClick={() => {
+                  setShowSchedulesModal(false)
+                  setSelectedMedico(null)
+                  setSchedules([])
+                  setEditingScheduleId(null)
+                }} 
+                className={styles.closeModalBtn}
+                title="Cerrar"
+              >
+                ×
+              </button>
+            </div>
+            <p className={styles.medicoName}>
+              Médico: <strong>{selectedMedico.nombreCompleto}</strong> | Especialidad: <strong>{selectedMedico.departamento || 'No asignada'}</strong>
+            </p>
+
+            {/* Mensajes del Modal */}
+            {schedulesError && (
+              <div className={styles.modalError}>
+                <span>❌</span>
+                <p>{schedulesError}</p>
+              </div>
+            )}
+            {schedulesSuccess && (
+              <div className={styles.modalSuccess}>
+                <span>✅</span>
+                <p>{schedulesSuccess}</p>
+              </div>
+            )}
+
+            {/* Listado de horarios */}
+            <div className={styles.schedulesListSection}>
+              <h4>Horarios Semanales Configurados</h4>
+              {loadingSchedules && schedules.length === 0 ? (
+                <div className={styles.modalLoading}>
+                  <div className="spinner" aria-hidden="true" />
+                  <p>Cargando horarios...</p>
+                </div>
+              ) : schedules.length === 0 ? (
+                <p className={styles.noSchedules}>No hay horarios configurados para este médico.</p>
+              ) : (
+                <div className={styles.modalTableContainer}>
+                  <table className={styles.modalTable}>
+                    <thead>
+                      <tr>
+                        <th>Día</th>
+                        <th>Horario</th>
+                        <th>Capacidad</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {schedules.map((horario) => {
+                        const isEditing = editingScheduleId === horario.id;
+                        return (
+                          <tr key={horario.id} className={!horario.activo ? styles.inactiveRow : ''}>
+                            <td>
+                              {isEditing ? (
+                                <select
+                                  value={editFormData.diaSemana}
+                                  onChange={(e) => setEditFormData({ ...editFormData, diaSemana: Number(e.target.value) })}
+                                  className={styles.modalSelect}
+                                >
+                                  <option value={0}>Lunes</option>
+                                  <option value={1}>Martes</option>
+                                  <option value={2}>Miércoles</option>
+                                  <option value={3}>Jueves</option>
+                                  <option value={4}>Viernes</option>
+                                  <option value={5}>Sábado</option>
+                                  <option value={6}>Domingo</option>
+                                </select>
+                              ) : (
+                                getDayNameInSpanish(horario.diaSemana)
+                              )}
+                            </td>
+                            <td>
+                              {isEditing ? (
+                                <div className={styles.timeInputsInline}>
+                                  <input
+                                    type="text"
+                                    value={editFormData.horaInicio}
+                                    onChange={(e) => setEditFormData({ ...editFormData, horaInicio: e.target.value })}
+                                    placeholder="HH:MM"
+                                    maxLength={5}
+                                    className={styles.modalTimeInput}
+                                  />
+                                  <span>a</span>
+                                  <input
+                                    type="text"
+                                    value={editFormData.horaFin}
+                                    onChange={(e) => setEditFormData({ ...editFormData, horaFin: e.target.value })}
+                                    placeholder="HH:MM"
+                                    maxLength={5}
+                                    className={styles.modalTimeInput}
+                                  />
+                                </div>
+                              ) : (
+                                `${horario.horaInicio} - ${horario.horaFin}`
+                              )}
+                            </td>
+                            <td>
+                              {isEditing ? (
+                                <input
+                                  type="number"
+                                  value={editFormData.capacidadPorDia}
+                                  onChange={(e) => setEditFormData({ ...editFormData, capacidadPorDia: Number(e.target.value) })}
+                                  min={1}
+                                  className={styles.modalNumberInput}
+                                />
+                              ) : (
+                                horario.capacidadPorDia
+                              )}
+                            </td>
+                            <td>
+                              <span 
+                                className={horario.activo ? styles.activeBadge : styles.inactiveBadge}
+                                onClick={() => !isEditing && handleToggleScheduleActive(horario.id, horario.activo)}
+                                style={{ cursor: isEditing ? 'default' : 'pointer' }}
+                                title={isEditing ? '' : 'Haz clic para alternar'}
+                              >
+                                {horario.activo ? 'Activo' : 'Inactivo'}
+                              </span>
+                            </td>
+                            <td>
+                              <div className={styles.modalActions}>
+                                {isEditing ? (
+                                  <>
+                                    <button 
+                                      onClick={() => handleSaveEditSchedule(horario.id)} 
+                                      className={styles.saveInlineBtn}
+                                      title="Guardar"
+                                      disabled={loadingSchedules}
+                                    >
+                                      💾
+                                    </button>
+                                    <button 
+                                      onClick={() => setEditingScheduleId(null)} 
+                                      className={styles.cancelInlineBtn}
+                                      title="Cancelar"
+                                      disabled={loadingSchedules}
+                                    >
+                                      ❌
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <button 
+                                      onClick={() => startEditSchedule(horario)} 
+                                      className={styles.editInlineBtn}
+                                      title="Editar horario"
+                                      disabled={loadingSchedules}
+                                    >
+                                      ✏️
+                                    </button>
+                                    <button 
+                                      onClick={() => handleDeleteSchedule(horario.id)} 
+                                      className={styles.deleteInlineBtn}
+                                      title="Eliminar horario"
+                                      disabled={loadingSchedules}
+                                    >
+                                      🗑️
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Formulario para agregar horario */}
+            <form onSubmit={handleAddSchedule} className={styles.addScheduleForm}>
+              <h4>Agregar Nuevo Horario</h4>
+              <div className={styles.formRow}>
+                <div className={styles.formCol}>
+                  <label>Día</label>
+                  <select
+                    value={newSchedule.diaSemana}
+                    onChange={(e) => setNewSchedule({ ...newSchedule, diaSemana: Number(e.target.value) })}
+                    className={styles.modalSelect}
+                  >
+                    <option value={0}>Lunes</option>
+                    <option value={1}>Martes</option>
+                    <option value={2}>Miércoles</option>
+                    <option value={3}>Jueves</option>
+                    <option value={4}>Viernes</option>
+                    <option value={5}>Sábado</option>
+                    <option value={6}>Domingo</option>
+                  </select>
+                </div>
+                <div className={styles.formCol}>
+                  <label>Desde</label>
+                  <input
+                    type="text"
+                    value={newSchedule.horaInicio}
+                    onChange={(e) => setNewSchedule({ ...newSchedule, horaInicio: e.target.value })}
+                    placeholder="08:00"
+                    maxLength={5}
+                    className={styles.modalTimeInput}
+                    required
+                  />
+                </div>
+                <div className={styles.formCol}>
+                  <label>Hasta</label>
+                  <input
+                    type="text"
+                    value={newSchedule.horaFin}
+                    onChange={(e) => setNewSchedule({ ...newSchedule, horaFin: e.target.value })}
+                    placeholder="12:00"
+                    maxLength={5}
+                    className={styles.modalTimeInput}
+                    required
+                  />
+                </div>
+                <div className={styles.formCol}>
+                  <label>Capacidad</label>
+                  <input
+                    type="number"
+                    value={newSchedule.capacidadPorDia}
+                    onChange={(e) => setNewSchedule({ ...newSchedule, capacidadPorDia: Number(e.target.value) })}
+                    min={1}
+                    className={styles.modalNumberInput}
+                    required
+                  />
+                </div>
+                <div className={styles.formColBtn}>
+                  <button type="submit" className={styles.addBtn} disabled={loadingSchedules}>
+                    ➕ Agregar
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       )}
