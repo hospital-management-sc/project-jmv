@@ -13,6 +13,7 @@ import {
   create,
   update,
   deactivate,
+  deletePermanent,
   bulkCreate,
 } from '../controllers/authorizedPersonnel';
 import { authMiddleware } from '../middleware/auth';
@@ -70,9 +71,15 @@ router.put('/:ci', authMiddleware, requireSuperAdminWithAudit, update);
 
 /**
  * DELETE /api/authorized-personnel/:ci
- * Da de baja a un personal (no elimina, cambia estado)
+ * Da de baja a un personal (no elimina, cambia estado a BAJA)
  * Body: { motivoBaja: string }
  */
 router.delete('/:ci', authMiddleware, requireSuperAdminWithAudit, deactivate);
+
+/**
+ * DELETE /api/authorized-personnel/permanente/:ci
+ * Elimina permanentemente un registro en estado BAJA
+ */
+router.delete('/permanente/:ci', authMiddleware, requireSuperAdminWithAudit, deletePermanent);
 
 export default router;

@@ -50,6 +50,7 @@ export interface CreateAuthorizedPersonnelInput {
   email?: string;
   rolAutorizado: string;
   departamento?: string;
+  especialidad?: string;
   cargo?: string;
   fechaIngreso: Date;
   fechaVencimiento?: Date;
@@ -61,6 +62,7 @@ export interface UpdateAuthorizedPersonnelInput {
   email?: string;
   rolAutorizado?: string;
   departamento?: string;
+  especialidad?: string;
   cargo?: string;
   estado?: string;
   fechaVencimiento?: Date;
@@ -379,6 +381,7 @@ export const addAuthorizedPersonnel = async (
       email: input.email?.toLowerCase().trim(),
       rolAutorizado: input.rolAutorizado,
       departamento: input.departamento,
+      especialidad: input.especialidad,
       cargo: input.cargo,
       fechaIngreso: input.fechaIngreso,
       fechaVencimiento: input.fechaVencimiento,

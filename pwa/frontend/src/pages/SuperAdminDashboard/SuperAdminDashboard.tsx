@@ -26,6 +26,7 @@ interface PersonalAutorizado {
   email: string | null
   rolAutorizado: string
   departamento: string | null
+  especialidad: string | null
   cargo: string | null
   estado: string
   fechaIngreso: string
@@ -56,6 +57,7 @@ interface FormData {
   email: string
   rolAutorizado: string
   departamento: string
+  especialidad: string
   cargo: string
   fechaIngreso: string
   fechaVencimiento: string
@@ -118,6 +120,7 @@ export default function SuperAdminDashboard() {
     email: '',
     rolAutorizado: '',
     departamento: '',
+    especialidad: '',
     cargo: '',
     fechaIngreso: new Date().toISOString().split('T')[0],
     fechaVencimiento: '',
@@ -343,7 +346,8 @@ export default function SuperAdminDashboard() {
       if (filtroRol) params.append('rol', filtroRol)
       if (filtroRegistrado) params.append('registrado', filtroRegistrado)
       
-      const url = `${API_BASE_URL}/authorized-personnel${params.toString() ? `?${params}` : ''}`
+      params.append('_t', Date.now().toString())
+      const url = `${API_BASE_URL}/authorized-personnel?${params}`
       const response = await fetch(url, { headers: getHeaders() })
       const result = await response.json()
       
@@ -458,6 +462,14 @@ export default function SuperAdminDashboard() {
       setSuccessMessage(editingCI ? 'Personal actualizado exitosamente' : 'Personal agregado exitosamente')
       setTimeout(() => setSuccessMessage(null), 3000)
       
+      // Actualizar el state local inmediatamente con el dato devuelto por la API
+      // para no depender de la latencia del re-fetch
+      if (editingCI) {
+        setPersonalList(prev => prev.map(p => p.ci === editingCI ? { ...p, ...result.data } : p))
+      } else {
+        setPersonalList(prev => [...prev, result.data])
+      }
+
       // Limpiar y volver a lista
       setFormData({
         ci: '',
@@ -465,6 +477,7 @@ export default function SuperAdminDashboard() {
         email: '',
         rolAutorizado: '',
         departamento: '',
+        especialidad: '',
         cargo: '',
         fechaIngreso: new Date().toISOString().split('T')[0],
         fechaVencimiento: '',
@@ -488,6 +501,7 @@ export default function SuperAdminDashboard() {
       email: personal.email || '',
       rolAutorizado: personal.rolAutorizado,
       departamento: personal.departamento || '',
+      especialidad: personal.especialidad || '',
       cargo: personal.cargo || '',
       fechaIngreso: personal.fechaIngreso.split('T')[0],
       fechaVencimiento: personal.fechaVencimiento ? personal.fechaVencimiento.split('T')[0] : '',
@@ -530,6 +544,31 @@ export default function SuperAdminDashboard() {
       cargarStats()
     } catch (err: any) {
       setError(err.message || 'Error al dar de baja')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Eliminar permanentemente (solo registros en estado BAJA)
+  const handleEliminarPermanente = async (ci: string, nombre: string) => {
+    if (!window.confirm(`¿Eliminar permanentemente a "${nombre}" de la whitelist?\n\nEsta acción no se puede deshacer.`)) return
+
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await fetch(`${API_BASE_URL}/authorized-personnel/permanente/${ci}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.message || 'Error al eliminar')
+
+      setPersonalList(prev => prev.filter(p => p.ci !== ci))
+      setSuccessMessage('Registro eliminado permanentemente de la whitelist')
+      setTimeout(() => setSuccessMessage(null), 3000)
+      cargarStats()
+    } catch (err: any) {
+      setError(err.message || 'Error al eliminar')
     } finally {
       setLoading(false)
     }
@@ -761,6 +800,9 @@ export default function SuperAdminDashboard() {
                             {personal.email && (
                               <span className={styles.email}>{personal.email}</span>
                             )}
+                            {personal.especialidad && (
+                              <span className={styles.email} style={{ color: '#059669', fontStyle: 'italic' }}>{personal.especialidad}</span>
+                            )}
                           </div>
                         </td>
                         <td>
@@ -792,7 +834,7 @@ export default function SuperAdminDashboard() {
                         </td>
                         <td>
                           <div className={styles.actions}>
-                            <button 
+                            <button
                               onClick={() => handleEditar(personal)}
                               className={styles.editBtn}
                               title="Editar"
@@ -800,7 +842,7 @@ export default function SuperAdminDashboard() {
                               ✏️
                             </button>
                             {personal.estado === 'ACTIVO' && (
-                              <button 
+                              <button
                                 onClick={() => {
                                   setBajaCI(personal.ci)
                                   setShowBajaModal(true)
@@ -811,8 +853,18 @@ export default function SuperAdminDashboard() {
                                 🚫
                               </button>
                             )}
+                            {personal.estado === 'BAJA' && (
+                              <button
+                                onClick={() => handleEliminarPermanente(personal.ci, personal.nombreCompleto)}
+                                className={styles.deleteBtn}
+                                title="Eliminar permanentemente de la whitelist"
+                                style={{ backgroundColor: '#7f1d1d' }}
+                              >
+                                🗑️
+                              </button>
+                            )}
                             {personal.rolAutorizado === 'MEDICO' && personal.registrado && personal.usuarioId && (
-                              <button 
+                              <button
                                 onClick={() => handleManageSchedules(personal)}
                                 className={styles.scheduleBtn}
                                 title="Gestionar Horarios"
@@ -909,7 +961,23 @@ export default function SuperAdminDashboard() {
                     ))}
                   </select>
                 </div>
-                
+
+                {formData.rolAutorizado === 'MEDICO' && (
+                  <div className={styles.formGroup}>
+                    <label>Especialidad Médica</label>
+                    <select
+                      value={formData.especialidad}
+                      onChange={(e) => setFormData({ ...formData, especialidad: e.target.value })}
+                    >
+                      <option value="">Seleccione especialidad...</option>
+                      {obtenerNombresEspecialidades().map(esp => (
+                        <option key={esp} value={esp}>{esp}</option>
+                      ))}
+                    </select>
+                    <small className={styles.fieldHint}>Requerida para que el médico aparezca en interconsultas</small>
+                  </div>
+                )}
+
                 <div className={styles.formGroup}>
                   <label>Cargo</label>
                   <input

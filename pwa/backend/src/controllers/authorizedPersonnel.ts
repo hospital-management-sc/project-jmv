@@ -168,6 +168,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
       email,
       rolAutorizado,
       departamento,
+      especialidad,
       cargo,
       fechaIngreso,
       fechaVencimiento,
@@ -185,6 +186,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
         email,
         rolAutorizado,
         departamento,
+        especialidad,
         cargo,
         fechaIngreso: new Date(fechaIngreso),
         fechaVencimiento: fechaVencimiento ? new Date(fechaVencimiento) : undefined,
@@ -326,6 +328,50 @@ export const deactivate = async (req: AuthRequest, res: Response): Promise<void>
         error: 'Internal Server Error',
         message: 'Error al dar de baja personal autorizado',
       });
+    }
+  }
+};
+
+/**
+ * DELETE /api/authorized-personnel/:ci/permanente
+ * Elimina permanentemente un registro de la whitelist (solo si está en estado BAJA)
+ */
+export const deletePermanent = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { ci } = req.params;
+
+    if (!ci) {
+      throw new ValidationError('CI es requerido');
+    }
+
+    const { getPrismaClient } = await import('../database/connection');
+    const prisma = getPrismaClient();
+
+    const record = await prisma.personalAutorizado.findUnique({ where: { ci: ci.toUpperCase() } });
+
+    if (!record) {
+      res.status(404).json({ success: false, error: 'Not Found', message: 'Registro no encontrado' });
+      return;
+    }
+
+    if (record.estado !== 'BAJA') {
+      throw new ValidationError('Solo se pueden eliminar registros en estado BAJA. Primero dé de baja al personal.');
+    }
+
+    await prisma.personalAutorizado.delete({ where: { ci: ci.toUpperCase() } });
+
+    logger.info(`Personal eliminado permanentemente: ${ci} por usuario ${req.user?.id}`);
+
+    res.status(200).json({
+      success: true,
+      message: 'Registro eliminado permanentemente de la whitelist',
+    });
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ success: false, error: error.name, message: error.message });
+    } else {
+      logger.error('Error deleting authorized personnel permanently:', error);
+      res.status(500).json({ success: false, error: 'Internal Server Error', message: 'Error al eliminar registro' });
     }
   }
 };
