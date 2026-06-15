@@ -647,6 +647,7 @@ export default function SuperAdminDashboard() {
               email: '',
               rolAutorizado: '',
               departamento: '',
+              especialidad: '',
               cargo: '',
               fechaIngreso: new Date().toISOString().split('T')[0],
               fechaVencimiento: '',
