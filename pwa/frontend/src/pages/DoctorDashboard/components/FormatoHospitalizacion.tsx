@@ -9,6 +9,7 @@ import styles from './FormatoHospitalizacion.module.css';
 import admisionesService, { type Admision } from '@/services/admisiones.service';
 import * as formatoService from '@/services/formatoHospitalizacion.service';
 import type { FormatoHospitalizacion } from '@/services/formatoHospitalizacion.service';
+import { IconClipboard, IconHeartPulse, IconMicroscope, IconXRay, IconEcg, IconHospital, IconStethoscope, IconNotes, IconPill, IconCalendar, IconX, IconChevronLeft, IconSave, IconConstruction } from '@/components/icons';
 
 // Importar componentes de secciones
 import Seccion1_GeneralInfo from './FormatoHospitalizacion/Seccion1_GeneralInfo';
@@ -41,23 +42,23 @@ type TabKey =
 interface Tab {
   key: TabKey;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
   component?: React.ComponentType<any>;
   implemented: boolean;
 }
 
 const TABS: Tab[] = [
-  { key: 'general', label: 'Datos Generales', icon: '📋', component: Seccion1_GeneralInfo, implemented: true },
-  { key: 'signos', label: 'Signos Vitales', icon: '💓', component: Seccion2_SignosVitales, implemented: true },
-  { key: 'laboratorio', label: 'Laboratorio', icon: '🔬', component: Seccion3_Laboratorios, implemented: true },
-  { key: 'estudios', label: 'Estudios Especiales', icon: '🩻', component: Seccion4_EstudiosEspeciales, implemented: true },
-  { key: 'ekg', label: 'Electrocardiograma', icon: '📈', component: Seccion5_Electrocardiograma, implemented: true },
-  { key: 'clinica1', label: 'Clínica I', icon: '🏥', component: Seccion6_Clinica1, implemented: true },
-  { key: 'clinica2', label: 'Clínica II', icon: '🩺', component: Seccion7_Clinica2, implemented: true },
-  { key: 'clinica3', label: 'Clínica III', icon: '📋', component: Seccion8_Clinica3, implemented: true },
-  { key: 'resumen', label: 'Resumen', icon: '📝', component: Seccion9_ResumenIngreso, implemented: true },
-  { key: 'ordenes', label: 'Órdenes Médicas', icon: '💊', component: Seccion10_OrdenesMedicas, implemented: true },
-  { key: 'evoluciones', label: 'Evoluciones', icon: '📅', component: Seccion11_Evoluciones, implemented: true },
+  { key: 'general', label: 'Datos Generales', icon: <IconClipboard size={16} />, component: Seccion1_GeneralInfo, implemented: true },
+  { key: 'signos', label: 'Signos Vitales', icon: <IconHeartPulse size={16} />, component: Seccion2_SignosVitales, implemented: true },
+  { key: 'laboratorio', label: 'Laboratorio', icon: <IconMicroscope size={16} />, component: Seccion3_Laboratorios, implemented: true },
+  { key: 'estudios', label: 'Estudios Especiales', icon: <IconXRay size={16} />, component: Seccion4_EstudiosEspeciales, implemented: true },
+  { key: 'ekg', label: 'Electrocardiograma', icon: <IconEcg size={16} />, component: Seccion5_Electrocardiograma, implemented: true },
+  { key: 'clinica1', label: 'Clínica I', icon: <IconHospital size={16} />, component: Seccion6_Clinica1, implemented: true },
+  { key: 'clinica2', label: 'Clínica II', icon: <IconStethoscope size={16} />, component: Seccion7_Clinica2, implemented: true },
+  { key: 'clinica3', label: 'Clínica III', icon: <IconClipboard size={16} />, component: Seccion8_Clinica3, implemented: true },
+  { key: 'resumen', label: 'Resumen', icon: <IconNotes size={16} />, component: Seccion9_ResumenIngreso, implemented: true },
+  { key: 'ordenes', label: 'Órdenes Médicas', icon: <IconPill size={16} />, component: Seccion10_OrdenesMedicas, implemented: true },
+  { key: 'evoluciones', label: 'Evoluciones', icon: <IconCalendar size={16} />, component: Seccion11_Evoluciones, implemented: true },
 ];
 
 export default function FormatoHospitalizacionView({}: Props) {
@@ -136,10 +137,10 @@ export default function FormatoHospitalizacionView({}: Props) {
     return (
       <div className={styles.container}>
         <div className={styles.errorContainer}>
-          <h3>❌ Error</h3>
+          <h3><IconX size={16} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Error</h3>
           <p>{error || 'No se pudo cargar la información'}</p>
           <button onClick={handleBack} className={styles.btnSecondary}>
-            ← Volver a Pacientes
+            <IconChevronLeft size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Volver a Pacientes
           </button>
         </div>
       </div>
@@ -154,11 +155,11 @@ export default function FormatoHospitalizacionView({}: Props) {
       {/* Header con información del paciente */}
       <div className={styles.header}>
         <button onClick={handleBack} className={styles.btnBack}>
-          ← Volver
+          <IconChevronLeft size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Volver
         </button>
         
         <div className={styles.patientInfo}>
-          <h2>📋 Formato de Hospitalización</h2>
+          <h2><IconClipboard size={20} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Formato de Hospitalización</h2>
           <div className={styles.patientDetails}>
             <div className={styles.detailItem}>
               <span className={styles.label}>Paciente:</span>
@@ -189,7 +190,7 @@ export default function FormatoHospitalizacionView({}: Props) {
 
         {saving && (
           <div className={styles.savingIndicator}>
-            💾 Guardando...
+            <IconSave size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Guardando...
           </div>
         )}
       </div>
@@ -206,7 +207,7 @@ export default function FormatoHospitalizacionView({}: Props) {
             >
               <span className={styles.tabIcon}>{tab.icon}</span>
               <span className={styles.tabLabel}>{tab.label}</span>
-              {!tab.implemented && <span className={styles.comingSoon}>🚧</span>}
+              {!tab.implemented && <span className={styles.comingSoon}><IconConstruction size={12} /></span>}
             </button>
           ))}
         </div>
@@ -223,7 +224,7 @@ export default function FormatoHospitalizacionView({}: Props) {
           />
         ) : (
           <div className={styles.notImplemented}>
-            <h3>🚧 En Construcción</h3>
+            <h3><IconConstruction size={16} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> En Construcción</h3>
             <p>La sección <strong>"{currentTab?.label}"</strong> está en desarrollo.</p>
             <p>Próximamente disponible.</p>
           </div>

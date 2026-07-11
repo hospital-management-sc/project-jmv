@@ -7,6 +7,7 @@ import styles from './Secciones.module.css';
 import type { FormatoHospitalizacion } from '@/services/formatoHospitalizacion.service';
 import type { Admision } from '@/services/admisiones.service';
 import { formatDateVenezuela, formatTimeVenezuela } from '@/utils/dateUtils';
+import { IconClipboard, IconFile, IconHospital, IconEmergency, IconUser, IconPhone, IconInfo } from '@/components/icons';
 
 interface Props {
   formato: FormatoHospitalizacion;
@@ -37,7 +38,7 @@ export default function Seccion1_GeneralInfo({ formato, admision }: Props) {
   return (
     <div className={styles.seccion}>
       <div className={styles.seccionHeader}>
-        <h3>📋 Información General del Formato</h3>
+        <h3><IconClipboard size={16} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Información General del Formato</h3>
         <p className={styles.seccionDescription}>
           Datos básicos de la admisión y del paciente
         </p>
@@ -46,7 +47,7 @@ export default function Seccion1_GeneralInfo({ formato, admision }: Props) {
       <div className={styles.infoGrid}>
         {/* Datos del Formato */}
         <div className={styles.infoCard}>
-          <h4>📄 Formato de Hospitalización</h4>
+          <h4><IconFile size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Formato de Hospitalización</h4>
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>ID Formato:</span>
             <span className={styles.infoValue}>#{formato.id}</span>
@@ -67,7 +68,7 @@ export default function Seccion1_GeneralInfo({ formato, admision }: Props) {
 
         {/* Datos de la Admisión */}
         <div className={styles.infoCard}>
-          <h4>🏥 Datos de Admisión</h4>
+          <h4><IconHospital size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Datos de Admisión</h4>
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Nro. Admisión:</span>
             <span className={styles.infoValue}>#{admision.id}</span>
@@ -75,7 +76,7 @@ export default function Seccion1_GeneralInfo({ formato, admision }: Props) {
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Tipo:</span>
             <span className={`${styles.badge} ${styles[`badge${admision.tipo}`]}`}>
-              {admision.tipo === 'HOSPITALIZACION' ? '🏥 HOSPITALIZACIÓN' : '🚨 EMERGENCIA'}
+              {admision.tipo === 'HOSPITALIZACION' ? <><IconHospital size={12} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />HOSPITALIZACIÓN</> : <><IconEmergency size={12} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />EMERGENCIA</>}
             </span>
           </div>
           <div className={styles.infoItem}>
@@ -108,7 +109,7 @@ export default function Seccion1_GeneralInfo({ formato, admision }: Props) {
 
         {/* Datos del Paciente */}
         <div className={styles.infoCard}>
-          <h4>👤 Datos del Paciente</h4>
+          <h4><IconUser size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Datos del Paciente</h4>
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Nombre Completo:</span>
             <span className={styles.infoValue}>{admision.paciente?.apellidosNombres || 'N/A'}</span>
@@ -149,7 +150,7 @@ export default function Seccion1_GeneralInfo({ formato, admision }: Props) {
 
         {/* Información de Contacto */}
         <div className={styles.infoCard}>
-          <h4>📞 Información de Contacto</h4>
+          <h4><IconPhone size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Información de Contacto</h4>
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Teléfono:</span>
             <span className={styles.infoValue}>{admision.paciente?.telefono || 'No registrado'}</span>
@@ -166,7 +167,7 @@ export default function Seccion1_GeneralInfo({ formato, admision }: Props) {
       </div>
 
       <div className={styles.infoNote}>
-        <strong>ℹ️ Nota:</strong> Esta sección muestra datos de solo lectura. 
+        <strong><IconInfo size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Nota:</strong> Esta sección muestra datos de solo lectura. 
         Para modificar información del paciente o de la admisión, utilice las 
         interfaces administrativas correspondientes.
       </div>

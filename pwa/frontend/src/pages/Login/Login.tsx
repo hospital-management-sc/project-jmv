@@ -3,9 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useNavigate, Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import FormInput from '@components/FormInput'
 import PasswordToggle from '@components/PasswordToggle'
-import { authService } from '@services/auth'
 import { useAuth } from '@/contexts/AuthContext'
 import { API_BASE_URL } from '@/utils/constants'
 import {
@@ -16,68 +14,31 @@ import {
 } from '@/utils/webauthn'
 import styles from './Login.module.css'
 
-// Mensajes de error mejorados para login
-const ERROR_MESSAGES: Record<string, { title: string; description: string; suggestion?: string }> = {
-  INVALID_CREDENTIALS: {
-    title: 'Credenciales Incorrectas',
-    description: 'El correo electrónico o la contraseña que ingresaste no son correctos.',
-    suggestion: 'Verifica que tu correo esté bien escrito y que la contraseña sea la correcta. Recuerda que las contraseñas distinguen entre mayúsculas y minúsculas.',
-  },
-  NETWORK_ERROR: {
-    title: 'Error de Conexión',
-    description: 'No se pudo conectar con el servidor.',
-    suggestion: 'Verifica tu conexión a internet e intenta nuevamente. Si el problema persiste, el servidor podría estar en mantenimiento.',
-  },
-  SERVER_ERROR: {
-    title: 'Error del Servidor',
-    description: 'Ocurrió un error interno en el servidor.',
-    suggestion: 'Por favor, intenta nuevamente en unos minutos. Si el problema continúa, contacta al soporte técnico.',
-  },
-  VALIDATION_ERROR: {
-    title: 'Datos Incompletos',
-    description: 'Por favor, completa todos los campos requeridos.',
-  },
-  DEFAULT: {
-    title: 'Error al Iniciar Sesión',
-    description: 'Ocurrió un error inesperado.',
-    suggestion: 'Por favor, intenta nuevamente. Si el problema persiste, contacta al soporte técnico.',
-  },
-}
-
 const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email es requerido')
-    .email('Email inválido'),
-  password: z
-    .string()
-    .min(1, 'Contraseña es requerida')
-    .min(6, 'Contraseña debe tener al menos 6 caracteres'),
+  ciTipo: z.string().min(1),
+  ciNumeros: z.string().regex(/^\d{7,9}$/, 'Debe tener 7-9 dígitos'),
+  password: z.string().min(1, 'Contraseña requerida'),
 })
 
 type LoginFormData = z.infer<typeof loginSchema>
-
-interface LoginError {
-  code: string
-  message: string
-}
 
 export default function Login() {
   const navigate = useNavigate()
   const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
-  const [loginError, setLoginError] = useState<LoginError | null>(null)
+  const [loginError, setLoginError] = useState<string | null>(null)
   const [biometricAvailable, setBiometricAvailable] = useState(false)
   const [biometricLoading, setBiometricLoading] = useState(false)
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    defaultValues: { ciTipo: 'V' },
   })
 
-  // Check biometric availability once on mount
   useEffect(() => {
     const check = async () => {
       if (isWebAuthnSupported()) {
@@ -88,172 +49,84 @@ export default function Login() {
     check()
   }, [])
 
-  // Detectar tipo de error del mensaje de la API
-  const detectErrorCode = (message: string): string => {
-    const lowerMessage = message.toLowerCase()
-    
-    // Errores de credenciales
-    if (
-      lowerMessage.includes('credenciales') ||
-      lowerMessage.includes('invalid') ||
-      lowerMessage.includes('password') ||
-      lowerMessage.includes('contraseña') ||
-      lowerMessage.includes('correo') ||
-      lowerMessage.includes('email')
-    ) {
-      return 'INVALID_CREDENTIALS'
-    }
-    
-    // Errores de red
-    if (
-      lowerMessage.includes('network') ||
-      lowerMessage.includes('fetch') ||
-      lowerMessage.includes('conexión') ||
-      lowerMessage.includes('connect') ||
-      lowerMessage.includes('timeout')
-    ) {
-      return 'NETWORK_ERROR'
-    }
-    
-    // Errores del servidor
-    if (
-      lowerMessage.includes('500') ||
-      lowerMessage.includes('server') ||
-      lowerMessage.includes('interno')
-    ) {
-      return 'SERVER_ERROR'
-    }
-    
-    // Errores de validación
-    if (
-      lowerMessage.includes('requerido') ||
-      lowerMessage.includes('required') ||
-      lowerMessage.includes('validación')
-    ) {
-      return 'VALIDATION_ERROR'
-    }
-    
-    return 'DEFAULT'
-  }
-
-  const getErrorInfo = () => {
-    if (!loginError) return null
-    return ERROR_MESSAGES[loginError.code] || ERROR_MESSAGES.DEFAULT
-  }
-
   const handleBiometricLogin = async () => {
     setLoginError(null)
     setBiometricLoading(true)
     try {
-      // 1. Get challenge from server
       const initiateRes = await fetch(`${API_BASE_URL}/biometric/authenticate/initiate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       })
-      if (!initiateRes.ok) {
-        throw new Error('No se pudo iniciar la autenticación biométrica')
-      }
+      if (!initiateRes.ok) throw new Error('No se pudo iniciar la autenticación biométrica')
       const initiateData = await initiateRes.json()
-      const authOptions = initiateData.data
-      const { challengeToken, ...webAuthnOptions } = authOptions
+      const { challengeToken, ...webAuthnOptions } = initiateData.data
 
-      // 2. Browser prompts for biometrics
       let assertionResponse
       try {
         assertionResponse = await startWebAuthnAuthentication(webAuthnOptions)
-      } catch (webAuthnErr) {
-        throw new Error(getWebAuthnErrorMessage(webAuthnErr))
+      } catch (err) {
+        throw new Error(getWebAuthnErrorMessage(err))
       }
 
-      // 3. Verify with server
       const verifyRes = await fetch(`${API_BASE_URL}/biometric/authenticate/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          credentialId: assertionResponse.id,
-          assertionResponse,
-          challengeToken,
-        }),
+        body: JSON.stringify({ credentialId: assertionResponse.id, assertionResponse, challengeToken }),
       })
       const verifyData = await verifyRes.json()
-      if (!verifyRes.ok || !verifyData.success) {
-        throw new Error(verifyData.message || 'Verificación biométrica fallida')
-      }
+      if (!verifyRes.ok || !verifyData.success) throw new Error(verifyData.message || 'Verificación biométrica fallida')
 
-      // 4. Log in via AuthContext
       const { id, nombre, email, role, especialidad, token } = verifyData.data
       login({ id, nombre, email, role, especialidad }, token)
       navigate(role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/medico')
     } catch (err: any) {
-      const msg = err?.message || 'Error desconocido en autenticación biométrica'
-      setLoginError({ code: 'DEFAULT', message: msg })
+      setLoginError(err?.message || 'Error en autenticación biométrica')
     } finally {
       setBiometricLoading(false)
     }
   }
 
   const onSubmit = async (data: LoginFormData) => {
-    // Limpiar errores previos
     setLoginError(null)
-    
+    const ci = `${data.ciTipo}${data.ciNumeros}`.toUpperCase()
     try {
-      const response = await authService.login({
-        email: data.email,
-        password: data.password,
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ci, password: data.password }),
       })
-      
-      if (response.success && response.data?.token) {
-        // Usar el método login del contexto
-        const userData = {
-          id: response.data.id,
-          email: response.data.email,
-          role: response.data.role,
-          nombre: response.data.nombre,
-          especialidad: response.data.especialidad,
-        }
-        
-        login(userData, response.data.token)
-        
-        // Redirigir al dashboard correspondiente según el rol
-        const dashboardPath = userData.role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/medico'
-        navigate(dashboardPath)
+      const json = await res.json()
+
+      if (json.success && json.data?.token) {
+        const { id, nombre, email, role, especialidad, token } = json.data
+        login({ id, nombre, email, role, especialidad }, token)
+        if (role === 'SUPER_ADMIN') navigate('/dashboard/superadmin')
+        else if (role === 'ADMIN') navigate('/dashboard/admin')
+        else navigate('/dashboard/medico')
       } else {
-        const errorMsg = response.error || 'Respuesta inválida del servidor'
-        const errorCode = detectErrorCode(errorMsg)
-        setLoginError({ code: errorCode, message: errorMsg })
+        setLoginError(json.message || 'Cédula o contraseña incorrectos.')
       }
-    } catch (error: any) {
-      const errorMessage = error?.message || 'Error desconocido'
-      const errorCode = detectErrorCode(errorMessage)
-      setLoginError({ code: errorCode, message: errorMessage })
+    } catch {
+      setLoginError('No se pudo conectar con el servidor. Verifica tu conexión.')
     }
   }
-
-  const errorInfo = getErrorInfo()
 
   return (
     <div className={styles.container}>
       <h1 className={styles.up_title}>Hospital Militar</h1>
       <h1 className={styles.title}>"Dr. José María Vargas"</h1>
-      <p className={styles.subtitle}>Inicia sesión en tu cuenta</p>
+      <p className={styles.subtitle}>Accede al sistema</p>
 
-      {/* Mensaje de error estilizado */}
-      {errorInfo && (
+      {loginError && (
         <div className={styles.errorAlert}>
           <div className={styles.alertContent}>
-            <h3 className={styles.alertTitle}>{errorInfo.title}</h3>
-            <p className={styles.alertDescription}>{errorInfo.description}</p>
-            {errorInfo.suggestion && (
-              <p className={styles.alertSuggestion}>
-                <strong>Sugerencia:</strong> {errorInfo.suggestion}
-              </p>
-            )}
+            <p className={styles.alertDescription}>{loginError}</p>
           </div>
           <button
             type="button"
             className={styles.alertClose}
             onClick={() => setLoginError(null)}
-            aria-label="Cerrar mensaje"
+            aria-label="Cerrar"
           >
             ×
           </button>
@@ -261,25 +134,73 @@ export default function Login() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-        <FormInput
-          id="email"
-          type="email"
-          label="Email"
-          placeholder="tu@email.com"
-          error={errors.email?.message}
-          {...register('email')}
-        />
+        {/* Campo CI */}
+        <div className={styles.formGroup}>
+          <label>Cédula de Identidad</label>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <select
+              {...register('ciTipo')}
+              style={{
+                width: '4.5rem',
+                flexShrink: 0,
+                padding: '0.625rem 0.5rem',
+                fontSize: '0.95rem',
+                border: '1.5px solid rgba(148,163,184,0.2)',
+                borderRadius: '0.875rem',
+                background: 'rgba(15,23,42,0.5)',
+                color: '#f1f5f9',
+              }}
+            >
+              <option value="V">V</option>
+              <option value="E">E</option>
+              <option value="P">P</option>
+            </select>
+            <input
+              {...register('ciNumeros')}
+              type="text"
+              inputMode="numeric"
+              placeholder="12345678"
+              maxLength={9}
+              style={{
+                flex: 1,
+                padding: '0.625rem 0.875rem',
+                fontSize: '0.95rem',
+                border: `1.5px solid ${errors.ciNumeros ? 'rgba(239,68,68,0.5)' : 'rgba(148,163,184,0.2)'}`,
+                borderRadius: '0.875rem',
+                background: 'rgba(15,23,42,0.5)',
+                color: '#f1f5f9',
+              }}
+            />
+          </div>
+          {errors.ciNumeros && (
+            <span className={styles.error}>{errors.ciNumeros.message}</span>
+          )}
+        </div>
 
-        <div style={{ position: 'relative' }}>
-          <FormInput
-            id="password"
-            type={showPassword ? 'text' : 'password'}
-            label="Contraseña"
-            placeholder="Tu contraseña"
-            error={errors.password?.message}
-            {...register('password')}
-          />
-          <PasswordToggle isVisible={showPassword} onChange={setShowPassword} />
+        {/* Campo Contraseña */}
+        <div className={styles.formGroup}>
+          <label>Contraseña</label>
+          <div style={{ position: 'relative' }}>
+            <input
+              {...register('password')}
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Tu contraseña"
+              style={{
+                width: '100%',
+                padding: '0.625rem 2.5rem 0.625rem 0.875rem',
+                fontSize: '0.95rem',
+                border: `1.5px solid ${errors.password ? 'rgba(239,68,68,0.5)' : 'rgba(148,163,184,0.2)'}`,
+                borderRadius: '0.875rem',
+                background: 'rgba(15,23,42,0.5)',
+                color: '#f1f5f9',
+                boxSizing: 'border-box',
+              }}
+            />
+            <PasswordToggle isVisible={showPassword} onChange={setShowPassword} />
+          </div>
+          {errors.password && (
+            <span className={styles.error}>{errors.password.message}</span>
+          )}
         </div>
 
         <button
@@ -287,15 +208,13 @@ export default function Login() {
           className={styles.submitButton}
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+          {isSubmitting ? 'Accediendo...' : 'Acceder'}
         </button>
       </form>
 
       {biometricAvailable && (
         <>
-          <div className={styles.divider}>
-            <span>o</span>
-          </div>
+          <div className={styles.divider}><span>o</span></div>
           <button
             type="button"
             className={styles.biometricButton}
@@ -319,7 +238,7 @@ export default function Login() {
             )}
             <span>{biometricLoading ? 'Verificando...' : 'Acceso Biométrico'}</span>
           </button>
-          <p className={styles.biometricHint}>Más rápido y seguro usando tu huella, rostro o PIN del dispositivo.</p>
+          <p className={styles.biometricHint}>Más rápido usando tu huella, rostro o PIN del dispositivo.</p>
         </>
       )}
 
@@ -329,13 +248,9 @@ export default function Login() {
         </Link>
       </p>
 
-      <div className={styles.divider}>———————</div>
-
-      <p className={styles.registerLink}>
-        ¿No tienes cuenta?{' '}
-        <Link to="/register" className={styles.link}>
-          Regístrate aquí
-        </Link>
+      <p style={{ textAlign: 'center', fontSize: '0.8rem', color: '#475569', marginTop: '1rem', lineHeight: 1.5 }}>
+        Tu contraseña inicial es tu número de cédula.<br />
+        Cámbiala en Ajustes tras tu primer acceso.
       </p>
     </div>
   )

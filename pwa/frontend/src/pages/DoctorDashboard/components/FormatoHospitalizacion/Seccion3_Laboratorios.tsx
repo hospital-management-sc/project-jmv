@@ -9,6 +9,7 @@ import type { FormatoHospitalizacion, Laboratorio } from '@/services/formatoHosp
 import type { Admision } from '@/services/admisiones.service';
 import * as formatoService from '@/services/formatoHospitalizacion.service';
 import { formatDateVenezuela } from '@/utils/dateUtils';
+import { IconMicroscope, IconBloodDrop, IconFlask, IconX, IconPlus, IconEdit, IconNotes, IconSave, IconChartBar, IconInfo } from '@/components/icons';
 
 interface Props {
   formato: FormatoHospitalizacion;
@@ -20,7 +21,7 @@ interface Props {
 // Definición de campos por categoría
 const CAMPOS_LABORATORIO = {
   hematologia: {
-    titulo: '🩸 Hematología',
+    titulo: 'Hematología',
     campos: [
       { key: 'hgb', label: 'Hemoglobina', unidad: 'g/dL', min: 12, max: 17 },
       { key: 'hct', label: 'Hematocrito', unidad: '%', min: 36, max: 50 },
@@ -34,7 +35,7 @@ const CAMPOS_LABORATORIO = {
     ]
   },
   coagulacion: {
-    titulo: '🔬 Coagulación',
+    titulo: 'Coagulación',
     campos: [
       { key: 'pt', label: 'PT', unidad: 'seg', min: 11, max: 14 },
       { key: 'ptt', label: 'PTT', unidad: 'seg', min: 25, max: 35 },
@@ -43,14 +44,14 @@ const CAMPOS_LABORATORIO = {
     ]
   },
   reactantes: {
-    titulo: '🧪 Reactantes de Fase Aguda',
+    titulo: 'Reactantes de Fase Aguda',
     campos: [
       { key: 'vsg', label: 'VSG', unidad: 'mm/h', min: 0, max: 20 },
       { key: 'pcr', label: 'PCR', unidad: 'mg/L', min: 0, max: 10 },
     ]
   },
   quimica: {
-    titulo: '⚗️ Química Sanguínea',
+    titulo: 'Química Sanguínea',
     campos: [
       { key: 'glicemia', label: 'Glicemia', unidad: 'mg/dL', min: 70, max: 110 },
       { key: 'urea', label: 'Urea', unidad: 'mg/dL', min: 15, max: 45 },
@@ -74,7 +75,7 @@ const CAMPOS_LABORATORIO = {
     ]
   },
   electrolitos: {
-    titulo: '⚡ Electrolitos',
+    titulo: 'Electrolitos',
     campos: [
       { key: 'sodio', label: 'Sodio', unidad: 'mEq/L', min: 136, max: 145 },
       { key: 'potasio', label: 'Potasio', unidad: 'mEq/L', min: 3.5, max: 5 },

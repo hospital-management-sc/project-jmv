@@ -17,15 +17,13 @@ import { getPrismaClient } from '../database/connection';
  */
 export const login = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const { ci, password } = req.body;
 
-    // Validation
-    if (!email || !password) {
-      throw new ValidationError('Email and password are required');
+    if (!ci || !password) {
+      throw new ValidationError('La cédula y la contraseña son requeridas');
     }
 
-    // Call service
-    const result = await loginUser({ email, password });
+    const result = await loginUser({ ci, password });
 
     res.status(200).json({
       success: true,

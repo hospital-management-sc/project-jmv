@@ -10,6 +10,7 @@ import admisionesService, {
 } from "@/services/admisiones.service";
 import { formatDateVenezuela } from "@/utils/dateUtils";
 import { SERVICIOS } from "@/constants";
+import { IconHospital, IconRefresh, IconBed, IconEmergency, IconNotes, IconClipboard, IconCheck, IconChartBar } from "@/components/icons";
 
 interface Props {}
 
@@ -93,7 +94,7 @@ export default function HospitalizedPatientsView({}: Props) {
   return (
     <section className={styles["view-section"]}>
       <div className={styles["section-header"]}>
-        <h2>🏥 Pacientes Hospitalizados Actualmente</h2>
+        <h2><IconHospital size={20} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Pacientes Hospitalizados Actualmente</h2>
         <p className={styles["section-subtitle"]}>
           Gestione la atención de pacientes internados
         </p>
@@ -114,7 +115,7 @@ export default function HospitalizedPatientsView({}: Props) {
           </select>
         </div>
         <button onClick={cargarPacientes} className={styles["refresh-btn"]}>
-          🔄 Actualizar
+          <IconRefresh size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Actualizar
         </button>
       </div>
 
@@ -122,7 +123,7 @@ export default function HospitalizedPatientsView({}: Props) {
 
       {admisiones.length === 0 ? (
         <div className={styles["empty-state"]}>
-          <span className={styles["empty-icon"]}>🛏️</span>
+          <span className={styles["empty-icon"]}><IconBed size={32} /></span>
           <h3>No hay pacientes hospitalizados</h3>
           <p>
             No se encontraron admisiones activas con los filtros seleccionados
@@ -154,10 +155,10 @@ export default function HospitalizedPatientsView({}: Props) {
                   }`}
                 >
                   {admision.tipo === "EMERGENCIA"
-                    ? "🚨"
+                    ? <IconEmergency size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />
                     : admision.tipo === "UCI"
-                    ? "🏥"
-                    : "🛏️"}{" "}
+                    ? <IconHospital size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />
+                    : <IconBed size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />}{" "}
                   {admision.tipo}
                 </span>
               </div>
@@ -198,7 +199,7 @@ export default function HospitalizedPatientsView({}: Props) {
                   onClick={() => navigate(`/doctor/paciente/${admision.id}/formato`)}
                   title="Ir al Formato de Hospitalización"
                 >
-                  📝 Evolución
+                  <IconNotes size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Evolución
                 </button>
                 <button
                   className={styles["action-btn-secondary"]}
@@ -236,13 +237,13 @@ export default function HospitalizedPatientsView({}: Props) {
                         alert("Próximamente: Ver Historia Completa")
                       }
                     >
-                      📋 Historia Clínica
+                      <IconClipboard size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Historia Clínica
                     </button>
                     <button
                       className={styles["action-btn-secondary"]}
                       onClick={() => alert("Próximamente: Registrar Alta")}
                     >
-                      ✅ Alta Médica
+                      <IconCheck size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Alta Médica
                     </button>
                   </div>
                 </div>
@@ -253,7 +254,7 @@ export default function HospitalizedPatientsView({}: Props) {
       )}
 
       <div className={styles["section-footer"]}>
-        <span>📊 Total: {admisiones.length} pacientes hospitalizados</span>
+        <span><IconChartBar size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Total: {admisiones.length} pacientes hospitalizados</span>
       </div>
     </section>
   );

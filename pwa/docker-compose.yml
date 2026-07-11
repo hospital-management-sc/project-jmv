@@ -1,47 +1,51 @@
 version: '3.8'
 
+# Stack completo: PostgreSQL + Backend + Frontend
+# Uso: docker compose up -d
+# Requiere: pwa/backend/.env con DATABASE_URL, JWT_SECRET, SESSION_SECRET
+
 services:
-  mongodb:
-    image: mongo:7.0
-    container_name: hospital-mongodb
+  postgres:
+    image: postgres:16-alpine
+    container_name: hospital_postgres
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: changeMe123!
-      MONGO_INITDB_DATABASE: hospital-management
+      POSTGRES_DB: hospital_db
+      POSTGRES_USER: hospital_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - '27017:27017'
+      - "5432:5432"
     volumes:
-      - mongodb_data:/data/db
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - hospital-network
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      test: ["CMD-SHELL", "pg_isready -U hospital_user -d hospital_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: hospital-backend
+    env_file:
+      - ./backend/.env
     environment:
-      NODE_ENV: development
-      PORT: 5000
-      MONGODB_URI: mongodb://admin:changeMe123!@mongodb:27017/hospital-management
-      JWT_SECRET: dev-secret-key-change-in-production
-      JWT_REFRESH_SECRET: dev-refresh-secret-change-in-production
-      FRONTEND_URL: http://localhost:5173
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://hospital_user:${POSTGRES_PASSWORD}@postgres:5432/hospital_db
     ports:
-      - '5000:5000'
+      - "3001:3001"
     depends_on:
-      mongodb:
+      postgres:
         condition: service_healthy
-    volumes:
-      - ./backend/src:/app/src
     networks:
       - hospital-network
-    command: npm run dev
+    restart: unless-stopped
 
   frontend:
     build:
@@ -49,18 +53,18 @@ services:
       dockerfile: Dockerfile
     container_name: hospital-frontend
     ports:
-      - '5173:5173'
+      - "5173:5173"
     environment:
-      VITE_API_URL: http://localhost:5000
-    volumes:
-      - ./frontend/src:/app/src
+      VITE_API_URL: http://localhost:3001
     networks:
       - hospital-network
     depends_on:
       - backend
+    restart: unless-stopped
 
 volumes:
-  mongodb_data:
+  postgres_data:
+    driver: local
 
 networks:
   hospital-network:

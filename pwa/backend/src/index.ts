@@ -104,7 +104,7 @@ app.use('/api/auth/login', authLimiter);
 // SESSION MANAGEMENT (Required for WebAuthn)
 // ============================================
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'hospital-key-military-secret-2024',
+  secret: process.env.SESSION_SECRET!,
   resave: false,
   saveUninitialized: false,
   cookie: {

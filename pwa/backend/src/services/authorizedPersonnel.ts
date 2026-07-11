@@ -29,6 +29,7 @@ export interface AuthorizedPersonnelRecord {
   rolAutorizado: string;
   departamento: string | null;
   cargo: string | null;
+  telefono: string | null;
   estado: string;
   fechaIngreso: Date;
   fechaVencimiento: Date | null;
@@ -52,6 +53,7 @@ export interface CreateAuthorizedPersonnelInput {
   departamento?: string;
   especialidad?: string;
   cargo?: string;
+  telefono?: string;
   fechaIngreso: Date;
   fechaVencimiento?: Date;
   autorizadoPor: string;
@@ -64,7 +66,9 @@ export interface UpdateAuthorizedPersonnelInput {
   departamento?: string;
   especialidad?: string;
   cargo?: string;
+  telefono?: string;
   estado?: string;
+  fechaIngreso?: Date;
   fechaVencimiento?: Date;
   motivoBaja?: string;
 }
@@ -383,6 +387,7 @@ export const addAuthorizedPersonnel = async (
       departamento: input.departamento,
       especialidad: input.especialidad,
       cargo: input.cargo,
+      telefono: input.telefono,
       fechaIngreso: input.fechaIngreso,
       fechaVencimiento: input.fechaVencimiento,
       autorizadoPor: input.autorizadoPor,
@@ -406,6 +411,28 @@ export const addAuthorizedPersonnel = async (
       },
     },
   });
+
+  // Crear cuenta de usuario automáticamente con contraseña = número de CI
+  try {
+    const { createUserFromWhitelist } = await import('./auth');
+    const newUser = await createUserFromWhitelist({
+      ci: newRecord.ci,
+      nombreCompleto: newRecord.nombreCompleto,
+      email: newRecord.email,
+      rolAutorizado: newRecord.rolAutorizado,
+      departamento: newRecord.departamento,
+      especialidad: newRecord.especialidad,
+      cargo: newRecord.cargo,
+      personalAutorizadoId: BigInt(newRecord.id),
+    });
+    await prisma.personalAutorizado.update({
+      where: { ci: newRecord.ci },
+      data: { registrado: true, fechaRegistro: new Date(), usuarioId: Number(newUser.id) },
+    });
+    logger.info(`[WHITELIST] Cuenta creada automáticamente para ${input.ci}`);
+  } catch (err) {
+    logger.warn(`[WHITELIST] No se pudo crear cuenta automática para ${input.ci}:`, err);
+  }
 
   logger.info(`[WHITELIST] Nuevo personal autorizado agregado: ${input.ci} por admin ${adminUserId}`);
   return newRecord;
