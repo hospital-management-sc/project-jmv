@@ -9,6 +9,7 @@ import type { FormatoHospitalizacion, Electrocardiograma } from '@/services/form
 import type { Admision } from '@/services/admisiones.service';
 import * as formatoService from '@/services/formatoHospitalizacion.service';
 import { formatDateVenezuela } from '@/utils/dateUtils';
+import { IconEcg, IconX, IconPlus, IconEdit, IconNotes, IconSave, IconChartBar, IconCalendar, IconSearch, IconInfo } from '@/components/icons';
 
 interface Props {
   formato: FormatoHospitalizacion;
@@ -66,7 +67,7 @@ export default function Seccion5_Electrocardiograma({ formato, onUpdate, setSavi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.fecha) {
       alert('La fecha es obligatoria');
       return;
@@ -79,9 +80,9 @@ export default function Seccion5_Electrocardiograma({ formato, onUpdate, setSavi
       } else {
         await formatoService.addElectrocardiograma(formato.id, formData as any);
       }
-      
+
       await onUpdate();
-      
+
       setFormData({
         fecha: new Date().toISOString().split('T')[0],
         hora: new Date().toTimeString().split(' ')[0].slice(0, 5),
@@ -112,7 +113,7 @@ export default function Seccion5_Electrocardiograma({ formato, onUpdate, setSavi
 
   const getValorStatus = (key: string, valor?: number) => {
     if (!valor) return '';
-    
+
     switch (key) {
       case 'frecuencia':
         if (valor < 60) return styles.bajo;
@@ -139,24 +140,30 @@ export default function Seccion5_Electrocardiograma({ formato, onUpdate, setSavi
     <div className={styles.seccion}>
       <div className={styles.seccionHeader}>
         <div>
-          <h3>📈 Electrocardiograma</h3>
+          <h3><IconEcg size={16} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Electrocardiograma</h3>
           <p className={styles.seccionDescription}>
             Registro e interpretación de electrocardiogramas
           </p>
         </div>
-        <button 
+        <button
           className={styles.btnPrimary}
           onClick={() => setShowForm(!showForm)}
         >
-          {showForm ? '❌ Cancelar' : '➕ Nuevo EKG'}
+          {showForm
+            ? <><IconX size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Cancelar</>
+            : <><IconPlus size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Nuevo EKG</>}
         </button>
       </div>
 
       {/* Formulario */}
       {showForm && (
         <div className={styles.formCard}>
-          <h4>{editingId ? '✏️ Editar EKG' : '📝 Nuevo Electrocardiograma'}</h4>
-          
+          <h4>
+            {editingId
+              ? <><IconEdit size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Editar EKG</>
+              : <><IconNotes size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Nuevo Electrocardiograma</>}
+          </h4>
+
           <form onSubmit={handleSubmit}>
             <div className={styles.formGrid}>
               {/* Fecha y Hora */}
@@ -269,7 +276,7 @@ export default function Seccion5_Electrocardiograma({ formato, onUpdate, setSavi
 
               {/* Hallazgos e Interpretación */}
               <div className={styles.formGroupFull}>
-                <label>Hallazgos</label>
+                <label><IconSearch size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Hallazgos</label>
                 <textarea
                   value={formData.hallazgos || ''}
                   onChange={(e) => handleInputChange('hallazgos', e.target.value)}
@@ -279,7 +286,7 @@ export default function Seccion5_Electrocardiograma({ formato, onUpdate, setSavi
               </div>
 
               <div className={styles.formGroupFull}>
-                <label>Interpretación</label>
+                <label><IconInfo size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Interpretación</label>
                 <textarea
                   value={formData.interpretacion || ''}
                   onChange={(e) => handleInputChange('interpretacion', e.target.value)}
@@ -291,7 +298,7 @@ export default function Seccion5_Electrocardiograma({ formato, onUpdate, setSavi
 
             <div className={styles.formActions}>
               <button type="submit" className={styles.btnPrimary}>
-                {editingId ? '💾 Actualizar' : '💾 Guardar'}
+                <IconSave size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />{editingId ? 'Actualizar' : 'Guardar'}
               </button>
               <button type="button" className={styles.btnSecondary} onClick={handleCancel}>
                 Cancelar
@@ -303,8 +310,8 @@ export default function Seccion5_Electrocardiograma({ formato, onUpdate, setSavi
 
       {/* Lista de EKGs */}
       <div className={styles.recordsList}>
-        <h4>📊 Electrocardiogramas ({ekgs.length})</h4>
-        
+        <h4><IconChartBar size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Electrocardiogramas ({ekgs.length})</h4>
+
         {ekgs.length === 0 ? (
           <div className={styles.emptyState}>
             <p>No hay electrocardiogramas registrados.</p>
@@ -316,14 +323,14 @@ export default function Seccion5_Electrocardiograma({ formato, onUpdate, setSavi
               <div key={ekg.id} className={styles.ekgCard}>
                 <div className={styles.ekgHeader}>
                   <span className={styles.ekgFecha}>
-                    📅 {formatDateVenezuela(ekg.fecha)} {ekg.hora && `- ${ekg.hora}`}
+                    <IconCalendar size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> {formatDateVenezuela(ekg.fecha)} {ekg.hora && `- ${ekg.hora}`}
                   </span>
-                  <button 
+                  <button
                     className={styles.btnEdit}
                     onClick={() => handleEdit(ekg)}
                     title="Editar"
                   >
-                    ✏️ Editar
+                    <IconEdit size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Editar
                   </button>
                 </div>
 
@@ -385,14 +392,14 @@ export default function Seccion5_Electrocardiograma({ formato, onUpdate, setSavi
 
                   {ekg.hallazgos && (
                     <div className={styles.ekgSeccion}>
-                      <strong>🔍 Hallazgos:</strong>
+                      <strong><IconSearch size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Hallazgos:</strong>
                       <p>{ekg.hallazgos}</p>
                     </div>
                   )}
 
                   {ekg.interpretacion && (
                     <div className={styles.ekgSeccion}>
-                      <strong>💡 Interpretación:</strong>
+                      <strong><IconInfo size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Interpretación:</strong>
                       <p>{ekg.interpretacion}</p>
                     </div>
                   )}
@@ -404,7 +411,7 @@ export default function Seccion5_Electrocardiograma({ formato, onUpdate, setSavi
       </div>
 
       <div className={styles.infoNote}>
-        <strong>ℹ️ Valores de referencia EKG:</strong>
+        <strong><IconInfo size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Valores de referencia EKG:</strong>
         <ul>
           <li>FC: 60-100 lpm</li>
           <li>PR: 120-200 ms</li>

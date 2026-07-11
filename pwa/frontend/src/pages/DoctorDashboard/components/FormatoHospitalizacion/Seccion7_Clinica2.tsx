@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import styles from './Secciones.module.css';
 import type { FormatoHospitalizacion, ExamenFisico } from '@/services/formatoHospitalizacion.service';
 import * as formatoService from '@/services/formatoHospitalizacion.service';
+import { IconStethoscope, IconSave, IconBook, IconCheck, IconAlertTriangle, IconInfo } from '@/components/icons';
 
 interface Props {
   formato: FormatoHospitalizacion;
@@ -99,7 +100,7 @@ export default function Seccion7_Clinica2({ formato, onUpdate, setSaving }: Prop
     <div className={styles.seccion}>
       <div className={styles.seccionHeader}>
         <div>
-          <h3>🩺 Clínica II - Examen Físico</h3>
+          <h3><IconStethoscope size={16} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Clínica II - Examen Físico</h3>
           <p className={styles.seccionDescription}>
             Exploración física completa por sistemas y regiones anatómicas
           </p>
@@ -108,44 +109,44 @@ export default function Seccion7_Clinica2({ formato, onUpdate, setSaving }: Prop
           <span className={styles.progressBadge}>
             {camposLlenos}/{sistemasExamen.length} ({porcentaje}%)
           </span>
-          <button 
+          <button
             className={`${styles.btnPrimary} ${!hasChanges ? styles.btnDisabled : ''}`}
             onClick={handleSave}
             disabled={!hasChanges || saving}
           >
-            {saving ? '💾 Guardando...' : '💾 Guardar'}
+            <IconSave size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />{saving ? 'Guardando...' : 'Guardar'}
           </button>
         </div>
       </div>
 
       <div className={styles.expandCollapseBar}>
         <button onClick={expandAll} className={styles.btnSecondary}>
-          📖 Expandir Todo
+          <IconBook size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Expandir Todo
         </button>
         <button onClick={collapseAll} className={styles.btnSecondary}>
-          📕 Colapsar Todo
+          <IconBook size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Colapsar Todo
         </button>
       </div>
 
       <div className={styles.examenContainer}>
         {sistemasExamen.map((sistema) => (
-          <div 
-            key={sistema.key} 
+          <div
+            key={sistema.key}
             className={`${styles.examenSection} ${expandedSections.has(sistema.key) ? styles.expanded : ''} ${formData[sistema.key]?.trim() ? styles.filled : ''}`}
           >
-            <div 
+            <div
               className={styles.examenHeader}
               onClick={() => toggleSection(sistema.key)}
             >
               <span className={styles.examenIcon}>
-                {formData[sistema.key]?.trim() ? '✅' : '⬜'}
+                {formData[sistema.key]?.trim() ? <IconCheck size={14} /> : <span style={{ display: 'inline-block', width: 14, height: 14 }} />}
               </span>
               <span className={styles.examenLabel}>{sistema.label}</span>
               <span className={styles.expandIcon}>
                 {expandedSections.has(sistema.key) ? '▼' : '▶'}
               </span>
             </div>
-            
+
             {expandedSections.has(sistema.key) && (
               <div className={styles.examenBody}>
                 <textarea
@@ -162,12 +163,12 @@ export default function Seccion7_Clinica2({ formato, onUpdate, setSaving }: Prop
 
       {hasChanges && (
         <div className={styles.unsavedWarning}>
-          ⚠️ Hay cambios sin guardar. Haga clic en "Guardar" para no perderlos.
+          <IconAlertTriangle size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Hay cambios sin guardar. Haga clic en "Guardar" para no perderlos.
         </div>
       )}
 
       <div className={styles.infoNote}>
-        <strong>ℹ️ Guía para el examen físico:</strong>
+        <strong><IconInfo size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Guía para el examen físico:</strong>
         <ul>
           <li>Sea sistemático: examine de cabeza a pies</li>
           <li>Documente hallazgos positivos Y negativos pertinentes</li>

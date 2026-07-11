@@ -9,6 +9,7 @@ import type { FormatoHospitalizacion, EstudioEspecial } from '@/services/formato
 import type { Admision } from '@/services/admisiones.service';
 import * as formatoService from '@/services/formatoHospitalizacion.service';
 import { formatDateVenezuela } from '@/utils/dateUtils';
+import { IconXRay, IconBrain, IconLungs, IconUltrasound, IconMicroscope, IconRadiation, IconBloodDrop, IconClipboard, IconX, IconPlus, IconEdit, IconNotes, IconSave, IconChartBar, IconSearch, IconInfo } from '@/components/icons';
 
 interface Props {
   formato: FormatoHospitalizacion;
@@ -18,26 +19,26 @@ interface Props {
 }
 
 const TIPOS_ESTUDIO = [
-  { value: 'RX_TORAX', label: '🫁 Rx de Tórax', icon: '🫁' },
-  { value: 'RX_ABDOMEN', label: '🩻 Rx de Abdomen', icon: '🩻' },
-  { value: 'RX_COLUMNA', label: '🦴 Rx de Columna', icon: '🦴' },
-  { value: 'RX_EXTREMIDADES', label: '🦵 Rx de Extremidades', icon: '🦵' },
-  { value: 'TAC_CABEZA', label: '🧠 TAC de Cabeza', icon: '🧠' },
-  { value: 'TAC_TORAX', label: '🫁 TAC de Tórax', icon: '🫁' },
-  { value: 'TAC_ABDOMEN', label: '🩻 TAC de Abdomen/Pelvis', icon: '🩻' },
-  { value: 'RMN_CEREBRO', label: '🧠 RMN Cerebral', icon: '🧠' },
-  { value: 'RMN_COLUMNA', label: '🦴 RMN de Columna', icon: '🦴' },
-  { value: 'ECO_ABDOMINAL', label: '📡 Ecografía Abdominal', icon: '📡' },
-  { value: 'ECO_PELVICA', label: '📡 Ecografía Pélvica', icon: '📡' },
-  { value: 'ECO_RENAL', label: '📡 Ecografía Renal', icon: '📡' },
-  { value: 'ECO_CARDIACA', label: '❤️ Ecocardiograma', icon: '❤️' },
-  { value: 'ECO_DOPPLER', label: '🔊 Eco Doppler', icon: '🔊' },
-  { value: 'ENDOSCOPIA_ALTA', label: '🔬 Endoscopía Alta', icon: '🔬' },
-  { value: 'COLONOSCOPIA', label: '🔬 Colonoscopía', icon: '🔬' },
-  { value: 'BRONCOSCOPIA', label: '🔬 Broncoscopía', icon: '🔬' },
-  { value: 'GAMMAGRAFIA', label: '☢️ Gammagrafía', icon: '☢️' },
-  { value: 'ANGIOGRAFIA', label: '🩸 Angiografía', icon: '🩸' },
-  { value: 'OTRO', label: '📋 Otro', icon: '📋' },
+  { value: 'RX_TORAX', label: 'Rx de Tórax', icon: <IconLungs size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'RX_ABDOMEN', label: 'Rx de Abdomen', icon: <IconXRay size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'RX_COLUMNA', label: 'Rx de Columna', icon: <IconXRay size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'RX_EXTREMIDADES', label: 'Rx de Extremidades', icon: <IconXRay size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'TAC_CABEZA', label: 'TAC de Cabeza', icon: <IconBrain size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'TAC_TORAX', label: 'TAC de Tórax', icon: <IconLungs size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'TAC_ABDOMEN', label: 'TAC de Abdomen/Pelvis', icon: <IconXRay size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'RMN_CEREBRO', label: 'RMN Cerebral', icon: <IconBrain size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'RMN_COLUMNA', label: 'RMN de Columna', icon: <IconXRay size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'ECO_ABDOMINAL', label: 'Ecografía Abdominal', icon: <IconUltrasound size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'ECO_PELVICA', label: 'Ecografía Pélvica', icon: <IconUltrasound size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'ECO_RENAL', label: 'Ecografía Renal', icon: <IconUltrasound size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'ECO_CARDIACA', label: 'Ecocardiograma', icon: <IconUltrasound size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'ECO_DOPPLER', label: 'Eco Doppler', icon: <IconUltrasound size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'ENDOSCOPIA_ALTA', label: 'Endoscopía Alta', icon: <IconMicroscope size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'COLONOSCOPIA', label: 'Colonoscopía', icon: <IconMicroscope size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'BRONCOSCOPIA', label: 'Broncoscopía', icon: <IconMicroscope size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'GAMMAGRAFIA', label: 'Gammagrafía', icon: <IconRadiation size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'ANGIOGRAFIA', label: 'Angiografía', icon: <IconBloodDrop size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
+  { value: 'OTRO', label: 'Otro', icon: <IconClipboard size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> },
 ];
 
 export default function Seccion4_EstudiosEspeciales({ formato, onUpdate, setSaving }: Props) {
@@ -65,7 +66,7 @@ export default function Seccion4_EstudiosEspeciales({ formato, onUpdate, setSavi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.fecha || !formData.tipo || !formData.descripcion) {
       alert('Fecha, tipo de estudio y descripción son obligatorios');
       return;
@@ -78,9 +79,9 @@ export default function Seccion4_EstudiosEspeciales({ formato, onUpdate, setSavi
       } else {
         await formatoService.addEstudioEspecial(formato.id, formData as any);
       }
-      
+
       await onUpdate();
-      
+
       setFormData({
         fecha: new Date().toISOString().split('T')[0],
         tipo: '',
@@ -116,33 +117,39 @@ export default function Seccion4_EstudiosEspeciales({ formato, onUpdate, setSavi
     return found ? found.label : tipo;
   };
 
-  const getTipoIcon = (tipo: string) => {
+  const getTipoIcon = (tipo: string): React.ReactNode => {
     const found = TIPOS_ESTUDIO.find(t => t.value === tipo);
-    return found ? found.icon : '📋';
+    return found ? found.icon : <IconClipboard size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />;
   };
 
   return (
     <div className={styles.seccion}>
       <div className={styles.seccionHeader}>
         <div>
-          <h3>🩻 Estudios Especiales</h3>
+          <h3><IconXRay size={16} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Estudios Especiales</h3>
           <p className={styles.seccionDescription}>
             Registro de estudios de imágenes, endoscopías y otros procedimientos diagnósticos
           </p>
         </div>
-        <button 
+        <button
           className={styles.btnPrimary}
           onClick={() => setShowForm(!showForm)}
         >
-          {showForm ? '❌ Cancelar' : '➕ Nuevo Estudio'}
+          {showForm
+            ? <><IconX size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Cancelar</>
+            : <><IconPlus size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Nuevo Estudio</>}
         </button>
       </div>
 
       {/* Formulario */}
       {showForm && (
         <div className={styles.formCard}>
-          <h4>{editingId ? '✏️ Editar Estudio' : '📝 Nuevo Estudio Especial'}</h4>
-          
+          <h4>
+            {editingId
+              ? <><IconEdit size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Editar Estudio</>
+              : <><IconNotes size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Nuevo Estudio Especial</>}
+          </h4>
+
           <form onSubmit={handleSubmit}>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
@@ -205,7 +212,7 @@ export default function Seccion4_EstudiosEspeciales({ formato, onUpdate, setSavi
 
             <div className={styles.formActions}>
               <button type="submit" className={styles.btnPrimary}>
-                {editingId ? '💾 Actualizar' : '💾 Guardar'}
+                <IconSave size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />{editingId ? 'Actualizar' : 'Guardar'}
               </button>
               <button type="button" className={styles.btnSecondary} onClick={handleCancel}>
                 Cancelar
@@ -217,8 +224,8 @@ export default function Seccion4_EstudiosEspeciales({ formato, onUpdate, setSavi
 
       {/* Lista de Estudios */}
       <div className={styles.recordsList}>
-        <h4>📊 Estudios Registrados ({estudios.length})</h4>
-        
+        <h4><IconChartBar size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Estudios Registrados ({estudios.length})</h4>
+
         {estudios.length === 0 ? (
           <div className={styles.emptyState}>
             <p>No hay estudios especiales registrados.</p>
@@ -237,32 +244,32 @@ export default function Seccion4_EstudiosEspeciales({ formato, onUpdate, setSavi
                     <span className={styles.estudioFecha}>
                       {formatDateVenezuela(estudio.fecha)}
                     </span>
-                    <button 
+                    <button
                       className={styles.btnEdit}
                       onClick={() => handleEdit(estudio)}
                       title="Editar"
                     >
-                      ✏️
+                      <IconEdit size={14} />
                     </button>
                   </div>
                 </div>
 
                 <div className={styles.estudioBody}>
                   <div className={styles.estudioSeccion}>
-                    <strong>📋 Descripción:</strong>
+                    <strong><IconClipboard size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Descripción:</strong>
                     <p>{estudio.descripcion}</p>
                   </div>
 
                   {estudio.resultado && (
                     <div className={styles.estudioSeccion}>
-                      <strong>🔍 Resultado:</strong>
+                      <strong><IconSearch size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Resultado:</strong>
                       <p>{estudio.resultado}</p>
                     </div>
                   )}
 
                   {estudio.interpretacion && (
                     <div className={styles.estudioSeccion}>
-                      <strong>💡 Interpretación:</strong>
+                      <strong><IconInfo size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Interpretación:</strong>
                       <p>{estudio.interpretacion}</p>
                     </div>
                   )}
@@ -274,7 +281,7 @@ export default function Seccion4_EstudiosEspeciales({ formato, onUpdate, setSavi
       </div>
 
       <div className={styles.infoNote}>
-        <strong>ℹ️ Tipos de estudios disponibles:</strong>
+        <strong><IconInfo size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Tipos de estudios disponibles:</strong>
         <p>Radiografías, TAC, RMN, Ecografías, Endoscopías, Gammagrafías, Angiografías y otros.</p>
       </div>
     </div>
