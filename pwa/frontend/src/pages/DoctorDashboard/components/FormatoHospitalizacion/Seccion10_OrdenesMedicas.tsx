@@ -15,7 +15,6 @@ interface Props {
   setSaving: (saving: boolean) => void;
 }
 
-// Tipos de órdenes médicas
 const tiposOrden = [
   { value: 'MEDICAMENTO', label: 'Medicamento', icon: <IconPill size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} />, color: '#3b82f6' },
   { value: 'LABORATORIO', label: 'Laboratorio', icon: <IconFlask size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} />, color: '#8b5cf6' },
@@ -27,7 +26,6 @@ const tiposOrden = [
   { value: 'OTRO', label: 'Otro', icon: <IconNotes size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} />, color: '#6b7280' },
 ];
 
-// Frecuencias de administración comunes
 const frecuencias = [
   { value: 'STAT', label: 'STAT (Inmediato)' },
   { value: 'C/4H', label: 'Cada 4 horas' },
@@ -40,7 +38,6 @@ const frecuencias = [
   { value: 'CUSTOM', label: 'Personalizado' },
 ];
 
-// Vías de administración
 const vias = [
   'VO (Vía Oral)',
   'IV (Intravenoso)',
@@ -77,12 +74,11 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
   const [filterTipo, setFilterTipo] = useState<string>('TODOS');
   const [filterEstado, setFilterEstado] = useState<string>('ACTIVA');
 
-  // Cargar órdenes
   const loadOrdenes = useCallback(async () => {
     try {
       const data = await formatoService.getOrdenesMedicas(formato.id);
       setOrdenes(data);
-    } catch (error: any) {
+    } catch (_error: unknown) {
       // Error loading medical orders
     }
   }, [formato.id]);
@@ -91,7 +87,7 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
     loadOrdenes();
   }, [loadOrdenes]);
 
-  const handleInputChange = (field: keyof OrdenMedica, value: any) => {
+  const handleInputChange = (field: keyof OrdenMedica, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -103,12 +99,14 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     if (!formData.descripcion?.trim()) {
       alert('La descripción es obligatoria');
       return;
     }
-
     setLocalSaving(true);
     setSaving(true);
     try {
@@ -120,8 +118,8 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
       await loadOrdenes();
       await onUpdate();
       resetForm();
-    } catch (error: any) {
-      alert(`Error: ${error.message}`);
+    } catch (error: unknown) {
+      alert(`Error: ${(error as Error).message}`);
     } finally {
       setLocalSaving(false);
       setSaving(false);
@@ -136,15 +134,18 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
 
   const handleSuspend = async (id: string) => {
     if (!confirm('¿Suspender esta orden médica?')) return;
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     setLocalSaving(true);
     setSaving(true);
     try {
       await formatoService.updateOrdenMedica(id, { estado: 'SUSPENDIDA' });
       await loadOrdenes();
       await onUpdate();
-    } catch (error: any) {
-      alert(`Error: ${error.message}`);
+    } catch (error: unknown) {
+      alert(`Error: ${(error as Error).message}`);
     } finally {
       setLocalSaving(false);
       setSaving(false);
@@ -158,8 +159,8 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
       await formatoService.updateOrdenMedica(id, { estado: 'COMPLETADA' });
       await loadOrdenes();
       await onUpdate();
-    } catch (error: any) {
-      alert(`Error: ${error.message}`);
+    } catch (error: unknown) {
+      alert(`Error: ${(error as Error).message}`);
     } finally {
       setLocalSaving(false);
       setSaving(false);
@@ -168,29 +169,30 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
 
   const handleDelete = async (id: string) => {
     if (!confirm('¿Eliminar esta orden médica? Esta acción no se puede deshacer.')) return;
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     setLocalSaving(true);
     setSaving(true);
     try {
       await formatoService.deleteOrdenMedica(id);
       await loadOrdenes();
       await onUpdate();
-    } catch (error: any) {
-      alert(`Error: ${error.message}`);
+    } catch (error: unknown) {
+      alert(`Error: ${(error as Error).message}`);
     } finally {
       setLocalSaving(false);
       setSaving(false);
     }
   };
 
-  // Filtrar órdenes
   const ordenesFiltradas = ordenes.filter(orden => {
     if (filterTipo !== 'TODOS' && orden.tipo !== filterTipo) return false;
     if (filterEstado !== 'TODAS' && orden.estado !== filterEstado) return false;
     return true;
   });
 
-  // Estadísticas
   const ordenesActivas = ordenes.filter(o => o.estado === 'ACTIVA').length;
   const totalOrdenes = ordenes.length;
 
@@ -218,7 +220,6 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
         </div>
       </div>
 
-      {/* Filtros */}
       <div className={styles.ordenesFilters}>
         <div className={styles.filterGroup}>
           <label>Tipo:</label>
@@ -240,7 +241,6 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
         </div>
       </div>
 
-      {/* Formulario de nueva/editar orden */}
       {showForm && (
         <div className={styles.ordenForm}>
           <h4>
@@ -350,7 +350,6 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
         </div>
       )}
 
-      {/* Lista de órdenes */}
       <div className={styles.ordenesList}>
         {ordenesFiltradas.length === 0 ? (
           <div className={styles.emptyState}>

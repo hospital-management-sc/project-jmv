@@ -6,6 +6,7 @@ import styles from "../DoctorDashboard.module.css";
 import type { Interconsulta } from "@/services";
 import * as interconsultasService from "@/services/interconsultas.service";
 import { formatDateTimeVenezuela } from "@/utils/dateUtils";
+import { IconClipboard, IconNotes, IconCheck, IconClock } from "@/components/icons";
 
 interface Props {
   interconsulta: Interconsulta;
@@ -57,7 +58,7 @@ export default function InterconsultaModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className={styles["modal-header"]}>
-          <h3>📋 Detalle de Interconsulta</h3>
+          <h3><IconClipboard size={15} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Detalle de Interconsulta</h3>
           <button className={styles["close-btn"]} onClick={onClose}>
             ×
           </button>
@@ -123,7 +124,7 @@ export default function InterconsultaModal({
 
           {puedeResponder && (
             <div className={styles["detail-section"]}>
-              <h4>📝 Su Respuesta</h4>
+              <h4><IconNotes size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Su Respuesta</h4>
               <div className={styles["form-group"]}>
                 <label>Evaluación / Recomendaciones *</label>
                 <textarea
@@ -156,7 +157,9 @@ export default function InterconsultaModal({
               onClick={completarInterconsulta}
               disabled={enviando}
             >
-              {enviando ? "⏳ Enviando..." : "✅ Completar Interconsulta"}
+              {enviando
+                ? <><IconClock size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Enviando...</>
+                : <><IconCheck size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Completar Interconsulta</>}
             </button>
           )}
         </div>

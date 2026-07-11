@@ -3,6 +3,7 @@
 // ==========================================
 import { useState, useMemo, useRef, useEffect } from "react";
 import styles from "../DoctorDashboard.module.css";
+import { IconClipboard, IconPlus, IconTrash } from "@/components/icons";
 import type { PatientBasic } from "../interfaces";
 import { API_BASE_URL } from "@/utils/constants";
 import { getTodayVenezuelaISO, getCurrentTimeVenezuela } from "@/utils/dateUtils";
@@ -565,7 +566,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
                   {camposPersonalizados.filter(c => c.paso === step).length > 0 && (
                     <div style={{ marginTop: '1.5rem', borderTop: '1px dashed rgba(255, 255, 255, 0.15)', paddingTop: '1.5rem' }}>
                       <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
-                        📋 Campos Personalizados agregados:
+                        <IconClipboard size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Campos Personalizados agregados:
                       </h4>
                       <div className={styles["form-grid"]}>
                         {camposPersonalizados.filter(c => c.paso === step).map(campo => (
@@ -589,7 +590,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
                                   });
                                 }}
                               >
-                                🗑️ Eliminar
+                                <IconTrash size={12} style={{ verticalAlign: 'middle', marginRight: '0.25em' }} /> Eliminar
                               </button>
                             </div>
                             {campo.tipo === 'textarea' && (
@@ -627,7 +628,7 @@ export default function RegisterEncounter({ patient = null, doctorId, especialid
                     borderRadius: '0.5rem', 
                     border: '1px solid rgba(255, 255, 255, 0.08)' 
                   }}>
-                    <h5 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '500' }}>➕ Agregar Campo Personalizado a este Paso</h5>
+                    <h5 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '500' }}><IconPlus size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Agregar Campo Personalizado a este Paso</h5>
                     <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
                       <input
                         type="text"

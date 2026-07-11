@@ -10,6 +10,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from './FormatoEmergencia.module.css';
+import { IconEmergency, IconInfo, IconSave, IconCheck } from '@/components/icons';
 
 interface FormatoEmergenciaProps {
   paciente: any;
@@ -226,7 +227,7 @@ export default function FormatoEmergencia({
           ← Volver
         </button>
         <div className={styles.headerContent}>
-          <h1>🚨 FORMATO DE EMERGENCIA</h1>
+          <h1><IconEmergency size={20} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> FORMATO DE EMERGENCIA</h1>
           <div className={styles.pacienteInfo}>
             <div className={styles.pacienteItem}>
               <strong>Paciente:</strong> {paciente.apellidosNombres}
@@ -620,7 +621,7 @@ export default function FormatoEmergencia({
               </label>
               {formData.requiereHospitalizacion && (
                 <p className={styles.infoBox}>
-                  ℹ️ El paciente será derivado al personal administrativo para asignación de cama y
+                  <IconInfo size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> El paciente será derivado al personal administrativo para asignación de cama y
                   creación de admisión de hospitalización.
                 </p>
               )}
@@ -648,7 +649,7 @@ export default function FormatoEmergencia({
             className={styles.guardarBtn}
             disabled={submitting}
           >
-            💾 Guardar Borrador
+            <IconSave size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Guardar Borrador
           </button>
           <div className={styles.navigationBtns}>
             {seccionActiva > 1 && (
@@ -671,7 +672,7 @@ export default function FormatoEmergencia({
             )}
             {seccionActiva === 3 && (
               <button type="submit" className={styles.submitBtn} disabled={submitting}>
-                {submitting ? 'Guardando...' : '✓ Finalizar Formato de Emergencia'}
+                {submitting ? 'Guardando...' : <><IconCheck size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Finalizar Formato de Emergencia</>}
               </button>
             )}
           </div>

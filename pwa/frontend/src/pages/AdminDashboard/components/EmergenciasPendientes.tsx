@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import styles from './EmergenciasPendientes.module.css';
 import { SERVICIOS } from '@/constants';
 import { toastCustom } from '@/utils/toastCustom';
+import { IconEmergency, IconCheck, IconHospital, IconX } from '@/components/icons';
 
 interface Paciente {
   id: number;
@@ -147,7 +148,7 @@ export default function EmergenciasPendientes({ onBack: _ }: EmergenciasPendient
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2>🚨 Emergencias Pendientes de Hospitalización</h2>
+        <h2><IconEmergency size={18} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Emergencias Pendientes de Hospitalización</h2>
         <p className={styles.subtitle}>
           Pacientes que requieren asignación de cama y servicio hospitalario
         </p>
@@ -157,7 +158,7 @@ export default function EmergenciasPendientes({ onBack: _ }: EmergenciasPendient
 
       {emergencias.length === 0 ? (
         <div className={styles.emptyState}>
-          <span className={styles.emptyIcon}>✅</span>
+          <span className={styles.emptyIcon}><IconCheck size={32} /></span>
           <h3>No hay emergencias pendientes</h3>
           <p>Todos los pacientes que requieren hospitalización ya tienen cama asignada</p>
         </div>
@@ -209,7 +210,7 @@ export default function EmergenciasPendientes({ onBack: _ }: EmergenciasPendient
                   onClick={() => handleAsignarCama(emergencia)}
                   className={styles.asignarBtn}
                 >
-                  🏥 Asignar Cama y Hospitalizar
+                  <IconHospital size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Asignar Cama y Hospitalizar
                 </button>
               </div>
             </div>
@@ -224,7 +225,7 @@ export default function EmergenciasPendientes({ onBack: _ }: EmergenciasPendient
             <div className={styles.modalHeader}>
               <h3>Asignar Cama y Hospitalizar</h3>
               <button onClick={() => setShowAsignarModal(false)} className={styles.closeBtn}>
-                ✕
+                <IconX size={14} />
               </button>
             </div>
 
@@ -297,7 +298,7 @@ export default function EmergenciasPendientes({ onBack: _ }: EmergenciasPendient
                     className={styles.submitBtn}
                     disabled={submitting}
                   >
-                    {submitting ? 'Hospitalizando...' : '✓ Confirmar Hospitalización'}
+                    {submitting ? 'Hospitalizando...' : <><IconCheck size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Confirmar Hospitalización</>}
                   </button>
                 </div>
               </form>

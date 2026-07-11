@@ -14,6 +14,7 @@ import { API_BASE_URL } from "@/utils/constants";
 import { formatDateTimeVenezuela } from "@/utils/dateUtils";
 import InterconsultaModal from "./InterconsultaModal";
 import { toastCustom } from "@/utils/toastCustom";
+import { IconRefresh, IconSend, IconInbox, IconPlus, IconDotRed, IconDotOrange, IconDotYellow, IconDotGreen, IconSearch, IconEye, IconNotes, IconCheck, IconClock } from "@/components/icons";
 
 interface Props {
   doctorId: number;
@@ -35,7 +36,6 @@ export default function InterconsultasView({ doctorId }: Props) {
   const [selectedInterconsulta, setSelectedInterconsulta] =
     useState<Interconsulta | null>(null);
 
-  // Para crear nueva interconsulta
   const [searchCI, setSearchCI] = useState("");
   const [pacienteSeleccionado, setPacienteSeleccionado] =
     useState<PatientBasic | null>(null);
@@ -48,9 +48,6 @@ export default function InterconsultasView({ doctorId }: Props) {
     observaciones: "",
   });
   const [creando, setCreando] = useState(false);
-
-  // TODO: Obtener ID del médico actual del contexto de autenticación
-  // const medicoId = 1; // Temporal - deberá venir del contexto de auth
 
   useEffect(() => {
     cargarInterconsultas();
@@ -65,7 +62,7 @@ export default function InterconsultasView({ doctorId }: Props) {
       ]);
       setInterconsultasEnviadas(enviadas);
       setInterconsultasRecibidas(recibidas);
-    } catch (err) {
+    } catch (_err) {
       setError("Error al cargar interconsultas");
       toastCustom.error("Error al cargar interconsultas");
     } finally {
@@ -81,15 +78,11 @@ export default function InterconsultasView({ doctorId }: Props) {
       return;
     }
 
-    // Normalizar la entrada para búsquedas robustas
     if (/^\d+$/.test(ciQuery)) {
-      // Si son solo números, por defecto anteponer "V-" (Venezolano)
       ciQuery = `V-${ciQuery}`;
     } else if (/^[vepVEP]\d+$/.test(ciQuery)) {
-      // Si puso la letra pero olvidó el guión (ej: V20200200)
       ciQuery = `${ciQuery.charAt(0).toUpperCase()}-${ciQuery.slice(1)}`;
     } else if (/^[vepVEP]-\d+$/.test(ciQuery)) {
-      // Si puso la letra en minúscula con guión (ej: v-20200200), normalizar
       ciQuery = `${ciQuery.charAt(0).toUpperCase()}-${ciQuery.slice(2)}`;
     }
 
@@ -142,7 +135,6 @@ export default function InterconsultasView({ doctorId }: Props) {
 
       await interconsultasService.crearInterconsulta(nuevaInterconsulta);
 
-      // Limpiar y volver a cargar
       setPacienteSeleccionado(null);
       setSearchCI("");
       setFormData({
@@ -154,7 +146,6 @@ export default function InterconsultasView({ doctorId }: Props) {
       });
       setTabActiva("enviadas");
       await cargarInterconsultas();
-      // alert("✅ Interconsulta creada exitosamente");
       toastCustom.success("Interconsulta creada exitosamente");
     } catch (err: unknown) {
       const errorMessage =
@@ -173,42 +164,40 @@ export default function InterconsultasView({ doctorId }: Props) {
         doctorId
       );
       await cargarInterconsultas();
-      // alert("✅ Interconsulta aceptada");
       toastCustom.success("Interconsulta aceptada");
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Error al aceptar";
-      // alert("❌ " + errorMessage);
       toastCustom.error(errorMessage);
     }
   };
 
   const getPrioridadBadge = (prioridad: string) => {
-    const config: Record<string, { emoji: string; className: string }> = {
-      URGENTE: { emoji: "🔴", className: styles["prioridad-urgente"] },
-      ALTA: { emoji: "🟠", className: styles["prioridad-alta"] },
-      MEDIA: { emoji: "🟡", className: styles["prioridad-media"] },
-      BAJA: { emoji: "🟢", className: styles["prioridad-baja"] },
+    const config: Record<string, { icon: React.ReactNode; className: string }> = {
+      URGENTE: { icon: <IconDotRed size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} />, className: styles["prioridad-urgente"] },
+      ALTA: { icon: <IconDotOrange size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} />, className: styles["prioridad-alta"] },
+      MEDIA: { icon: <IconDotYellow size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} />, className: styles["prioridad-media"] },
+      BAJA: { icon: <IconDotGreen size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} />, className: styles["prioridad-baja"] },
     };
     return config[prioridad] || config.MEDIA;
   };
 
   const getEstadoBadge = (estado: string) => {
-    const config: Record<string, { label: string; className: string }> = {
+    const config: Record<string, { label: React.ReactNode; className: string }> = {
       PENDIENTE: {
-        label: "⏳ Pendiente",
+        label: <><IconClock size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} />Pendiente</>,
         className: styles["estado-pendiente"],
       },
       EN_PROCESO: {
-        label: "🔄 En Proceso",
+        label: <><IconRefresh size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} />En Proceso</>,
         className: styles["estado-proceso"],
       },
       COMPLETADA: {
-        label: "✅ Completada",
+        label: <><IconCheck size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} />Completada</>,
         className: styles["estado-completada"],
       },
       CANCELADA: {
-        label: "❌ Cancelada",
+        label: <><IconCheck size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} />Cancelada</>,
         className: styles["estado-cancelada"],
       },
     };
@@ -227,14 +216,13 @@ export default function InterconsultasView({ doctorId }: Props) {
   return (
     <section className={styles["view-section"]}>
       <div className={styles["section-header"]}>
-        <h2>🔄 Interconsultas Médicas</h2>
+        <h2><IconRefresh size={16} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Interconsultas Médicas</h2>
         <p className={styles["section-subtitle"]}>
           Solicite evaluaciones de otras especialidades o responda consultas
           recibidas
         </p>
       </div>
 
-      {/* Tabs de navegación */}
       <div className={styles["tabs-container"]}>
         <button
           className={`${styles.tab} ${
@@ -242,7 +230,7 @@ export default function InterconsultasView({ doctorId }: Props) {
           }`}
           onClick={() => setTabActiva("enviadas")}
         >
-          📤 Enviadas ({interconsultasEnviadas.length})
+          <IconSend size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Enviadas ({interconsultasEnviadas.length})
         </button>
         <button
           className={`${styles.tab} ${
@@ -250,7 +238,7 @@ export default function InterconsultasView({ doctorId }: Props) {
           }`}
           onClick={() => setTabActiva("recibidas")}
         >
-          📥 Recibidas ({interconsultasRecibidas.length})
+          <IconInbox size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Recibidas ({interconsultasRecibidas.length})
         </button>
         <button
           className={`${styles.tab} ${
@@ -258,19 +246,18 @@ export default function InterconsultasView({ doctorId }: Props) {
           }`}
           onClick={() => setTabActiva("nueva")}
         >
-          ➕ Nueva Interconsulta
+          <IconPlus size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Nueva Interconsulta
         </button>
       </div>
 
       {error && <div className={styles["error-alert"]}>{error}</div>}
 
-      {/* Tab: Interconsultas Enviadas */}
       {tabActiva === "enviadas" && (
         <div className={styles["form-card"]}>
-          <h3>📤 Interconsultas Enviadas</h3>
+          <h3><IconSend size={15} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Interconsultas Enviadas</h3>
           {interconsultasEnviadas.length === 0 ? (
             <div className={styles["empty-state"]}>
-              <span className={styles["empty-icon"]}>📭</span>
+              <span className={styles["empty-icon"]}><IconSend size={32} /></span>
               <h3>No hay interconsultas enviadas</h3>
               <p>Las solicitudes que envíe aparecerán aquí</p>
             </div>
@@ -289,7 +276,7 @@ export default function InterconsultasView({ doctorId }: Props) {
                       <span
                         className={getPrioridadBadge(ic.prioridad).className}
                       >
-                        {getPrioridadBadge(ic.prioridad).emoji} {ic.prioridad}
+                        {getPrioridadBadge(ic.prioridad).icon} {ic.prioridad}
                       </span>
                       <span className={getEstadoBadge(ic.estado).className}>
                         {getEstadoBadge(ic.estado).label}
@@ -329,7 +316,7 @@ export default function InterconsultasView({ doctorId }: Props) {
                         setShowModal(true);
                       }}
                     >
-                      👁️ Ver detalle
+                      <IconEye size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Ver detalle
                     </button>
                   </div>
                 </div>
@@ -339,13 +326,12 @@ export default function InterconsultasView({ doctorId }: Props) {
         </div>
       )}
 
-      {/* Tab: Interconsultas Recibidas */}
       {tabActiva === "recibidas" && (
         <div className={styles["form-card"]}>
-          <h3>📥 Interconsultas Recibidas</h3>
+          <h3><IconInbox size={15} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Interconsultas Recibidas</h3>
           {interconsultasRecibidas.length === 0 ? (
             <div className={styles["empty-state"]}>
-              <span className={styles["empty-icon"]}>📬</span>
+              <span className={styles["empty-icon"]}><IconInbox size={32} /></span>
               <h3>No hay interconsultas recibidas</h3>
               <p>Las solicitudes dirigidas a su especialidad aparecerán aquí</p>
             </div>
@@ -367,7 +353,7 @@ export default function InterconsultasView({ doctorId }: Props) {
                       <span
                         className={getPrioridadBadge(ic.prioridad).className}
                       >
-                        {getPrioridadBadge(ic.prioridad).emoji} {ic.prioridad}
+                        {getPrioridadBadge(ic.prioridad).icon} {ic.prioridad}
                       </span>
                       <span className={getEstadoBadge(ic.estado).className}>
                         {getEstadoBadge(ic.estado).label}
@@ -401,7 +387,7 @@ export default function InterconsultasView({ doctorId }: Props) {
                         className={styles["btn-primary"]}
                         onClick={() => aceptarInterconsulta(ic.id)}
                       >
-                        ✅ Aceptar
+                        <IconCheck size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Aceptar
                       </button>
                     )}
                     {ic.estado === "EN_PROCESO" && (
@@ -412,7 +398,7 @@ export default function InterconsultasView({ doctorId }: Props) {
                           setShowModal(true);
                         }}
                       >
-                        📝 Responder
+                        <IconNotes size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Responder
                       </button>
                     )}
                     <button
@@ -422,7 +408,7 @@ export default function InterconsultasView({ doctorId }: Props) {
                         setShowModal(true);
                       }}
                     >
-                      👁️ Ver detalle
+                      <IconEye size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Ver detalle
                     </button>
                   </div>
                 </div>
@@ -432,12 +418,10 @@ export default function InterconsultasView({ doctorId }: Props) {
         </div>
       )}
 
-      {/* Tab: Nueva Interconsulta */}
       {tabActiva === "nueva" && (
         <div className={styles["form-card"]}>
-          <h3>➕ Crear Nueva Interconsulta</h3>
+          <h3><IconPlus size={15} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Crear Nueva Interconsulta</h3>
 
-          {/* Paso 1: Buscar paciente */}
           {!pacienteSeleccionado ? (
             <div className={styles["form-section"]}>
               <h4>1. Buscar Paciente</h4>
@@ -450,13 +434,14 @@ export default function InterconsultasView({ doctorId }: Props) {
                   onKeyPress={(e) => e.key === "Enter" && buscarPaciente()}
                 />
                 <button onClick={buscarPaciente} disabled={searching}>
-                  {searching ? "🔄 Buscando..." : "🔍 Buscar"}
+                  {searching
+                    ? <><IconRefresh size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Buscando...</>
+                    : <><IconSearch size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Buscar</>}
                 </button>
               </div>
             </div>
           ) : (
             <>
-              {/* Paciente seleccionado */}
               <div className={styles["patient-summary"]}>
                 <div className={styles["patient-details"]}>
                   <p>
@@ -479,7 +464,6 @@ export default function InterconsultasView({ doctorId }: Props) {
                 </button>
               </div>
 
-              {/* Formulario de interconsulta */}
               <form onSubmit={crearInterconsulta}>
                 <div className={styles["form-section"]}>
                   <h4>2. Datos de la Interconsulta</h4>
@@ -601,7 +585,9 @@ export default function InterconsultasView({ doctorId }: Props) {
                     className={styles["btn-primary"]}
                     disabled={creando}
                   >
-                    {creando ? "⏳ Enviando..." : "📤 Enviar Interconsulta"}
+                    {creando
+                      ? <><IconClock size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Enviando...</>
+                      : <><IconSend size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Enviar Interconsulta</>}
                   </button>
                 </div>
               </form>
@@ -610,7 +596,6 @@ export default function InterconsultasView({ doctorId }: Props) {
         </div>
       )}
 
-      {/* Modal de detalle/respuesta */}
       {showModal && selectedInterconsulta && (
         <InterconsultaModal
           interconsulta={selectedInterconsulta}
