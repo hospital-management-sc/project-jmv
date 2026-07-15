@@ -126,7 +126,7 @@ export default function DoctorDashboard() {
             {!user?.id ? (
               <div style={{ padding: '2rem', backgroundColor: '#fee2e2', borderRadius: '0.5rem', textAlign: 'center' }}>
                 <p style={{ color: '#dc2626', fontWeight: 'bold' }}>
-                  ⚠️ Error: No se puede obtener tu ID de usuario. Por favor, recarga la página o inicia sesión nuevamente.
+                  Error: No se puede obtener tu ID de usuario. Por favor, recarga la página o inicia sesión nuevamente.
                 </p>
               </div>
             ) : (
@@ -157,7 +157,7 @@ export default function DoctorDashboard() {
             {!user?.id ? (
               <div style={{ padding: '2rem', backgroundColor: '#fee2e2', borderRadius: '0.5rem', textAlign: 'center' }}>
                 <p style={{ color: '#dc2626', fontWeight: 'bold' }}>
-                  ⚠️ Error: No se puede obtener tu ID de usuario. Por favor, recarga la página o inicia sesión nuevamente.
+                  Error: No se puede obtener tu ID de usuario. Por favor, recarga la página o inicia sesión nuevamente.
                 </p>
               </div>
             ) : (
@@ -174,7 +174,7 @@ export default function DoctorDashboard() {
             {!user?.id ? (
               <div style={{ padding: '2rem', backgroundColor: '#fee2e2', borderRadius: '0.5rem', textAlign: 'center' }}>
                 <p style={{ color: '#dc2626', fontWeight: 'bold' }}>
-                  ⚠️ Error: No se puede obtener tu ID de usuario. Por favor, recarga la página o inicia sesión nuevamente.
+                  Error: No se puede obtener tu ID de usuario. Por favor, recarga la página o inicia sesión nuevamente.
                 </p>
               </div>
             ) : (

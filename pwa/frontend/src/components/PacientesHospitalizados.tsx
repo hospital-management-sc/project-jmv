@@ -167,7 +167,7 @@ export default function PacientesHospitalizados({ onBack }: PacientesHospitaliza
         </div>
 
         <button onClick={cargarAdmisionesActivas} className={styles.refreshBtn} disabled={loading}>
-          {loading ? '🔄 Actualizando...' : '🔄 Actualizar'}
+          {loading ? 'Actualizando...' : 'Actualizar'}
         </button>
       </div>
 
@@ -181,7 +181,7 @@ export default function PacientesHospitalizados({ onBack }: PacientesHospitaliza
         </div>
       ) : admisionesFiltradas.length === 0 ? (
         <div className={styles.emptyState}>
-          <span className={styles.emptyIcon}>🏥</span>
+          <span className={styles.emptyIcon}>🏛️</span>
           <h3>No hay pacientes hospitalizados actualmente</h3>
           <p>No se encontraron admisiones activas con los filtros seleccionados</p>
         </div>
@@ -231,13 +231,13 @@ export default function PacientesHospitalizados({ onBack }: PacientesHospitaliza
                             : styles.badgeHospitalizacion
                         }`}
                       >
-                        {admision.tipo === 'EMERGENCIA' 
-                          ? '🚨 Emergencia' 
+                        {admision.tipo === 'EMERGENCIA'
+                          ? 'Emergencia'
                           : admision.tipo === 'UCI'
-                          ? '🏥 UCI'
+                          ? 'UCI'
                           : admision.tipo === 'CIRUGIA'
-                          ? '⚕️ Cirugía'
-                          : '🏥 Hospitalización'}
+                          ? 'Cirugía'
+                          : 'Hospitalización'}
                       </span>
                     </td>
                     <td>

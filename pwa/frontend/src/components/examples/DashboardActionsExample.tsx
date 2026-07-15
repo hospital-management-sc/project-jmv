@@ -24,22 +24,22 @@ export function DashboardActionsExample({ onClick }: DashboardActionsProps) {
 
   // Definir acciones disponibles por opción especial
   const accionesEspeciales: Record<string, { label: string; icon: string; action: ViewMode }> = {
-    'cirugia-reparadora': { label: 'Reporte Quirúrgico', icon: '🏥', action: 'search-patient' },
-    'control-prenatal': { label: 'Control Prenatal', icon: '🤰', action: 'search-patient' },
-    'rehabilitacion': { label: 'Sesión de Rehabilitación', icon: '💪', action: 'search-patient' },
-    'evaluacion-psicologica': { label: 'Evaluación Psicológica', icon: '🧠', action: 'search-patient' },
-    'espirometria': { label: 'Espirometría', icon: '💨', action: 'search-patient' },
-    'biopsia': { label: 'Solicitar Biopsia', icon: '🔬', action: 'search-patient' },
-    'consulta': { label: 'Consulta General', icon: '👥', action: 'search-patient' },
-    'seguimiento': { label: 'Seguimiento de Paciente', icon: '📋', action: 'search-patient' },
+    'cirugia-reparadora': { label: 'Reporte Quirúrgico', icon: 'hospital', action: 'search-patient' },
+    'control-prenatal': { label: 'Control Prenatal', icon: 'user', action: 'search-patient' },
+    'rehabilitacion': { label: 'Sesión de Rehabilitación', icon: 'activity', action: 'search-patient' },
+    'evaluacion-psicologica': { label: 'Evaluación Psicológica', icon: 'brain', action: 'search-patient' },
+    'espirometria': { label: 'Espirometría', icon: 'lungs', action: 'search-patient' },
+    'biopsia': { label: 'Solicitar Biopsia', icon: 'microscope', action: 'search-patient' },
+    'consulta': { label: 'Consulta General', icon: 'users', action: 'search-patient' },
+    'seguimiento': { label: 'Seguimiento de Paciente', icon: 'clipboard', action: 'search-patient' },
   }
 
   // Acciones básicas (siempre disponibles)
   const accionesBasicas = [
-    { label: 'Buscar Paciente', icon: '🔍', mode: 'search-patient' as ViewMode },
-    { label: 'Pacientes Hospitalizados', icon: '🏥', mode: 'hospitalized-patients' as ViewMode },
-    { label: 'Encuentros de Hoy', icon: '📅', mode: 'today-encounters' as ViewMode },
-    { label: 'Mis Citas', icon: '📆', mode: 'my-appointments' as ViewMode },
+    { label: 'Buscar Paciente', icon: 'search', mode: 'search-patient' as ViewMode },
+    { label: 'Pacientes Hospitalizados', icon: 'hospital', mode: 'hospitalized-patients' as ViewMode },
+    { label: 'Encuentros de Hoy', icon: 'calendar', mode: 'today-encounters' as ViewMode },
+    { label: 'Mis Citas', icon: 'calendar', mode: 'my-appointments' as ViewMode },
   ]
 
   // Filtrar acciones especiales que apliquen a esta especialidad
@@ -50,7 +50,7 @@ export function DashboardActionsExample({ onClick }: DashboardActionsProps) {
   return (
     <section style={{ padding: '2rem', marginBottom: '2rem' }}>
       <div style={{ marginBottom: '2rem' }}>
-        <h2>🎯 Panel de Acciones</h2>
+        <h2>Panel de Acciones</h2>
         <p>
           Especialidad: <strong>{nombre}</strong>
           {especialidad?.color && (

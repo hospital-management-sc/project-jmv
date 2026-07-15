@@ -625,13 +625,13 @@ export default function RegistrarPaciente({
             fontSize: '14px',
             marginTop: '20px'
           }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 
         <div className="form-actions">
           <button type="submit" className="btn-primary" disabled={registrando}>
-            {registrando ? '⏳ Registrando...' : 'Registrar Paciente'}
+            {registrando ? 'Registrando...' : 'Registrar Paciente'}
           </button>
           {showCancel && (
             <button 

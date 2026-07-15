@@ -58,11 +58,11 @@ export default function HospitalizedPatientsView({}: Props) {
         
         // Si es error de token, mostrar mensaje más específico
         if (err.message.includes("401") || err.message.includes("Token is invalid")) {
-          errorMessage = "❌ Sesión expirada. Por favor, inicie sesión nuevamente.";
+          errorMessage = "Sesión expirada. Por favor, inicie sesión nuevamente.";
         }
         // Manejar error 429 específicamente
         else if (errorMessage.includes("429") || errorMessage.includes("Too Many Requests")) {
-          errorMessage = "⏳ Demasiadas solicitudes. Por favor, intente nuevamente en unos momentos.";
+          errorMessage = "Demasiadas solicitudes. Por favor, intente nuevamente en unos momentos.";
         }
       }
       

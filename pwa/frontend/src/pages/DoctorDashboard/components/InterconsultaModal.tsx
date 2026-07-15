@@ -39,13 +39,13 @@ export default function InterconsultaModal({
         respuesta,
         observaciones,
       });
-      alert("✅ Interconsulta completada");
+      alert("Interconsulta completada");
       onUpdate();
       onClose();
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Error al completar";
-      alert("❌ " + errorMessage);
+      alert("Error: " + errorMessage);
     } finally {
       setEnviando(false);
     }

@@ -91,7 +91,7 @@ export default function EmergenciasPendientes({ onBack: _ }: EmergenciasPendient
     e.preventDefault();
     
     if (!selectedEmergencia || !servicio || !cama) {
-      toastCustom.warning('⚠️ Campos requeridos', 'Complete servicio y cama');
+      toastCustom.warning('Campos requeridos', 'Complete servicio y cama');
       return;
     }
 
@@ -115,11 +115,11 @@ export default function EmergenciasPendientes({ onBack: _ }: EmergenciasPendient
         throw new Error(errorData.error || 'Error al hospitalizar paciente');
       }
 
-      toastCustom.success('✅ Paciente hospitalizado', 'La admisión se ha registrado correctamente');
+      toastCustom.success('Paciente hospitalizado', 'La admisión se ha registrado correctamente');
       setShowAsignarModal(false);
       cargarEmergenciasPendientes(); // Recargar lista
     } catch (err: any) {
-      toastCustom.error('❌ Error al hospitalizar', err.message);
+      toastCustom.error('Error al hospitalizar', err.message);
       console.error(err);
     } finally {
       setSubmitting(false);
