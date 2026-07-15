@@ -170,6 +170,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
       departamento,
       especialidad,
       cargo,
+      telefono,
       fechaIngreso,
       fechaVencimiento,
     } = req.body;
@@ -188,6 +189,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
         departamento,
         especialidad,
         cargo,
+        telefono,
         fechaIngreso: new Date(fechaIngreso),
         fechaVencimiento: fechaVencimiento ? new Date(fechaVencimiento) : undefined,
         autorizadoPor: req.user?.nombre || 'Sistema',
@@ -239,6 +241,9 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
     }
 
     // Parse dates if provided
+    if (updateData.fechaIngreso) {
+      updateData.fechaIngreso = new Date(updateData.fechaIngreso);
+    }
     if (updateData.fechaVencimiento) {
       updateData.fechaVencimiento = new Date(updateData.fechaVencimiento);
     }
@@ -406,7 +411,9 @@ export const bulkCreate = async (req: AuthRequest, res: Response): Promise<void>
             email: person.email,
             rolAutorizado: person.rolAutorizado,
             departamento: person.departamento,
+            especialidad: person.especialidad,
             cargo: person.cargo,
+            telefono: person.telefono,
             fechaIngreso: new Date(person.fechaIngreso),
             fechaVencimiento: person.fechaVencimiento ? new Date(person.fechaVencimiento) : undefined,
             autorizadoPor: req.user?.nombre || 'Sistema (Carga Masiva)',

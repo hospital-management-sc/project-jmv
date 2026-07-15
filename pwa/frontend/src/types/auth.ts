@@ -9,10 +9,10 @@ export const UserRole = {
 export type UserRoleType = (typeof UserRole)[keyof typeof UserRole]
 
 /**
- * Login credentials
+ * Login credentials (sistema cerrado: CI + contraseña)
  */
 export interface LoginCredentials {
-  email: string
+  ci: string
   password: string
 }
 

@@ -160,7 +160,7 @@ export default function RegistrarEmergencia({ onBack }: RegistrarEmergenciaProps
       {paso === 'busqueda' && (
         <>
           <div className={styles.header}>
-            <h1>🚨 Nuevo Paciente en Emergencia</h1>
+            <h1>Nuevo Paciente en Emergencia</h1>
             <p className={styles.subtitle}>Busque al paciente por CI para iniciar atención</p>
           </div>
 
@@ -195,13 +195,13 @@ export default function RegistrarEmergencia({ onBack }: RegistrarEmergenciaProps
                   disabled={buscando}
                   className={styles.buscarBtn}
                 >
-                  {buscando ? '🔍 Buscando...' : '🔍 Buscar'}
+                  {buscando ? 'Buscando...' : 'Buscar'}
                 </button>
               </div>
 
               {errorBusqueda && (
                 <div className={styles.errorMsg}>
-                  ⚠️ {errorBusqueda}
+                  {errorBusqueda}
                 </div>
               )}
             </div>

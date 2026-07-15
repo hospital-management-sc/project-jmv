@@ -9,6 +9,7 @@ import type { FormatoHospitalizacion, EvolucionMedica } from '@/services/formato
 import type { Admision } from '@/services/admisiones.service';
 import * as formatoService from '@/services/formatoHospitalizacion.service';
 import { formatDateVenezuela } from '@/utils/dateUtils';
+import { IconCalendar, IconPlus, IconX, IconEdit, IconNotes, IconSave, IconBook, IconMessageSquare, IconSearch, IconBrain, IconClipboard, IconInfo } from '@/components/icons';
 
 interface Props {
   formato: FormatoHospitalizacion;
@@ -32,7 +33,6 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
 
   useEffect(() => {
     if (formato.evolucionesMedicas) {
-      // Ordenar por fecha y hora descendente (más recientes primero)
       const sorted = [...formato.evolucionesMedicas].sort((a, b) => {
         const dateA = new Date(`${a.fecha}T${a.hora}`).getTime();
         const dateB = new Date(`${b.fecha}T${b.hora}`).getTime();
@@ -42,13 +42,13 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
     }
   }, [formato.evolucionesMedicas]);
 
-  const handleInputChange = (field: keyof EvolucionMedica, value: any) => {
+  const handleInputChange = (field: keyof EvolucionMedica, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.fecha || !formData.hora) {
       alert('Fecha y hora son obligatorios');
       return;
@@ -57,17 +57,13 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
     setSaving(true);
     try {
       if (editingId) {
-        // Actualizar existente
         await formatoService.updateEvolucionMedica(editingId, formData);
       } else {
-        // Crear nuevo
-        await formatoService.addEvolucionMedica(formato.id, formData as any);
+        await formatoService.addEvolucionMedica(formato.id, formData as EvolucionMedica);
       }
-      
-      // Recargar datos
+
       await onUpdate();
-      
-      // Resetear formulario
+
       setFormData({
         fecha: new Date().toISOString().split('T')[0],
         hora: new Date().toTimeString().split(' ')[0].slice(0, 5),
@@ -78,8 +74,8 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
       });
       setShowForm(false);
       setEditingId(null);
-    } catch (error: any) {
-      alert(`Error: ${error.message}`);
+    } catch (error: unknown) {
+      alert(`Error: ${(error as Error).message}`);
     } finally {
       setSaving(false);
     }
@@ -124,24 +120,29 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
     <div className={styles.seccion}>
       <div className={styles.seccionHeader}>
         <div>
-          <h3>📅 Evoluciones Médicas</h3>
+          <h3><IconCalendar size={16} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Evoluciones Médicas</h3>
           <p className={styles.seccionDescription}>
             Evoluciones diarias con metodología SOAP (Subjetivo, Objetivo, Análisis, Plan)
           </p>
         </div>
-        <button 
+        <button
           className={styles.btnPrimary}
           onClick={() => setShowForm(!showForm)}
         >
-          {showForm ? '❌ Cancelar' : '➕ Nueva Evolución'}
+          {showForm
+            ? <><IconX size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Cancelar</>
+            : <><IconPlus size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Nueva Evolución</>}
         </button>
       </div>
 
-      {/* Formulario SOAP */}
       {showForm && (
         <div className={styles.formCard}>
-          <h4>{editingId ? '✏️ Editar Evolución' : '📝 Nueva Evolución Médica'}</h4>
-          
+          <h4>
+            {editingId
+              ? <><IconEdit size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Editar Evolución</>
+              : <><IconNotes size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Nueva Evolución Médica</>}
+          </h4>
+
           <div className={styles.soapInfo}>
             <p><strong>Metodología SOAP:</strong></p>
             <ul>
@@ -154,7 +155,6 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
 
           <form onSubmit={handleSubmit}>
             <div className={styles.formGrid}>
-              {/* Fecha y Hora */}
               <div className={styles.formGroup}>
                 <label>Fecha *</label>
                 <input
@@ -175,10 +175,9 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
                 />
               </div>
 
-              {/* SOAP Components */}
               <div className={styles.formGroupFull}>
                 <label className={styles.soapLabel}>
-                  <span className={styles.soapIcon}>💬</span>
+                  <span className={styles.soapIcon}><IconMessageSquare size={14} style={{ verticalAlign: 'middle' }} /></span>
                   <strong>S - SUBJETIVO</strong>
                   <span className={styles.helpText}>(¿Qué refiere el paciente?)</span>
                 </label>
@@ -193,7 +192,7 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
 
               <div className={styles.formGroupFull}>
                 <label className={styles.soapLabel}>
-                  <span className={styles.soapIcon}>🔍</span>
+                  <span className={styles.soapIcon}><IconSearch size={14} style={{ verticalAlign: 'middle' }} /></span>
                   <strong>O - OBJETIVO</strong>
                   <span className={styles.helpText}>(Hallazgos al examen, signos vitales, paraclínicos)</span>
                 </label>
@@ -208,7 +207,7 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
 
               <div className={styles.formGroupFull}>
                 <label className={styles.soapLabel}>
-                  <span className={styles.soapIcon}>🧠</span>
+                  <span className={styles.soapIcon}><IconBrain size={14} style={{ verticalAlign: 'middle' }} /></span>
                   <strong>A - ANÁLISIS</strong>
                   <span className={styles.helpText}>(Impresión diagnóstica, evaluación)</span>
                 </label>
@@ -223,7 +222,7 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
 
               <div className={styles.formGroupFull}>
                 <label className={styles.soapLabel}>
-                  <span className={styles.soapIcon}>📋</span>
+                  <span className={styles.soapIcon}><IconClipboard size={14} style={{ verticalAlign: 'middle' }} /></span>
                   <strong>P - PLAN</strong>
                   <span className={styles.helpText}>(Conducta, tratamiento, estudios)</span>
                 </label>
@@ -239,7 +238,9 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
 
             <div className={styles.formActions}>
               <button type="submit" className={styles.btnPrimary}>
-                {editingId ? '💾 Actualizar Evolución' : '💾 Guardar Evolución'}
+                {editingId
+                  ? <><IconSave size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Actualizar Evolución</>
+                  : <><IconSave size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Guardar Evolución</>}
               </button>
               <button type="button" className={styles.btnSecondary} onClick={handleCancel}>
                 Cancelar
@@ -249,10 +250,9 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
         </div>
       )}
 
-      {/* Lista de Evoluciones */}
       <div className={styles.recordsList}>
-        <h4>📚 Historial de Evoluciones ({evoluciones.length} registros)</h4>
-        
+        <h4><IconBook size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Historial de Evoluciones ({evoluciones.length} registros)</h4>
+
         {evoluciones.length === 0 ? (
           <div className={styles.emptyState}>
             <p>No hay evoluciones médicas registradas aún.</p>
@@ -275,12 +275,12 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
                     </span>
                   </div>
                   <div className={styles.evolucionActions}>
-                    <button 
+                    <button
                       className={styles.btnEdit}
                       onClick={() => handleEdit(evolucion)}
                       title="Editar"
                     >
-                      ✏️ Editar
+                      <IconEdit size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Editar
                     </button>
                   </div>
                 </div>
@@ -289,7 +289,7 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
                   {evolucion.subjetivo && (
                     <div className={styles.soapSection}>
                       <div className={styles.soapSectionHeader}>
-                        <span className={styles.soapIcon}>💬</span>
+                        <span className={styles.soapIcon}><IconMessageSquare size={14} style={{ verticalAlign: 'middle' }} /></span>
                         <strong>SUBJETIVO</strong>
                       </div>
                       <p>{evolucion.subjetivo}</p>
@@ -299,7 +299,7 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
                   {evolucion.objetivo && (
                     <div className={styles.soapSection}>
                       <div className={styles.soapSectionHeader}>
-                        <span className={styles.soapIcon}>🔍</span>
+                        <span className={styles.soapIcon}><IconSearch size={14} style={{ verticalAlign: 'middle' }} /></span>
                         <strong>OBJETIVO</strong>
                       </div>
                       <p>{evolucion.objetivo}</p>
@@ -309,7 +309,7 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
                   {evolucion.analisis && (
                     <div className={styles.soapSection}>
                       <div className={styles.soapSectionHeader}>
-                        <span className={styles.soapIcon}>🧠</span>
+                        <span className={styles.soapIcon}><IconBrain size={14} style={{ verticalAlign: 'middle' }} /></span>
                         <strong>ANÁLISIS</strong>
                       </div>
                       <p>{evolucion.analisis}</p>
@@ -319,7 +319,7 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
                   {evolucion.plan && (
                     <div className={styles.soapSection}>
                       <div className={styles.soapSectionHeader}>
-                        <span className={styles.soapIcon}>📋</span>
+                        <span className={styles.soapIcon}><IconClipboard size={14} style={{ verticalAlign: 'middle' }} /></span>
                         <strong>PLAN</strong>
                       </div>
                       <p className={styles.planContent}>{evolucion.plan}</p>
@@ -339,7 +339,7 @@ export default function Seccion11_Evoluciones({ formato, admision, onUpdate, set
       </div>
 
       <div className={styles.infoNote}>
-        <strong>ℹ️ Recomendaciones:</strong>
+        <strong><IconInfo size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Recomendaciones:</strong>
         <ul>
           <li>Registre al menos una evolución médica diaria</li>
           <li>Sea específico y objetivo en sus observaciones</li>

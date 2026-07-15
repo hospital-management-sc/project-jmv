@@ -1,160 +1,125 @@
-# 🏥 Hospital Management System
+# Sistema de Gestión Clínica y Administrativa
 
-**Aplicación Web Progresiva (PWA) para Gestión Clínica y Administrativa**
+Aplicación Web Progresiva (PWA) para el Hospital Militar Tipo I "Dr. José María Vargas".
 
----
-
-## 🌍 ¿Zona Horaria?
-
-Se implementó una **solución completa para manejo de zona horaria Venezuela (GMT-4)**. 
-
-👉 **Lee primero:** [TIMEZONE_START_HERE.md](./TIMEZONE_START_HERE.md)
-
-Para resumen ejecutivo: [RESUMEN_EJECUTIVO_TIMEZONE.md](./RESUMEN_EJECUTIVO_TIMEZONE.md)
+Desarrollado como proyecto de Servicio Comunitario — Universidad Nacional Experimental Rómulo Gallegos (UNERG).
 
 ---
 
-## 📌 Resumen
+## Estado del proyecto
 
-Solución digital para optimizar procesos administrativos y clínicos del **Hospital Militar Tipo I "Dr. José María Vargas"**.
+| Rama | Propósito | Estado |
+|------|-----------|--------|
+| `main` | Producción | Estable |
+| `dev` | Desarrollo activo | En progreso |
 
-Objetivo: Digitalizar flujos de atención, reducir tiempos de espera y mejorar la coordinación entre especialidades.
-
----
-
-## ✨ Funcionalidades Principales
-
-- 📋 **Historial Clínico Electrónico**: Registro y consulta segura de expedientes
-- 📅 **Gestión de Citas**: Agenda de especialistas y reducción de tiempos de espera
-- 🔄 **Interconsultas**: Coordinación multidisciplinaria entre áreas médicas
-- 📊 **Informes Clínicos**: Generación y distribución de reportes médicos
-- 🏥 **Panel Administrativo**: Gestión de cronogramas y recursos
+Versión actual: ver `pwa/frontend/package.json`
 
 ---
 
-## 🎯 Beneficios
+## Funcionalidades
 
-| Pacientes | Médicos | Administración | Institución |
-|-----------|---------|----------------|-------------|
-| ⏱️ Menor espera | 📖 Acceso rápido a historiales | 📋 Control centralizado | 📈 Modelo replicable |
-| 🔍 Mayor trazabilidad | 🤝 Coordinación eficiente | 📉 Reducción de papeleo | 💾 Datos para decisiones |
-| ✅ Menos duplicidad | ⚡ Menos carga admin | 🎯 Gestión optimizada | 🚀 Escalable |
-
----
-
-## 🗓️ Cronograma
-
-| Fase | Duración | Objetivo |
-|------|----------|----------|
-| **1** | 2 semanas | Recolección de requisitos |
-| **2** | 4 semanas | Desarrollo del prototipo |
-| **3** | 2 semanas | Ajustes y pruebas |
-| **4** | 4 semanas | Piloto e implementación |
-| **Total** | **12 semanas** | Entrega y capacitación |
+- Registro de encuentros médicos por especialidad
+- Historias clínicas electrónicas dinámicas
+- Gestión de citas y horarios de médicos
+- Interconsultas entre especialidades
+- Módulo de emergencias
+- Panel administrativo (Admin y Super Admin)
+- Autenticación biométrica (WebAuthn / passkeys)
+- Control de acceso por roles (Doctor, Admin, Super Admin)
 
 ---
 
-## 👥 Equipo
+## Stack tecnológico
 
-| Rol | Integrante | Contacto |
-|-----|-----------|----------|
-| **Lead General** | Carlos Nieves | cmoinr@icloud.com |
-| **Tutor Académico** | Prof. Karina Hernández | — |
-| **Co-coordinadores** | Leidy Hernández, Gustavo Colina, Germán Cordero, Jonathan Lemos | — |
-| **Institución** | Universidad Nacional Experimental Rómulo Gallegos | — |
-
----
-
-## 🛠️ Stack Tecnológico
-
-- **Frontend**: React + TypeScript + Vite
-- **Backend**: Express.js + TypeScript + MongoDB
-- **Infraestructura**: Docker + Docker Compose
-- **Seguridad**: Autenticación por roles, encriptación de datos
+| Capa | Tecnología |
+|------|-----------|
+| Frontend | React 19 + TypeScript + Vite |
+| Backend | Express.js + TypeScript + Prisma ORM |
+| Base de datos | PostgreSQL |
+| Infraestructura | Docker + Docker Compose |
+| Deploy backend | DigitalOcean (GitHub Actions) |
+| Autenticación | JWT + WebAuthn (passkeys) |
 
 ---
 
+## Estructura del repositorio
 
-## 🚀 Inicio Rápido
-
-```bash
-# Clonar repositorio
-git clone https://github.com/hospital-management-sc/hospital-management-dev.git
-
-# Navegar al proyecto principal
-cd hospital-management-dev/hospital-management-system
-
-# Configurar ambiente con Docker
-docker-compose up
-
-# La aplicación estará disponible en:
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:5000
+```
+pwa/
+  frontend/     React PWA
+  backend/      API REST Express + Prisma
+  docker-compose.yml
+wiki/           Documentación interna
+.github/
+  workflows/    CI/CD (deploy-backend.yml)
+.claude/
+  skills/       Skills de Claude Code (/pre, /release)
 ```
 
-Ver [hospital-management-system/README.md](./hospital-management-system/README.md) para instrucciones detalladas de instalación y configuración.
+---
+
+## Flujo de trabajo
+
+Todo el desarrollo se hace en la rama `dev`. Nunca se commitea directamente a `main`.
+
+```
+dev  →  (PR + review)  →  main  →  deploy automático a DigitalOcean
+```
+
+**Skills de Claude Code disponibles:**
+- `/pre` — commitea cambios en `dev` con bump de versión patch
+- `/release` — lleva `dev` a `main`, crea tag y GitHub Release
 
 ---
 
-## 📖 Documentación
+## Setup local
 
-Toda la documentación del proyecto se encuentra organizada en el directorio [`wiki/`](./wiki/):
+### Prerrequisitos
 
-### 📚 Documentación Principal
-- 📋 **[Wiki Home](./wiki/Home.md)** - Índice completo de la documentación
-- 🎯 **[Guía del Proyecto](./wiki/Guia-del-Proyecto.md)** - Contexto, arquitectura y fases
-- 📖 **[Resumen del Proyecto](./wiki/Resumen-del-Proyecto.md)** - Descripción general
+- Node.js 20+
+- Docker y Docker Compose
+- PostgreSQL (o usar el contenedor de Docker)
 
-### 👥 Gestión y Liderazgo
-- 🎓 **[Liderazgo del Equipo](./wiki/Liderazgo-Equipo.md)** - Manual de liderazgo
-- 📌 **[Recursos para Líderes](./wiki/Recursos-Lideres.md)** - Herramientas y referencias
+### Instalación
 
-### 📋 Planificación
-- ⚡ **[Acciones Inmediatas](./wiki/Acciones-Inmediatas-Kickoff.md)** - Tareas antes del kickoff
-- 📅 **[Próximas Acciones](./wiki/Proximas-Acciones.md)** - Siguientes pasos
+```bash
+git clone https://github.com/hospital-management-sc/project-jmv.git
+cd project-jmv
 
-### 🔐 Configuración Técnica
-- 🛡️ **[Protección de Ramas](./wiki/Guia-Proteger-Leads-Only-Rulesets.md)** - Configuración de rulesets
-- ❓ **[FAQ Rulesets](./wiki/FAQ-Rulesets.md)** - Preguntas frecuentes
+# Backend
+cd pwa/backend
+cp .env.example .env
+# Completar variables en .env
+npm install
+npm run db:migrate:dev
+npm run dev
 
-### 🛠️ Desarrollo
-- 🤝 **[Guía de Contribución](./hospital-management-system/CONTRIBUTING.md)** - Flujo de trabajo Git
-- 📦 **[README del Proyecto](./hospital-management-system/README.md)** - Setup e instalación
+# Frontend (otra terminal)
+cd pwa/frontend
+npm install
+npm run dev
+```
 
----
+Con Docker:
 
-## 🔐 Seguridad y Confidencialidad
-
-- ✅ Control de acceso por roles (Médicos, Administrativos, Soporte)
-- ✅ Encriptación en transmisión y almacenamiento
-- ✅ Cumplimiento de políticas internas del hospital
-- ✅ Confidencialidad de datos clínicos garantizada
-
----
-
-## 📊 Métricas de Éxito
-
-- ⏱️ Reducción de tiempos de gestión de citas
-- 📈 Número de interconsultas procesadas electrónicamente
-- 😊 Satisfacción de usuarios (médicos y administrativos)
-- 📋 Documentación y capacitación completadas
+```bash
+cd pwa
+docker-compose up
+```
 
 ---
 
-## 📞 Contacto
+## Equipo
 
-**Coordinador Técnico**: Carlos Nieves /Gustavo Colina
-📧 gustavojose0819@gmail.com
-📧 cmoinr@icloud.com  
-📱 +58 412-564-2771
-📱 +58 424-3737-586
----
-
-## 📄 Licencia
-
-Proyecto académico de Servicio Comunitario - Universidad Nacional Experimental Rómulo Gallegos
+| Rol | Integrante |
+|-----|-----------|
+| Lead / Coordinador técnico | Carlos Nieves |
+| Tutor académico | Prof. Karina Hernández |
+| Co-coordinadores | Leidy Hernández, Gustavo Colina, Germán Cordero, Jonathan Lemos |
 
 ---
 
-**Estado**: 🟢 En Desarrollo  
-**Última actualización**: 11 de noviembre, 2025  
+## Licencia
+
+Proyecto académico de Servicio Comunitario — UNERG. Uso restringido a la institución.

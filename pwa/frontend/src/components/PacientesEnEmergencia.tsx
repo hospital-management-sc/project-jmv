@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import styles from './PacientesEnEmergencia.module.css';
+import { IconEmergency, IconRefresh, IconCheck, IconHospital } from '@/components/icons';
 
 interface Paciente {
   id: number;
@@ -97,10 +98,10 @@ export default function PacientesEnEmergencia({ onBack }: Props) {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.headerTop}>
-          <h2>🚨 Pacientes en Emergencia Actualmente</h2>
+          <h2><IconEmergency size={18} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Pacientes en Emergencia Actualmente</h2>
           <div className={styles.headerActions}>
             <button onClick={cargarEmergencias} className={styles.refreshBtn}>
-              🔄 Actualizar
+              <IconRefresh size={13} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Actualizar
             </button>
             {onBack && (
               <button onClick={onBack} className={styles.backBtn}>
@@ -118,7 +119,7 @@ export default function PacientesEnEmergencia({ onBack }: Props) {
 
       {emergencias.length === 0 ? (
         <div className={styles.emptyState}>
-          <span className={styles.emptyIcon}>✅</span>
+          <span className={styles.emptyIcon}><IconCheck size={32} /></span>
           <h3>No hay pacientes en emergencia</h3>
           <p>No hay admisiones de emergencia activas en este momento</p>
         </div>
@@ -160,7 +161,7 @@ export default function PacientesEnEmergencia({ onBack }: Props) {
                     </span>
                     {emergencia.formatoEmergencia?.requiereHospitalizacion && (
                       <span className={styles.hospitalizacionBadge}>
-                        🏥 Requiere hospitalización
+                        <IconHospital size={12} style={{ verticalAlign: 'middle', marginRight: '0.2em' }} /> Requiere hospitalización
                       </span>
                     )}
                   </div>

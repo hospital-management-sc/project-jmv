@@ -17,6 +17,12 @@ import { API_BASE_URL } from '@/utils/constants'
 import { VENEZUELA_TIMEZONE, VENEZUELA_LOCALE } from '@/utils/dateUtils'
 import { obtenerNombresEspecialidades } from '@/config/especialidades.config'
 import styles from './SuperAdminDashboard.module.css'
+import {
+  IconShield, IconList, IconUserPlus, IconChartBar, IconUsers, IconCheckCircle,
+  IconKey, IconClock, IconRefresh, IconPencil, IconUserX, IconTrash,
+  IconCalendarClock, IconAlertCircle, IconX, IconCheck, IconSave, IconPlus,
+  IconWhatsApp,
+} from './icons'
 
 // Tipos
 interface PersonalAutorizado {
@@ -28,6 +34,7 @@ interface PersonalAutorizado {
   departamento: string | null
   especialidad: string | null
   cargo: string | null
+  telefono: string | null
   estado: string
   fechaIngreso: string
   fechaVencimiento: string | null
@@ -59,6 +66,7 @@ interface FormData {
   departamento: string
   especialidad: string
   cargo: string
+  telefono: string
   fechaIngreso: string
   fechaVencimiento: string
 }
@@ -66,20 +74,20 @@ interface FormData {
 type ViewMode = 'list' | 'add' | 'edit' | 'stats'
 
 const ROLES_DISPONIBLES = [
-  { value: 'SUPER_ADMIN', label: 'Super Administrador', color: '#dc2626' },
-  { value: 'ADMIN', label: 'Personal Administrativo', color: '#7c3aed' },
-  { value: 'MEDICO', label: 'Médico', color: '#059669' },
+  { value: 'SUPER_ADMIN', label: 'Super Administrador', color: '#b3372f' },
+  { value: 'ADMIN', label: 'Personal Administrativo', color: '#5b46c9' },
+  { value: 'MEDICO', label: 'Médico', color: '#3a8a63' },
 ]
 
 const ESTADOS_PERSONAL = [
-  { value: 'ACTIVO', label: 'Activo', color: '#059669' },
+  { value: 'ACTIVO', label: 'Activo', color: '#3a8a63' },
   { value: 'INACTIVO', label: 'Inactivo', color: '#6b7280' },
-  { value: 'SUSPENDIDO', label: 'Suspendido', color: '#f59e0b' },
-  { value: 'BAJA', label: 'Baja', color: '#dc2626' },
+  { value: 'SUSPENDIDO', label: 'Suspendido', color: '#b8842f' },
+  { value: 'BAJA', label: 'Baja', color: '#b3372f' },
 ]
 
 const DEPARTAMENTOS = [
-  ...obtenerNombresEspecialidades(), // 🎯 Especialidades médicas desde fuente única
+  ...obtenerNombresEspecialidades(), // Especialidades médicas desde fuente única
   // Servicios de Apoyo
   'Emergencia',
   'UCI',
@@ -122,6 +130,7 @@ export default function SuperAdminDashboard() {
     departamento: '',
     especialidad: '',
     cargo: '',
+    telefono: '',
     fechaIngreso: new Date().toISOString().split('T')[0],
     fechaVencimiento: '',
   })
@@ -479,6 +488,7 @@ export default function SuperAdminDashboard() {
         departamento: '',
         especialidad: '',
         cargo: '',
+        telefono: '',
         fechaIngreso: new Date().toISOString().split('T')[0],
         fechaVencimiento: '',
       })
@@ -503,6 +513,7 @@ export default function SuperAdminDashboard() {
       departamento: personal.departamento || '',
       especialidad: personal.especialidad || '',
       cargo: personal.cargo || '',
+      telefono: personal.telefono || '',
       fechaIngreso: personal.fechaIngreso.split('T')[0],
       fechaVencimiento: personal.fechaVencimiento ? personal.fechaVencimiento.split('T')[0] : '',
     })
@@ -601,40 +612,26 @@ export default function SuperAdminDashboard() {
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.headerContent}>
-          <div>
-            <h1>🔐 Panel de Super Administrador</h1>
-            <p className={styles.subtitle}>Gestión de Personal Autorizado (Whitelist)</p>
+          <div className={styles.headerTitle}>
+            <IconShield size={26} className={styles.headerIcon} />
+            <div>
+              <h1>Panel de Super Administrador</h1>
+              <p className={styles.subtitle}>Gestión de Personal Autorizado (Whitelist)</p>
+            </div>
           </div>
           <div className={styles.userInfo}>
             <span className={styles.userName}>{user?.nombre}</span>
             <span className={styles.userRole}>SUPER_ADMIN</span>
           </div>
         </div>
-      </header>
 
-      {/* Mensajes */}
-      {error && (
-        <div className={styles.errorAlert}>
-          <span>❌</span>
-          <p>{error}</p>
-          <button onClick={() => setError(null)}>×</button>
-        </div>
-      )}
-      
-      {successMessage && (
-        <div className={styles.successAlert}>
-          <span>✅</span>
-          <p>{successMessage}</p>
-        </div>
-      )}
-
-      {/* Navegación */}
-      <nav className={styles.nav}>
-        <button 
+        {/* Navegación */}
+        <nav className={styles.nav}>
+        <button
           className={`${styles.navBtn} ${viewMode === 'list' ? styles.active : ''}`}
           onClick={() => { setViewMode('list'); setEditingCI(null); }}
         >
-          📋 Lista de Personal
+          <IconList size={16} /> Lista de Personal
         </button>
         <button 
           className={`${styles.navBtn} ${viewMode === 'add' ? styles.active : ''}`}
@@ -649,21 +646,43 @@ export default function SuperAdminDashboard() {
               departamento: '',
               especialidad: '',
               cargo: '',
+              telefono: '',
               fechaIngreso: new Date().toISOString().split('T')[0],
               fechaVencimiento: '',
             });
             setFormErrors({});
           }}
         >
-          ➕ Agregar Personal
+          <IconUserPlus size={16} /> Agregar Personal
         </button>
-        <button 
+        <button
           className={`${styles.navBtn} ${viewMode === 'stats' ? styles.active : ''}`}
           onClick={() => setViewMode('stats')}
         >
-          📊 Estadísticas
+          <IconChartBar size={16} /> Estadísticas
         </button>
-      </nav>
+        </nav>
+      </header>
+
+      {/* Mensajes */}
+      {(error || successMessage) && (
+        <div className={styles.alertWrapper}>
+          {error && (
+            <div className={styles.errorAlert}>
+              <IconAlertCircle size={18} />
+              <p>{error}</p>
+              <button onClick={() => setError(null)}><IconX size={16} /></button>
+            </div>
+          )}
+
+          {successMessage && (
+            <div className={styles.successAlert}>
+              <IconCheck size={18} />
+              <p>{successMessage}</p>
+            </div>
+          )}
+        </div>
+      )}
 
       <main className={styles.main}>
         {/* Vista: Estadísticas */}
@@ -672,28 +691,28 @@ export default function SuperAdminDashboard() {
             <h2>Estadísticas de la Whitelist</h2>
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>👥</div>
+                <div className={styles.statIcon}><IconUsers size={22} /></div>
                 <div className={styles.statInfo}>
                   <span className={styles.statValue}>{stats.total}</span>
                   <span className={styles.statLabel}>Total Personal</span>
                 </div>
               </div>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>✅</div>
+                <div className={styles.statIcon}><IconCheckCircle size={22} /></div>
                 <div className={styles.statInfo}>
                   <span className={styles.statValue}>{stats.activos}</span>
                   <span className={styles.statLabel}>Activos</span>
                 </div>
               </div>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>🔑</div>
+                <div className={styles.statIcon}><IconKey size={22} /></div>
                 <div className={styles.statInfo}>
                   <span className={styles.statValue}>{stats.registrados}</span>
                   <span className={styles.statLabel}>Con Cuenta</span>
                 </div>
               </div>
               <div className={styles.statCard}>
-                <div className={styles.statIcon}>⏳</div>
+                <div className={styles.statIcon}><IconClock size={22} /></div>
                 <div className={styles.statInfo}>
                   <span className={styles.statValue}>{stats.pendientesRegistro}</span>
                   <span className={styles.statLabel}>Pendientes Registro</span>
@@ -763,7 +782,7 @@ export default function SuperAdminDashboard() {
                 <option value="false">Sin cuenta</option>
               </select>
               <button onClick={cargarPersonal} className={styles.refreshBtn}>
-                🔄 Actualizar
+                <IconRefresh size={15} /> Actualizar
               </button>
             </div>
 
@@ -786,6 +805,7 @@ export default function SuperAdminDashboard() {
                       <th>Nombre Completo</th>
                       <th>Rol</th>
                       <th>Departamento</th>
+                      <th>Teléfono</th>
                       <th>Estado</th>
                       <th>Cuenta</th>
                       <th>Acciones</th>
@@ -802,7 +822,7 @@ export default function SuperAdminDashboard() {
                               <span className={styles.email}>{personal.email}</span>
                             )}
                             {personal.especialidad && (
-                              <span className={styles.email} style={{ color: '#059669', fontStyle: 'italic' }}>{personal.especialidad}</span>
+                              <span className={styles.email} style={{ color: '#3a8a63', fontStyle: 'italic' }}>{personal.especialidad}</span>
                             )}
                           </div>
                         </td>
@@ -815,6 +835,7 @@ export default function SuperAdminDashboard() {
                           </span>
                         </td>
                         <td>{personal.departamento || '-'}</td>
+                        <td>{personal.telefono || '-'}</td>
                         <td>
                           <span 
                             className={styles.estadoBadge}
@@ -826,11 +847,11 @@ export default function SuperAdminDashboard() {
                         <td>
                           {personal.registrado ? (
                             <span className={styles.registrado}>
-                              ✅ Registrado
+                              <IconCheck size={13} /> Registrado
                               <small>{formatDate(personal.fechaRegistro)}</small>
                             </span>
                           ) : (
-                            <span className={styles.pendiente}>⏳ Pendiente</span>
+                            <span className={styles.pendiente}><IconClock size={13} /> Pendiente</span>
                           )}
                         </td>
                         <td>
@@ -840,7 +861,7 @@ export default function SuperAdminDashboard() {
                               className={styles.editBtn}
                               title="Editar"
                             >
-                              ✏️
+                              <IconPencil size={15} />
                             </button>
                             {personal.estado === 'ACTIVO' && (
                               <button
@@ -851,17 +872,16 @@ export default function SuperAdminDashboard() {
                                 className={styles.deleteBtn}
                                 title="Dar de baja"
                               >
-                                🚫
+                                <IconUserX size={15} />
                               </button>
                             )}
                             {personal.estado === 'BAJA' && (
                               <button
                                 onClick={() => handleEliminarPermanente(personal.ci, personal.nombreCompleto)}
-                                className={styles.deleteBtn}
+                                className={styles.deleteBtnStrong}
                                 title="Eliminar permanentemente de la whitelist"
-                                style={{ backgroundColor: '#7f1d1d' }}
                               >
-                                🗑️
+                                <IconTrash size={15} />
                               </button>
                             )}
                             {personal.rolAutorizado === 'MEDICO' && personal.registrado && personal.usuarioId && (
@@ -870,8 +890,19 @@ export default function SuperAdminDashboard() {
                                 className={styles.scheduleBtn}
                                 title="Gestionar Horarios"
                               >
-                                ⏰
+                                <IconCalendarClock size={15} />
                               </button>
+                            )}
+                            {personal.telefono && (
+                              <a
+                                href={`https://wa.me/${personal.telefono.replace(/\D/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={styles.whatsappBtn}
+                                title={`WhatsApp: ${personal.telefono}`}
+                              >
+                                <IconWhatsApp size={15} />
+                              </a>
                             )}
                           </div>
                         </td>
@@ -891,7 +922,10 @@ export default function SuperAdminDashboard() {
         {/* Vista: Agregar/Editar Personal */}
         {(viewMode === 'add' || viewMode === 'edit') && (
           <section className={styles.formSection}>
-            <h2>{editingCI ? '✏️ Editar Personal Autorizado' : '➕ Agregar Personal Autorizado'}</h2>
+            <h2 className={styles.sectionTitle}>
+              {editingCI ? <IconPencil size={20} /> : <IconUserPlus size={20} />}
+              {editingCI ? 'Editar Personal Autorizado' : 'Agregar Personal Autorizado'}
+            </h2>
             <p className={styles.formDescription}>
               {editingCI 
                 ? 'Modifique los datos del personal autorizado'
@@ -988,7 +1022,17 @@ export default function SuperAdminDashboard() {
                     placeholder="Ej: Médico Internista"
                   />
                 </div>
-                
+
+                <div className={styles.formGroup}>
+                  <label>Teléfono</label>
+                  <input
+                    type="tel"
+                    value={formData.telefono}
+                    onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                    placeholder="Ej: 0412-4751675"
+                  />
+                </div>
+
                 <div className={styles.formGroup}>
                   <label>Fecha de Ingreso al Hospital *</label>
                   <input
@@ -1035,7 +1079,7 @@ export default function SuperAdminDashboard() {
       {showBajaModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
-            <h3>🚫 Dar de Baja</h3>
+            <h3 className={styles.sectionTitle}><IconUserX size={19} /> Dar de Baja</h3>
             <p>¿Está seguro de dar de baja al personal con CI <strong>{bajaCI}</strong>?</p>
             <p className={styles.warningText}>
               Esta acción revocará su autorización para acceder al sistema.
@@ -1079,18 +1123,18 @@ export default function SuperAdminDashboard() {
         <div className={styles.modalOverlay}>
           <div className={`${styles.modal} ${styles.schedulesModal}`}>
             <div className={styles.modalHeader}>
-              <h3>⏰ Horarios de Atención</h3>
-              <button 
+              <h3 className={styles.sectionTitle}><IconCalendarClock size={19} /> Horarios de Atención</h3>
+              <button
                 onClick={() => {
                   setShowSchedulesModal(false)
                   setSelectedMedico(null)
                   setSchedules([])
                   setEditingScheduleId(null)
-                }} 
+                }}
                 className={styles.closeModalBtn}
                 title="Cerrar"
               >
-                ×
+                <IconX size={20} />
               </button>
             </div>
             <p className={styles.medicoName}>
@@ -1100,13 +1144,13 @@ export default function SuperAdminDashboard() {
             {/* Mensajes del Modal */}
             {schedulesError && (
               <div className={styles.modalError}>
-                <span>❌</span>
+                <IconAlertCircle size={16} />
                 <p>{schedulesError}</p>
               </div>
             )}
             {schedulesSuccess && (
               <div className={styles.modalSuccess}>
-                <span>✅</span>
+                <IconCheck size={16} />
                 <p>{schedulesSuccess}</p>
               </div>
             )}
@@ -1209,40 +1253,40 @@ export default function SuperAdminDashboard() {
                               <div className={styles.modalActions}>
                                 {isEditing ? (
                                   <>
-                                    <button 
-                                      onClick={() => handleSaveEditSchedule(horario.id)} 
+                                    <button
+                                      onClick={() => handleSaveEditSchedule(horario.id)}
                                       className={styles.saveInlineBtn}
                                       title="Guardar"
                                       disabled={loadingSchedules}
                                     >
-                                      💾
+                                      <IconSave size={15} />
                                     </button>
-                                    <button 
-                                      onClick={() => setEditingScheduleId(null)} 
+                                    <button
+                                      onClick={() => setEditingScheduleId(null)}
                                       className={styles.cancelInlineBtn}
                                       title="Cancelar"
                                       disabled={loadingSchedules}
                                     >
-                                      ❌
+                                      <IconX size={15} />
                                     </button>
                                   </>
                                 ) : (
                                   <>
-                                    <button 
-                                      onClick={() => startEditSchedule(horario)} 
+                                    <button
+                                      onClick={() => startEditSchedule(horario)}
                                       className={styles.editInlineBtn}
                                       title="Editar horario"
                                       disabled={loadingSchedules}
                                     >
-                                      ✏️
+                                      <IconPencil size={15} />
                                     </button>
-                                    <button 
-                                      onClick={() => handleDeleteSchedule(horario.id)} 
+                                    <button
+                                      onClick={() => handleDeleteSchedule(horario.id)}
                                       className={styles.deleteInlineBtn}
                                       title="Eliminar horario"
                                       disabled={loadingSchedules}
                                     >
-                                      🗑️
+                                      <IconTrash size={15} />
                                     </button>
                                   </>
                                 )}
@@ -1314,7 +1358,7 @@ export default function SuperAdminDashboard() {
                 </div>
                 <div className={styles.formColBtn}>
                   <button type="submit" className={styles.addBtn} disabled={loadingSchedules}>
-                    ➕ Agregar
+                    <IconPlus size={14} /> Agregar
                   </button>
                 </div>
               </div>

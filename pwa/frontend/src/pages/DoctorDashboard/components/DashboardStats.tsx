@@ -37,7 +37,7 @@ const METRICAS_DISPONIBLES: Record<string, MetricaConfig> = {
   },
   pacientesEnEmergencia: {
     id: 'pacientesEnEmergencia',
-    titulo: '🚨 Pacientes en Emergencia',
+    titulo: 'Pacientes en Emergencia',
     label: 'Atención de emergencia',
     key: 'pacientesEnEmergencia',
   },

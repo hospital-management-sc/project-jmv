@@ -23,7 +23,7 @@ const JWT_SECRET = config.jwtSecret;
 const JWT_EXPIRY = config.jwtExpiry;
 
 interface LoginPayload {
-  email: string;
+  ci: string;
   password: string;
 }
 
@@ -82,19 +82,19 @@ export const comparePassword = async (
 };
 
 /**
- * Login user
+ * Login user by CI + password (sistema cerrado, sin registro manual)
  */
 export const loginUser = async (payload: LoginPayload): Promise<TokenResponse> => {
-  const { email, password } = payload;
+  const { ci, password } = payload;
 
-  // Validation
-  if (!email || !password) {
-    throw new ValidationError('El correo electrónico y la contraseña son requeridos');
+  if (!ci || !password) {
+    throw new ValidationError('La cédula y la contraseña son requeridas');
   }
 
-  // Find user by email - SOLO campos necesarios
+  const ciNormalized = ci.toUpperCase().trim();
+
   const user = await prisma.usuario.findUnique({
-    where: { email: email.toLowerCase() },
+    where: { ci: ciNormalized },
     select: {
       id: true,
       nombre: true,
@@ -106,29 +106,27 @@ export const loginUser = async (payload: LoginPayload): Promise<TokenResponse> =
   });
 
   if (!user) {
-    logger.warn(`Login attempt with non-existent email: ${email}`);
-    throw new InvalidCredentialsError('Credenciales inválidas. Verifique su correo electrónico y contraseña.');
+    logger.warn(`Login attempt with non-existent CI: ${ciNormalized}`);
+    throw new InvalidCredentialsError('Cédula o contraseña incorrectos.');
   }
 
-  // Compare passwords
   const isPasswordValid = await comparePassword(password, user.password || '');
 
   if (!isPasswordValid) {
-    logger.warn(`Failed login attempt for user: ${email}`);
-    throw new InvalidCredentialsError('Credenciales inválidas. Verifique su correo electrónico y contraseña.');
+    logger.warn(`Failed login attempt for CI: ${ciNormalized}`);
+    throw new InvalidCredentialsError('Cédula o contraseña incorrectos.');
   }
 
-  // Generate token
   const token = generateToken(
     Number(user.id),
     user.nombre || '',
-    user.email || '', 
+    user.email || '',
     user.role || '',
     user.especialidad,
-    undefined // Departamento no está en Usuario, está en PersonalAutorizado
+    undefined
   );
 
-  logger.info(`User logged in successfully: ${email}`);
+  logger.info(`User logged in: ${ciNormalized}`);
 
   return {
     id: Number(user.id),
@@ -138,6 +136,68 @@ export const loginUser = async (payload: LoginPayload): Promise<TokenResponse> =
     especialidad: user.especialidad,
     token,
   };
+};
+
+/**
+ * Crea una cuenta de usuario automáticamente al agregar personal a la whitelist.
+ * La contraseña por defecto es el número de CI sin la letra (ej: V19472303 → "19472303").
+ */
+export const createUserFromWhitelist = async (input: {
+  ci: string;
+  nombreCompleto: string;
+  email: string | null;
+  rolAutorizado: string;
+  departamento: string | null;
+  especialidad: string | null;
+  cargo: string | null;
+  personalAutorizadoId: bigint;
+}): Promise<{ id: bigint }> => {
+  const defaultPassword = input.ci.replace(/^[VEP]/i, '');
+  const hashedPassword = await hashPassword(defaultPassword);
+
+  try {
+    const newUser = await prisma.usuario.create({
+      data: {
+        nombre: input.nombreCompleto,
+        email: input.email ? input.email.toLowerCase().trim() : null as unknown as string,
+        password: hashedPassword,
+        ci: input.ci,
+        role: input.rolAutorizado,
+        especialidad: input.departamento || input.especialidad || undefined,
+        cargo: input.cargo || null,
+      },
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        tabla: 'Usuario',
+        registroId: newUser.id,
+        usuarioId: newUser.id,
+        accion: 'REGISTER',
+        detalle: {
+          ci: input.ci,
+          role: newUser.role,
+          autoCreated: true,
+          personalAutorizadoId: Number(input.personalAutorizadoId),
+        },
+      },
+    });
+
+    if (newUser.role === 'MEDICO' && newUser.especialidad) {
+      const { generarHorariosPorDefecto } = await import('./generarHorariosMedico');
+      await generarHorariosPorDefecto(newUser.id, newUser.especialidad, newUser.nombre || 'Médico');
+    }
+
+    logger.info(`[AUTH] Cuenta creada automáticamente para CI: ${input.ci}`);
+    return { id: newUser.id as unknown as bigint };
+  } catch (error: any) {
+    if (error.code === 'P2002') {
+      logger.warn(`[AUTH] Cuenta ya existía para CI: ${input.ci}, omitiendo creación.`);
+      const existing = await prisma.usuario.findUnique({ where: { ci: input.ci }, select: { id: true } });
+      return { id: existing!.id as unknown as bigint };
+    }
+    throw error;
+  }
 };
 
 /**

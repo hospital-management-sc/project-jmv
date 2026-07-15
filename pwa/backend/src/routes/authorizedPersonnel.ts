@@ -51,7 +51,7 @@ router.get('/:ci', authMiddleware, requireSuperAdmin, getByCI);
 /**
  * POST /api/authorized-personnel
  * Agrega nuevo personal a la whitelist
- * Body: { ci, nombreCompleto, email?, rolAutorizado, departamento?, cargo?, fechaIngreso, fechaVencimiento? }
+ * Body: { ci, nombreCompleto, email?, rolAutorizado, departamento?, cargo?, telefono?, fechaIngreso, fechaVencimiento? }
  */
 router.post('/', authMiddleware, requireSuperAdminWithAudit, create);
 

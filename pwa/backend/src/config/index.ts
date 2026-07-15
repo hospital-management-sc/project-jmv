@@ -73,7 +73,7 @@ export const config = {
   databaseUrl: process.env.DATABASE_URL,
 
   // JWT
-  jwtSecret: process.env.JWT_SECRET || 'your-secret-key',
+  jwtSecret: process.env.JWT_SECRET!,
   jwtExpiry: process.env.JWT_EXPIRY || '24h', // Can be '24h', '7d', etc or milliseconds as number
 
   // CORS
@@ -88,8 +88,12 @@ if (!config.databaseUrl) {
   throw new Error('DATABASE_URL environment variable is required');
 }
 
-if (!config.jwtSecret || config.jwtSecret === 'your-secret-key') {
-  // JWT_SECRET is using default value
+if (!config.jwtSecret) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+
+if (!process.env.SESSION_SECRET) {
+  throw new Error('SESSION_SECRET environment variable is required');
 }
 
 export default config;

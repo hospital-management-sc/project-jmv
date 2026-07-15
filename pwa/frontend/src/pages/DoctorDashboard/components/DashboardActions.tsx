@@ -18,7 +18,7 @@ interface AccionConfig {
 const ACCIONES_DISPONIBLES: Record<string, AccionConfig> = {
   'registrar-emergency': {
     id: 'registrar-emergency',
-    titulo: '🚨 Nuevo Paciente en Emergencia',
+    titulo: 'Nuevo Paciente en Emergencia',
     descripcion: 'Atención inmediata 24/7 - Buscar o registrar paciente',
     view: 'register-emergency',
     icono: <path d="M22 12h-4l-3 9L9 3l-3 9H2" />,
@@ -52,7 +52,7 @@ const ACCIONES_DISPONIBLES: Record<string, AccionConfig> = {
   },
   'pacientes-emergencia': {
     id: 'pacientes-emergencia',
-    titulo: '📊 Pacientes en Emergencia',
+    titulo: 'Pacientes en Emergencia',
     descripcion: 'Monitoree pacientes en atención de emergencia',
     view: 'pacientes-emergencia',
     icono: <path d="M22 12h-4l-3 9L9 3l-3 9H2" />,

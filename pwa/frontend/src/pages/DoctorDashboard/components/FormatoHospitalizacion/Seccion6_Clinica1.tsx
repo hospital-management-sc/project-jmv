@@ -8,6 +8,7 @@ import styles from './Secciones.module.css';
 import type { FormatoHospitalizacion, AntecedentesDetallados } from '@/services/formatoHospitalizacion.service';
 import type { Admision } from '@/services/admisiones.service';
 import * as formatoService from '@/services/formatoHospitalizacion.service';
+import { IconHospital, IconSave, IconClipboard, IconUsers, IconUser, IconAlertTriangle, IconInfo } from '@/components/icons';
 
 interface Props {
   formato: FormatoHospitalizacion;
@@ -54,25 +55,25 @@ export default function Seccion6_Clinica1({ formato, admision, onUpdate, setSavi
     <div className={styles.seccion}>
       <div className={styles.seccionHeader}>
         <div>
-          <h3>🏥 Clínica I - Antecedentes</h3>
+          <h3><IconHospital size={16} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Clínica I - Antecedentes</h3>
           <p className={styles.seccionDescription}>
             Antecedentes personales, familiares y gineco-obstétricos del paciente
           </p>
         </div>
-        <button 
+        <button
           className={`${styles.btnPrimary} ${!hasChanges ? styles.btnDisabled : ''}`}
           onClick={handleSave}
           disabled={!hasChanges || saving}
         >
-          {saving ? '💾 Guardando...' : '💾 Guardar Cambios'}
+          <IconSave size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />{saving ? 'Guardando...' : 'Guardar Cambios'}
         </button>
       </div>
 
       <div className={styles.clinicaContainer}>
         {/* Antecedentes Personales */}
         <div className={styles.clinicaSection}>
-          <h4>📋 Antecedentes Personales Patológicos</h4>
-          
+          <h4><IconClipboard size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Antecedentes Personales Patológicos</h4>
+
           <div className={styles.clinicaField}>
             <label>Antecedentes Médicos</label>
             <textarea
@@ -136,8 +137,8 @@ export default function Seccion6_Clinica1({ formato, admision, onUpdate, setSavi
 
         {/* Antecedentes Familiares */}
         <div className={styles.clinicaSection}>
-          <h4>👨‍👩‍👧‍👦 Antecedentes Familiares</h4>
-          
+          <h4><IconUsers size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Antecedentes Familiares</h4>
+
           <div className={styles.clinicaField}>
             <label>Antecedentes Familiares Patológicos</label>
             <textarea
@@ -152,8 +153,8 @@ export default function Seccion6_Clinica1({ formato, admision, onUpdate, setSavi
         {/* Antecedentes Gineco-obstétricos (solo para mujeres) */}
         {mostrarGineco && (
           <div className={styles.clinicaSection}>
-            <h4>👩 Antecedentes Gineco-Obstétricos</h4>
-            
+            <h4><IconUser size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Antecedentes Gineco-Obstétricos</h4>
+
             <div className={styles.ginecoGrid}>
               <div className={styles.formGroup}>
                 <label>Menarquia (años)</label>
@@ -255,12 +256,12 @@ export default function Seccion6_Clinica1({ formato, admision, onUpdate, setSavi
 
       {hasChanges && (
         <div className={styles.unsavedWarning}>
-          ⚠️ Hay cambios sin guardar. Haga clic en "Guardar Cambios" para no perderlos.
+          <IconAlertTriangle size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Hay cambios sin guardar. Haga clic en "Guardar Cambios" para no perderlos.
         </div>
       )}
 
       <div className={styles.infoNote}>
-        <strong>ℹ️ Recuerde:</strong>
+        <strong><IconInfo size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Recuerde:</strong>
         <ul>
           <li>Documentar alergias conocidas es crítico para la seguridad del paciente</li>
           <li>Incluir dosis y tiempo de uso en medicamentos crónicos</li>

@@ -24,6 +24,7 @@ model PersonalAutorizado {
   departamento      String?  @db.VarChar(100) // Departamento/Servicio asignado
   especialidad      String?  @db.VarChar(100) // Especialidad médica (si es MEDICO)
   cargo             String?  @db.VarChar(100) // Cargo específico
+  telefono          String?  @db.VarChar(20) // Teléfono/WhatsApp de contacto
   
   // Control de vigencia
   estado            String   @default("ACTIVO") @db.VarChar(50) // ACTIVO | INACTIVO | SUSPENDIDO | BAJA

@@ -190,7 +190,7 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>🏥 Nueva Admisión de Hospitalización</h1>
+        <h1>Nueva Admisión de Hospitalización</h1>
         <p className={styles.subtitle}>
           Busque al paciente y asigne cama/servicio para hospitalización
         </p>
@@ -223,12 +223,12 @@ export default function RegistrarAdmision({ onBack }: RegistrarAdmisionProps) {
                   inputMode="numeric"
                 />
                 <button onClick={buscarPaciente} disabled={buscando}>
-                  {buscando ? '🔍 Buscando...' : '🔍 Buscar'}
+                  {buscando ? 'Buscando...' : 'Buscar'}
                 </button>
               </div>
               {errorBusqueda && (
                 <>
-                  <div className={styles.errorMsg}>⚠️ {errorBusqueda}</div>
+                  <div className={styles.errorMsg}>{errorBusqueda}</div>
                   <div className={styles.registroSuggestion}>
                     <p>¿El paciente no está registrado?</p>
                     <button

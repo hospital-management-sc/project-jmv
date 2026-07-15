@@ -9,6 +9,7 @@ import type { FormatoHospitalizacion, Laboratorio } from '@/services/formatoHosp
 import type { Admision } from '@/services/admisiones.service';
 import * as formatoService from '@/services/formatoHospitalizacion.service';
 import { formatDateVenezuela } from '@/utils/dateUtils';
+import { IconMicroscope, IconBloodDrop, IconFlask, IconX, IconPlus, IconEdit, IconNotes, IconSave, IconChartBar, IconInfo } from '@/components/icons';
 
 interface Props {
   formato: FormatoHospitalizacion;
@@ -20,7 +21,7 @@ interface Props {
 // Definición de campos por categoría
 const CAMPOS_LABORATORIO = {
   hematologia: {
-    titulo: '🩸 Hematología',
+    titulo: 'Hematología',
     campos: [
       { key: 'hgb', label: 'Hemoglobina', unidad: 'g/dL', min: 12, max: 17 },
       { key: 'hct', label: 'Hematocrito', unidad: '%', min: 36, max: 50 },
@@ -34,7 +35,7 @@ const CAMPOS_LABORATORIO = {
     ]
   },
   coagulacion: {
-    titulo: '🔬 Coagulación',
+    titulo: 'Coagulación',
     campos: [
       { key: 'pt', label: 'PT', unidad: 'seg', min: 11, max: 14 },
       { key: 'ptt', label: 'PTT', unidad: 'seg', min: 25, max: 35 },
@@ -43,14 +44,14 @@ const CAMPOS_LABORATORIO = {
     ]
   },
   reactantes: {
-    titulo: '🧪 Reactantes de Fase Aguda',
+    titulo: 'Reactantes de Fase Aguda',
     campos: [
       { key: 'vsg', label: 'VSG', unidad: 'mm/h', min: 0, max: 20 },
       { key: 'pcr', label: 'PCR', unidad: 'mg/L', min: 0, max: 10 },
     ]
   },
   quimica: {
-    titulo: '⚗️ Química Sanguínea',
+    titulo: 'Química Sanguínea',
     campos: [
       { key: 'glicemia', label: 'Glicemia', unidad: 'mg/dL', min: 70, max: 110 },
       { key: 'urea', label: 'Urea', unidad: 'mg/dL', min: 15, max: 45 },
@@ -74,7 +75,7 @@ const CAMPOS_LABORATORIO = {
     ]
   },
   electrolitos: {
-    titulo: '⚡ Electrolitos',
+    titulo: 'Electrolitos',
     campos: [
       { key: 'sodio', label: 'Sodio', unidad: 'mEq/L', min: 136, max: 145 },
       { key: 'potasio', label: 'Potasio', unidad: 'mEq/L', min: 3.5, max: 5 },
@@ -84,6 +85,14 @@ const CAMPOS_LABORATORIO = {
       { key: 'fosforo', label: 'Fósforo', unidad: 'mg/dL', min: 2.5, max: 4.5 },
     ]
   }
+};
+
+const CATEGORIA_ICONOS: Record<string, React.ReactNode> = {
+  hematologia: <IconBloodDrop size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />,
+  coagulacion: <IconMicroscope size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />,
+  reactantes: <IconFlask size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />,
+  quimica: <IconFlask size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />,
+  electrolitos: <IconFlask size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />,
 };
 
 export default function Seccion3_Laboratorios({ formato, onUpdate, setSaving }: Props) {
@@ -113,7 +122,7 @@ export default function Seccion3_Laboratorios({ formato, onUpdate, setSaving }: 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.fecha) {
       alert('La fecha es obligatoria');
       return;
@@ -126,9 +135,9 @@ export default function Seccion3_Laboratorios({ formato, onUpdate, setSaving }: 
       } else {
         await formatoService.addLaboratorio(formato.id, formData as any);
       }
-      
+
       await onUpdate();
-      
+
       setFormData({
         fecha: new Date().toISOString().split('T')[0],
         hora: new Date().toTimeString().split(' ')[0].slice(0, 5),
@@ -159,7 +168,7 @@ export default function Seccion3_Laboratorios({ formato, onUpdate, setSaving }: 
 
   const getValorStatus = (key: string, valor?: number) => {
     if (valor === undefined || valor === null) return '';
-    
+
     // Buscar el campo en todas las categorías
     for (const cat of Object.values(CAMPOS_LABORATORIO)) {
       const campo = cat.campos.find(c => c.key === key);
@@ -195,24 +204,30 @@ export default function Seccion3_Laboratorios({ formato, onUpdate, setSaving }: 
     <div className={styles.seccion}>
       <div className={styles.seccionHeader}>
         <div>
-          <h3>🔬 Laboratorios</h3>
+          <h3><IconMicroscope size={16} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Laboratorios</h3>
           <p className={styles.seccionDescription}>
             Registro de resultados de laboratorio (44 parámetros)
           </p>
         </div>
-        <button 
+        <button
           className={styles.btnPrimary}
           onClick={() => setShowForm(!showForm)}
         >
-          {showForm ? '❌ Cancelar' : '➕ Nuevo Registro'}
+          {showForm
+            ? <><IconX size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Cancelar</>
+            : <><IconPlus size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Nuevo Registro</>}
         </button>
       </div>
 
       {/* Formulario */}
       {showForm && (
         <div className={styles.formCard}>
-          <h4>{editingId ? '✏️ Editar Laboratorio' : '📝 Nuevo Registro de Laboratorio'}</h4>
-          
+          <h4>
+            {editingId
+              ? <><IconEdit size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Editar Laboratorio</>
+              : <><IconNotes size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />Nuevo Registro de Laboratorio</>}
+          </h4>
+
           <form onSubmit={handleSubmit}>
             {/* Fecha y Hora */}
             <div className={styles.formGrid}>
@@ -244,7 +259,7 @@ export default function Seccion3_Laboratorios({ formato, onUpdate, setSaving }: 
                   className={`${styles.labCategoryTab} ${activeCategory === key ? styles.active : ''}`}
                   onClick={() => setActiveCategory(key)}
                 >
-                  {cat.titulo}
+                  {CATEGORIA_ICONOS[key]}{cat.titulo}
                 </button>
               ))}
             </div>
@@ -267,7 +282,7 @@ export default function Seccion3_Laboratorios({ formato, onUpdate, setSaving }: 
 
             <div className={styles.formActions}>
               <button type="submit" className={styles.btnPrimary}>
-                {editingId ? '💾 Actualizar' : '💾 Guardar'}
+                <IconSave size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />{editingId ? 'Actualizar' : 'Guardar'}
               </button>
               <button type="button" className={styles.btnSecondary} onClick={handleCancel}>
                 Cancelar
@@ -279,8 +294,8 @@ export default function Seccion3_Laboratorios({ formato, onUpdate, setSaving }: 
 
       {/* Lista de Registros */}
       <div className={styles.recordsList}>
-        <h4>📊 Historial de Laboratorios ({laboratorios.length} registros)</h4>
-        
+        <h4><IconChartBar size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Historial de Laboratorios ({laboratorios.length} registros)</h4>
+
         {laboratorios.length === 0 ? (
           <div className={styles.emptyState}>
             <p>No hay registros de laboratorio aún.</p>
@@ -296,12 +311,12 @@ export default function Seccion3_Laboratorios({ formato, onUpdate, setSaving }: 
                       {formatDateVenezuela(lab.fecha)} {lab.hora && `- ${lab.hora}`}
                     </span>
                   </div>
-                  <button 
+                  <button
                     className={styles.btnEdit}
                     onClick={() => handleEdit(lab)}
                     title="Editar"
                   >
-                    ✏️ Editar
+                    <IconEdit size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Editar
                   </button>
                 </div>
 
@@ -310,10 +325,10 @@ export default function Seccion3_Laboratorios({ formato, onUpdate, setSaving }: 
                   {Object.entries(CAMPOS_LABORATORIO).map(([catKey, cat]) => {
                     const valoresConDatos = cat.campos.filter(c => (lab as any)[c.key] !== null && (lab as any)[c.key] !== undefined);
                     if (valoresConDatos.length === 0) return null;
-                    
+
                     return (
                       <div key={catKey} className={styles.labCardSection}>
-                        <h5>{cat.titulo}</h5>
+                        <h5>{CATEGORIA_ICONOS[catKey]}{cat.titulo}</h5>
                         <div className={styles.labCardValues}>
                           {valoresConDatos.map(campo => (
                             <div key={campo.key} className={styles.labCardValue}>
@@ -341,7 +356,7 @@ export default function Seccion3_Laboratorios({ formato, onUpdate, setSaving }: 
       </div>
 
       <div className={styles.infoNote}>
-        <strong>ℹ️ Valores de referencia:</strong>
+        <strong><IconInfo size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Valores de referencia:</strong>
         <p>Los valores fuera de rango se mostrarán en <span className={styles.alto}>rojo (alto)</span> o <span className={styles.bajo}>azul (bajo)</span>.</p>
       </div>
     </div>

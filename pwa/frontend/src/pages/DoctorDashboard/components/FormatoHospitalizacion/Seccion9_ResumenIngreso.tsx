@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import styles from './Secciones.module.css';
 import type { FormatoHospitalizacion, ResumenIngreso } from '@/services/formatoHospitalizacion.service';
 import * as formatoService from '@/services/formatoHospitalizacion.service';
+import { IconNotes, IconSave, IconTag, IconBook, IconClipboard, IconMicroscope, IconPill, IconChartBar, IconAlertTriangle, IconInfo } from '@/components/icons';
 
 interface Props {
   formato: FormatoHospitalizacion;
@@ -87,25 +88,25 @@ export default function Seccion9_ResumenIngreso({ formato, onUpdate, setSaving }
     <div className={styles.seccion}>
       <div className={styles.seccionHeader}>
         <div>
-          <h3>📝 Resumen de Ingreso</h3>
+          <h3><IconNotes size={16} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Resumen de Ingreso</h3>
           <p className={styles.seccionDescription}>
             Diagnósticos, plan diagnóstico/terapéutico y pronóstico del paciente
           </p>
         </div>
-        <button 
+        <button
           className={`${styles.btnPrimary} ${!hasChanges ? styles.btnDisabled : ''}`}
           onClick={handleSave}
           disabled={!hasChanges || saving}
         >
-          {saving ? '💾 Guardando...' : '💾 Guardar Cambios'}
+          <IconSave size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} />{saving ? 'Guardando...' : 'Guardar Cambios'}
         </button>
       </div>
 
       <div className={styles.resumenContainer}>
         {/* Diagnósticos */}
         <div className={styles.resumenSection}>
-          <h4>🏷️ Diagnósticos</h4>
-          
+          <h4><IconTag size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Diagnósticos</h4>
+
           <div className={styles.formGroup}>
             <label className={styles.required}>Diagnóstico Principal (Dx Ingreso)</label>
             <input
@@ -124,8 +125,8 @@ export default function Seccion9_ResumenIngreso({ formato, onUpdate, setSaving }
               {formData.diagnosticosSecundarios?.map((dx, index) => (
                 <div key={index} className={styles.diagnosticoItem}>
                   <span>{index + 1}. {dx}</span>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => removeDiagnosticoSecundario(index)}
                     className={styles.btnRemove}
                   >
@@ -151,7 +152,7 @@ export default function Seccion9_ResumenIngreso({ formato, onUpdate, setSaving }
 
         {/* Padecimiento Actual */}
         <div className={styles.resumenSection}>
-          <h4>📖 Padecimiento Actual</h4>
+          <h4><IconBook size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Padecimiento Actual</h4>
           <div className={styles.formGroup}>
             <label>Resumen del Padecimiento Actual</label>
             <textarea
@@ -165,7 +166,7 @@ export default function Seccion9_ResumenIngreso({ formato, onUpdate, setSaving }
 
         {/* Resumen Clínico */}
         <div className={styles.resumenSection}>
-          <h4>📋 Resumen Clínico</h4>
+          <h4><IconClipboard size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Resumen Clínico</h4>
           <div className={styles.formGroup}>
             <label>Integración Clínica</label>
             <textarea
@@ -179,7 +180,7 @@ export default function Seccion9_ResumenIngreso({ formato, onUpdate, setSaving }
 
         {/* Plan Diagnóstico */}
         <div className={styles.resumenSection}>
-          <h4>🔬 Plan Diagnóstico</h4>
+          <h4><IconMicroscope size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Plan Diagnóstico</h4>
           <div className={styles.formGroup}>
             <label>Estudios y Procedimientos Diagnósticos</label>
             <textarea
@@ -199,7 +200,7 @@ export default function Seccion9_ResumenIngreso({ formato, onUpdate, setSaving }
 
         {/* Plan Terapéutico */}
         <div className={styles.resumenSection}>
-          <h4>💊 Plan Terapéutico</h4>
+          <h4><IconPill size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Plan Terapéutico</h4>
           <div className={styles.formGroup}>
             <label>Tratamiento Inicial</label>
             <textarea
@@ -221,10 +222,10 @@ export default function Seccion9_ResumenIngreso({ formato, onUpdate, setSaving }
 
         {/* Pronóstico */}
         <div className={styles.resumenSection}>
-          <h4>📊 Pronóstico</h4>
+          <h4><IconChartBar size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Pronóstico</h4>
           <div className={styles.pronosticoGrid}>
             {pronosticoOptions.map((option) => (
-              <div 
+              <div
                 key={option.value}
                 className={`${styles.pronosticoOption} ${formData.pronostico === option.value ? styles.selected : ''}`}
                 style={{ borderColor: formData.pronostico === option.value ? option.color : undefined }}
@@ -243,7 +244,7 @@ export default function Seccion9_ResumenIngreso({ formato, onUpdate, setSaving }
 
         {/* Observaciones */}
         <div className={styles.resumenSection}>
-          <h4>📝 Observaciones Adicionales</h4>
+          <h4><IconNotes size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Observaciones Adicionales</h4>
           <div className={styles.formGroup}>
             <label>Notas / Observaciones</label>
             <textarea
@@ -258,12 +259,12 @@ export default function Seccion9_ResumenIngreso({ formato, onUpdate, setSaving }
 
       {hasChanges && (
         <div className={styles.unsavedWarning}>
-          ⚠️ Hay cambios sin guardar. Haga clic en "Guardar Cambios" para no perderlos.
+          <IconAlertTriangle size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Hay cambios sin guardar. Haga clic en "Guardar Cambios" para no perderlos.
         </div>
       )}
 
       <div className={styles.infoNote}>
-        <strong>ℹ️ Guía para el resumen de ingreso:</strong>
+        <strong><IconInfo size={14} style={{ verticalAlign: 'middle', marginRight: '0.3em' }} /> Guía para el resumen de ingreso:</strong>
         <ul>
           <li>El diagnóstico principal debe ser el motivo de hospitalización</li>
           <li>Incluya códigos CIE-10 para mejor documentación</li>

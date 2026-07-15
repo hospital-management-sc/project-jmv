@@ -573,7 +573,7 @@ export function RegisterPatientForm() {
               />
             </div>
             {errors.ciNumeros && <span className={styles["error-message"]}>{errors.ciNumeros}</span>}
-            {checkingCIDuplicate && <span style={{ color: '#f59e0b', fontSize: '0.85rem', marginTop: '0.25rem' }}>⏳ Validando...</span>}
+            {checkingCIDuplicate && <span style={{ color: '#f59e0b', fontSize: '0.85rem', marginTop: '0.25rem' }}>Validando...</span>}
             {ciDuplicateError && <span className={styles["error-message"]}>{ciDuplicateError}</span>}
           </div>
 
