@@ -245,14 +245,14 @@ export function IconWrench({ size = 16, className, style }: IconProps) {
 
 // Dot indicators for priority
 export function IconDotRed({ size = 12, className, style }: IconProps) {
-  return <svg width={size} height={size} viewBox="0 0 12 12" className={className}><circle cx="6" cy="6" r="5" fill="#ef4444" stroke="none" /></svg>
+  return <svg width={size} height={size} viewBox="0 0 12 12" className={className} style={style}><circle cx="6" cy="6" r="5" fill="#ef4444" stroke="none" /></svg>
 }
 export function IconDotOrange({ size = 12, className, style }: IconProps) {
-  return <svg width={size} height={size} viewBox="0 0 12 12" className={className}><circle cx="6" cy="6" r="5" fill="#f97316" stroke="none" /></svg>
+  return <svg width={size} height={size} viewBox="0 0 12 12" className={className} style={style}><circle cx="6" cy="6" r="5" fill="#f97316" stroke="none" /></svg>
 }
 export function IconDotYellow({ size = 12, className, style }: IconProps) {
-  return <svg width={size} height={size} viewBox="0 0 12 12" className={className}><circle cx="6" cy="6" r="5" fill="#eab308" stroke="none" /></svg>
+  return <svg width={size} height={size} viewBox="0 0 12 12" className={className} style={style}><circle cx="6" cy="6" r="5" fill="#eab308" stroke="none" /></svg>
 }
 export function IconDotGreen({ size = 12, className, style }: IconProps) {
-  return <svg width={size} height={size} viewBox="0 0 12 12" className={className}><circle cx="6" cy="6" r="5" fill="#22c55e" stroke="none" /></svg>
+  return <svg width={size} height={size} viewBox="0 0 12 12" className={className} style={style}><circle cx="6" cy="6" r="5" fill="#22c55e" stroke="none" /></svg>
 }
