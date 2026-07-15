@@ -99,10 +99,6 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
     if (!formData.descripcion?.trim()) {
       alert('La descripción es obligatoria');
       return;
@@ -134,10 +130,6 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
 
   const handleSuspend = async (id: string) => {
     if (!confirm('¿Suspender esta orden médica?')) return;
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
     setLocalSaving(true);
     setSaving(true);
     try {
@@ -169,10 +161,6 @@ export default function Seccion10_OrdenesMedicas({ formato, onUpdate, setSaving 
 
   const handleDelete = async (id: string) => {
     if (!confirm('¿Eliminar esta orden médica? Esta acción no se puede deshacer.')) return;
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
     setLocalSaving(true);
     setSaving(true);
     try {
