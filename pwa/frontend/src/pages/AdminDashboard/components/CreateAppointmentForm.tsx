@@ -18,8 +18,12 @@ interface CreateAppointmentFormProps {
 
 export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentFormProps = {}) {
   const { user } = useAuth() // Obtener usuario actual para saber quién agendó la cita
+  const [searchMode, setSearchMode] = useState<'ci' | 'nombre' | 'historia'>('ci')
   const [searchCITipo, setSearchCITipo] = useState('V')
   const [searchCINumeros, setSearchCINumeros] = useState('')
+  const [searchNombre, setSearchNombre] = useState('')
+  const [searchHistoria, setSearchHistoria] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
   const [selectedPatient, setSelectedPatient] = useState<any>(preSelectedPatient || null)
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchError, setSearchError] = useState('')
@@ -142,6 +146,9 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
 
       if (result.success) {
         setDisponibilidadMedico(result.data)
+        if (result.data.atiendeSeDia && result.data.horaInicio) {
+          setAppointmentData(prev => ({ ...prev, hora: result.data.horaInicio }))
+        }
       }
     } catch (err: any) {
       // Error checking doctor availability
@@ -152,48 +159,112 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
 
   // ✅ Función eliminada - especialidades se obtienen directamente desde la configuración centralizada
 
+  const handleSearchHistoriaChange = (value: string) => {
+    let clean = value.replace(/[^\d-]/g, '')
+    if (clean.length > 8) clean = clean.slice(0, 8)
+    
+    // Auto-formatear si el usuario teclea 6 dígitos continuos sin guiones (ej. 000007 -> 00-00-07)
+    const digitsOnly = clean.replace(/\D/g, '')
+    if (!clean.includes('-') && digitsOnly.length === 6) {
+      clean = `${digitsOnly.slice(0, 2)}-${digitsOnly.slice(2, 4)}-${digitsOnly.slice(4, 6)}`
+    }
+    
+    setSearchHistoria(clean)
+    setSearchError('')
+  }
+
+  const seleccionarPaciente = async (paciente: any) => {
+    setSelectedPatient(paciente)
+    setSearchResults([])
+    setSearchError('')
+
+    try {
+      const citasResponse = await fetch(`${API_BASE_URL}/citas/paciente/${paciente.id}?estado=PROGRAMADA`)
+      const citasResult = await citasResponse.json()
+
+      if (citasResult.success) {
+        setCitasExistentes(citasResult.data || [])
+      }
+    } catch (err) {
+      // Ignorar error al cargar citas
+    }
+
+    setAppointmentData({
+      fecha: '',
+      hora: '',
+      especialidad: '',
+      medico: '',
+      motivo: '',
+    })
+    setErrors({})
+  }
+
   const handleSearchPatient = async () => {
-    if (!searchCINumeros.trim()) {
-      setSearchError('Por favor ingrese un CI')
-      return
+    let url = ''
+
+    if (searchMode === 'ci') {
+      if (!searchCINumeros.trim()) {
+        setSearchError('Por favor ingrese un número de cédula')
+        return
+      }
+      const ciCompleta = `${searchCITipo}-${searchCINumeros}`
+      url = `${API_BASE_URL}/pacientes/search?ci=${encodeURIComponent(ciCompleta)}`
+    } else if (searchMode === 'nombre') {
+      if (!searchNombre.trim()) {
+        setSearchError('Por favor ingrese un nombre o apellido')
+        return
+      }
+      url = `${API_BASE_URL}/pacientes/search?nombre=${encodeURIComponent(searchNombre.trim())}&q=${encodeURIComponent(searchNombre.trim())}`
+    } else if (searchMode === 'historia') {
+      if (!searchHistoria.trim()) {
+        setSearchError('Por favor ingrese un número de historia clínica')
+        return
+      }
+      url = `${API_BASE_URL}/pacientes/search?historia=${encodeURIComponent(searchHistoria.trim())}`
     }
 
     setSearchLoading(true)
     setSearchError('')
     setSelectedPatient(null)
+    setSearchResults([])
     setCitasExistentes([])
 
     try {
-      const ciCompleta = `${searchCITipo}-${searchCINumeros}`
-      const response = await fetch(`${API_BASE_URL}/pacientes/search?ci=${encodeURIComponent(ciCompleta)}`)
+      const response = await fetch(url)
       const result = await response.json()
 
       if (!response.ok) {
         throw new Error(result.message || 'Paciente no encontrado')
       }
 
-      setSelectedPatient(result.data)
-
-      // Cargar citas existentes del paciente
-      const citasResponse = await fetch(`${API_BASE_URL}/citas/paciente/${result.data.id}?estado=PROGRAMADA`)
-      const citasResult = await citasResponse.json()
-
-      if (citasResult.success) {
-        setCitasExistentes(citasResult.data || [])
+      if (Array.isArray(result.data)) {
+        if (result.data.length === 0) {
+          throw new Error('No se encontraron pacientes con esa búsqueda')
+        }
+        if (searchMode === 'nombre') {
+          // Al buscar por nombre, SIEMPRE mostrar la lista de coincidencias para que el usuario elija
+          setSearchResults(result.data)
+        } else {
+          // Búsqueda por cédula o historia: si hay 1 coincidencia directa, seleccionar automáticamente
+          if (result.data.length === 1) {
+            seleccionarPaciente(result.data[0])
+          } else {
+            setSearchResults(result.data)
+          }
+        }
+      } else if (result.data) {
+        if (searchMode === 'nombre') {
+          setSearchResults([result.data])
+        } else {
+          seleccionarPaciente(result.data)
+        }
+      } else {
+        throw new Error('Paciente no encontrado')
       }
-
-      // Limpiar formulario de cita
-      setAppointmentData({
-        fecha: '',
-        hora: '',
-        especialidad: '',
-        medico: '',
-        motivo: '',
-      })
-      setErrors({})
     } catch (err: any) {
       setSearchError(err.message || 'Error al buscar paciente')
       setSelectedPatient(null)
+      setSearchResults([])
     } finally {
       setSearchLoading(false)
     }
@@ -335,38 +406,111 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
       {/* Búsqueda de Paciente */}
       <div className={styles["search-patient-box"]}>
         <h3 className={styles["form-section-header"]}>1. Buscar Paciente</h3>
-        <div className={styles["search-input-group"]}>
-          {/* Fila 1: CI select + input */}
-          <div className={styles["dual-input-group"]}>
-            <select
-              value={searchCITipo}
-              onChange={(e) => setSearchCITipo(e.target.value)}
-              disabled={selectedPatient ? true : false}
-            >
-              <option value="V">V</option>
-              <option value="E">E</option>
-              <option value="P">P</option>
-            </select>
-            <input
-              type="text"
-              value={searchCINumeros}
-              onChange={(e) => handleSearchCINumerosChange(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleSearchPatient()
-                }
-              }}
-              placeholder="12345678"
-              maxLength={8}
-              disabled={selectedPatient ? true : false}
-              inputMode='numeric'
-            />
+
+        {/* Selector de modo de búsqueda */}
+        {!selectedPatient && (
+          <div className={styles["search-type-selector"]}>
+            <label className={searchMode === 'ci' ? styles["active"] : ''}>
+              <input
+                type="radio"
+                name="searchMode"
+                value="ci"
+                checked={searchMode === 'ci'}
+                onChange={() => { setSearchMode('ci'); setSearchError(''); setSearchResults([]); }}
+              />
+              Por Cédula
+            </label>
+
+            <label className={searchMode === 'nombre' ? styles["active"] : ''}>
+              <input
+                type="radio"
+                name="searchMode"
+                value="nombre"
+                checked={searchMode === 'nombre'}
+                onChange={() => { setSearchMode('nombre'); setSearchError(''); setSearchResults([]); }}
+              />
+              Por Nombre / Apellido
+            </label>
+
+            <label className={searchMode === 'historia' ? styles["active"] : ''}>
+              <input
+                type="radio"
+                name="searchMode"
+                value="historia"
+                checked={searchMode === 'historia'}
+                onChange={() => { setSearchMode('historia'); setSearchError(''); setSearchResults([]); }}
+              />
+              Por Nro. Historia
+            </label>
           </div>
+        )}
+
+        <div className={styles["search-input-group"]}>
+          {searchMode === 'ci' && (
+            <div className={styles["dual-input-group"]}>
+              <select
+                value={searchCITipo}
+                onChange={(e) => setSearchCITipo(e.target.value)}
+                disabled={!!selectedPatient}
+              >
+                <option value="V">V</option>
+                <option value="E">E</option>
+                <option value="P">P</option>
+                <option value="J">J</option>
+                <option value="G">G</option>
+              </select>
+              <input
+                type="text"
+                value={searchCINumeros}
+                onChange={(e) => handleSearchCINumerosChange(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') handleSearchPatient()
+                }}
+                placeholder="12345678"
+                maxLength={8}
+                disabled={!!selectedPatient}
+                inputMode="numeric"
+              />
+            </div>
+          )}
+
+          {searchMode === 'nombre' && (
+            <div style={{ flex: 1 }}>
+              <input
+                type="text"
+                className={styles["search-input"]}
+                value={searchNombre}
+                onChange={(e) => { setSearchNombre(e.target.value); setSearchError(''); }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') handleSearchPatient()
+                }}
+                placeholder="Ej: Pérez o María García"
+                disabled={!!selectedPatient}
+              />
+            </div>
+          )}
+
+          {searchMode === 'historia' && (
+            <div style={{ flex: 1 }}>
+              <input
+                type="text"
+                className={styles["search-input"]}
+                value={searchHistoria}
+                onChange={(e) => handleSearchHistoriaChange(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') handleSearchPatient()
+                }}
+                placeholder="Ej: 00-00-01"
+                disabled={!!selectedPatient}
+              />
+            </div>
+          )}
+
           {/* Fila 2: Botones de acción */}
           <div className={styles["search-actions"]}>
             <button
               onClick={handleSearchPatient}
-              disabled={searchLoading || selectedPatient ? true : false}
+              disabled={searchLoading || !!selectedPatient}
               className={styles["btn-search"]}
             >
               {searchLoading ? 'Buscando...' : 'Buscar'}
@@ -375,8 +519,11 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
               <button
                 onClick={() => {
                   setSelectedPatient(null)
+                  setSearchResults([])
                   setSearchCITipo('V')
                   setSearchCINumeros('')
+                  setSearchNombre('')
+                  setSearchHistoria('')
                   setCitasExistentes([])
                   setAppointmentData({
                     fecha: '',
@@ -397,8 +544,48 @@ export function CreateAppointmentForm({ preSelectedPatient }: CreateAppointmentF
         </div>{/* end search-input-group */}
 
         {searchError && (
-          <div className={styles["error-message"]} style={{ padding: '0.75rem', marginBottom: '1rem' }}>
+          <div className={styles["error-message"]} style={{ padding: '0.75rem', marginBottom: '1rem', marginTop: '0.5rem' }}>
             {searchError}
+          </div>
+        )}
+
+        {/* Lista de coincidencias cuando se busca por nombre u otros criterios múltiples */}
+        {searchResults.length > 0 && !selectedPatient && (
+          <div style={{ marginTop: '1rem', background: 'rgba(15, 23, 42, 0.6)', padding: '1rem', borderRadius: '0.5rem', border: '1px solid var(--dashboard-border)' }}>
+            <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
+              Coincidencias encontradas ({searchResults.length}):
+            </h4>
+            <div style={{ display: 'grid', gap: '0.5rem', maxHeight: '220px', overflowY: 'auto' }}>
+              {searchResults.map((paciente: any) => (
+                <div
+                  key={paciente.id}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.6rem 0.85rem',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    borderRadius: '0.375rem',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                  }}
+                >
+                  <div>
+                    <strong style={{ color: '#fff', fontSize: '0.9rem' }}>{paciente.apellidosNombres}</strong>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                      CI: <strong>{paciente.ci}</strong> | Historia: <strong>{paciente.nroHistoria}</strong>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => seleccionarPaciente(paciente)}
+                    className={styles["btn-primary"]}
+                    style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                  >
+                    Seleccionar
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

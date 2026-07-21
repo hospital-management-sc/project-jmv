@@ -219,12 +219,12 @@ const startServer = async () => {
     
     // Start Express server
     app.listen(PORT, () => {
-      logger.info(`🚀 Server running on port ${PORT}`);
-      logger.info(`📝 Environment: ${NODE_ENV}`);
-      logger.info(`🌐 CORS enabled for: ${corsOptions.origin}`);
+      logger.info(`Servidor en ejecucion en puerto ${PORT}`);
+      logger.info(`Entorno: ${NODE_ENV}`);
+      logger.info(`CORS configurado para: ${config.corsOrigin || '*'}`);
     });
   } catch (error) {
-    logger.error('Failed to start server:', error);
+    logger.error('Error al iniciar servidor:', error);
     process.exit(1);
   }
 };
@@ -234,14 +234,14 @@ const startServer = async () => {
 // ============================================
 
 const shutdown = async (signal: string) => {
-  logger.info(`${signal} received, shutting down gracefully...`);
+  logger.info(`Senal ${signal} recibida, cerrando servidor...`);
   
   try {
     await disconnectDatabase();
-    logger.info('✅ Graceful shutdown completed');
+    logger.info('Cierre del servidor completado exitosamente');
     process.exit(0);
   } catch (error) {
-    logger.error('Error during graceful shutdown:', error);
+    logger.error('Error durante el cierre del servidor:', error);
     process.exit(1);
   }
 };

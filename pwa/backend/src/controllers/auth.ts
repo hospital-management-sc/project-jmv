@@ -210,3 +210,49 @@ export const forgotPassword = async (req: AuthRequest, res: Response): Promise<v
     }
   }
 };
+
+/**
+ * POST /api/auth/change-password
+ * Change password for currently logged-in user
+ */
+export const changePassword = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!userId) {
+      throw new ValidationError('Usuario no autenticado');
+    }
+
+    if (!currentPassword || !newPassword) {
+      throw new ValidationError('La contraseña actual y la nueva contraseña son requeridas');
+    }
+
+    if (newPassword.length < 6) {
+      throw new ValidationError('La nueva contraseña debe tener al menos 6 caracteres');
+    }
+
+    const { changeUserPassword } = await import('../services/auth');
+    await changeUserPassword(userId, currentPassword, newPassword);
+
+    res.status(200).json({
+      success: true,
+      message: 'Contraseña actualizada exitosamente',
+    });
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({
+        success: false,
+        error: error.name,
+        message: error.message,
+      });
+    } else {
+      logger.error('Change password error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Internal Server Error',
+        message: 'Error al cambiar la contraseña',
+      });
+    }
+  }
+};

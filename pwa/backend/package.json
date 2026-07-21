@@ -1,6 +1,6 @@
 {
   "name": "hospital-management-backend",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Backend para PWA de Gestión Clínica y Administrativa - Hospital Militar Tipo I",
   "main": "dist/index.js",
   "scripts": {

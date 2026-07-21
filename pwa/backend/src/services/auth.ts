@@ -436,3 +436,51 @@ export const verifyToken = (token: string): boolean => {
     return false;
   }
 };
+
+/**
+ * Change password for authenticated user
+ */
+export const changeUserPassword = async (
+  userId: number,
+  currentPassword: string,
+  newPassword: string
+): Promise<void> => {
+  const user = await prisma.usuario.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new UnauthorizedError('Usuario no encontrado');
+  }
+
+  const isPasswordValid = await comparePassword(currentPassword, user.password);
+  if (!isPasswordValid) {
+    throw new ValidationError('La contraseña actual es incorrecta');
+  }
+
+  if (currentPassword === newPassword) {
+    throw new ValidationError('La nueva contraseña debe ser diferente a la contraseña actual');
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  await prisma.usuario.update({
+    where: { id: userId },
+    data: { password: hashedPassword },
+  });
+
+  logger.info(`[AUTH] Password changed successfully for user ID: ${userId}`);
+
+  await prisma.auditLog.create({
+    data: {
+      usuarioId: user.id,
+      tabla: 'Usuario',
+      registroId: user.id,
+      accion: 'PASSWORD_CHANGE',
+      detalle: {
+        message: 'Password changed by user in Settings',
+        timestamp: new Date().toISOString(),
+      },
+    },
+  });
+};

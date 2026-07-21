@@ -197,12 +197,28 @@ export function RegisterPatientForm() {
         siguiente = `${numeroStr.slice(0, 2)}-${numeroStr.slice(2, 4)}-${numeroStr.slice(4, 6)}`
       }
       
-      setFormData({...formData, nroHistoria: siguiente})
-      setErrors({...errors, nroHistoria: ''})
+      setFormData(prev => ({ ...prev, nroHistoria: siguiente }))
+      setErrors(prev => ({ ...prev, nroHistoria: '' }))
     } catch (error) {
       console.error('Error al cargar siguiente número de historia:', error)
-      setFormData({...formData, nroHistoria: '00-00-01'})
-      setErrors({...errors, nroHistoria: ''})
+      setFormData(prev => ({ ...prev, nroHistoria: '00-00-01' }))
+      setErrors(prev => ({ ...prev, nroHistoria: '' }))
+    }
+  }
+
+  const handleNroHistoriaChange = (value: string) => {
+    let clean = value.replace(/[^\d-]/g, '')
+    if (clean.length > 8) clean = clean.slice(0, 8)
+    
+    // Auto-formatear si el usuario teclea 6 dígitos continuos sin guiones (ej. 000007 -> 00-00-07)
+    const digitsOnly = clean.replace(/\D/g, '')
+    if (!clean.includes('-') && digitsOnly.length === 6) {
+      clean = `${digitsOnly.slice(0, 2)}-${digitsOnly.slice(2, 4)}-${digitsOnly.slice(4, 6)}`
+    }
+    
+    setFormData(prev => ({ ...prev, nroHistoria: clean }))
+    if (errors.nroHistoria) {
+      setErrors(prev => ({ ...prev, nroHistoria: '' }))
     }
   }
 
@@ -434,95 +450,16 @@ export function RegisterPatientForm() {
 
         <div className={styles["form-grid"]}>
           <div className={styles["form-group"]}>
-            <label>Nro. Historia Clínica * <span className={styles["hint"]}>(Autogenerado)</span></label>
+            <label>Nro. Historia Clínica * <span className={styles["hint"]}>(Editable - Sugerido por secuencia)</span></label>
             <input
               type="text"
               required
-              disabled
               value={formData.nroHistoria}
+              onChange={(e) => handleNroHistoriaChange(e.target.value)}
               placeholder="00-00-00"
-              title="Se genera automáticamente del último paciente registrado"
+              title="Puede modificar el número para coincidir con la Historia Clínica física existente"
             />
             {errors.nroHistoria && <span className={styles["error-message"]}>{errors.nroHistoria}</span>}
-          </div>
-
-          <div className={styles["form-group"]}>
-            <label>Forma de Ingreso *</label>
-            <div className={styles["radio-group"]}>
-              <label className={styles["radio-label"]}>
-                <input
-                  type="radio"
-                  name="formaIngreso"
-                  value="AMBULANTE"
-                  checked={formData.formaIngreso === 'AMBULANTE'}
-                  onChange={(e) => setFormData({...formData, formaIngreso: e.target.value})}
-                />
-                Ambulante
-              </label>
-              <label className={styles["radio-label"]}>
-                <input
-                  type="radio"
-                  name="formaIngreso"
-                  value="AMBULANCIA"
-                  checked={formData.formaIngreso === 'AMBULANCIA'}
-                  onChange={(e) => setFormData({...formData, formaIngreso: e.target.value})}
-                />
-                Ambulancia
-              </label>
-            </div>
-          </div>
-
-          <div className={styles["form-group"]}>
-            <label>Fecha de Admisión *</label>
-            <input
-              type="date"
-              required
-              value={formData.fechaAdmision}
-              onChange={(e) => setFormData({...formData, fechaAdmision: e.target.value})}
-            />
-            {errors.fechaAdmision && <span className={styles["error-message"]}>{errors.fechaAdmision}</span>}
-          </div>
-
-          <div className={styles["form-group"]}>
-            <label>Hora de Admisión *</label>
-            <input
-              type="time"
-              required
-              value={formData.horaAdmision}
-              onChange={(e) => setFormData({...formData, horaAdmision: e.target.value})}
-            />
-            {errors.horaAdmision && <span className={styles["error-message"]}>{errors.horaAdmision}</span>}
-          </div>
-
-          <div className={styles["form-group"]}>
-            <label>Habitación</label>
-            <input
-              type="text"
-              value={formData.habitacion}
-              onChange={(e) => setFormData({...formData, habitacion: e.target.value})}
-              placeholder="Ej: 101, 205"
-              inputMode="numeric"
-            />
-          </div>
-
-          <div className={styles["form-group"]}>
-            <label>Firma de Facultativo</label>
-            <input
-              type="text"
-              value={formData.firmaFacultativo}
-              onChange={(e) => setFormData({...formData, firmaFacultativo: e.target.value})}
-              placeholder="Nombre del médico"
-            />
-          </div>
-
-          <div className={styles["form-group"]} style={{ gridColumn: '1 / -1' }}>
-            <label>Diagnóstico de Ingreso</label>
-            <input
-              type="text"
-              value={formData.diagnosticoIngreso}
-              onChange={(e) => setFormData({...formData, diagnosticoIngreso: e.target.value})}
-              placeholder="Ej: Hipertensión Arterial, Fractura de tibia, etc."
-            />
           </div>
         </div>
 

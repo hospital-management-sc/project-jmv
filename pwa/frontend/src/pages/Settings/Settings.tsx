@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Settings.module.css';
-import { PersonalInfo, BiometricManager } from './components';
+import { PersonalInfo, BiometricManager, ChangePassword } from './components';
 import { useAuth } from '@/contexts/AuthContext';
 
 function UserIcon() {
@@ -37,10 +37,24 @@ function LockIcon() {
   );
 }
 
+function KeyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+      <path
+        d="M21 2l-2 2m-2-2l2 2m2 4l-4 4M9 14l-4 4v3h3l4-4M15 9a3 3 0 1 0-6 0 3 3 0 0 0 6 0z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default function Settings() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'info' | 'biometric'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'biometric' | 'security'>('info');
 
   const handleBack = () => {
     const path = user?.role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/medico';
@@ -88,6 +102,13 @@ export default function Settings() {
             <span className={styles.tabLabel}>Información Personal</span>
           </button>
           <button
+            className={`${styles.tab} ${activeTab === 'security' ? styles.active : ''}`}
+            onClick={() => setActiveTab('security')}
+          >
+            <span className={styles.tabIcon}><KeyIcon /></span>
+            <span className={styles.tabLabel}>Cambiar Contraseña</span>
+          </button>
+          <button
             className={`${styles.tab} ${activeTab === 'biometric' ? styles.active : ''}`}
             onClick={() => setActiveTab('biometric')}
           >
@@ -98,6 +119,7 @@ export default function Settings() {
 
         <div className={styles.tabContent}>
           {activeTab === 'info' && <PersonalInfo />}
+          {activeTab === 'security' && <ChangePassword />}
           {activeTab === 'biometric' && <BiometricManager />}
         </div>
       </div>
