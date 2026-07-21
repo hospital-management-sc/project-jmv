@@ -196,13 +196,22 @@ export const crearPaciente = async (
 
     // Usar transacción para crear paciente y admisión
     const resultado = await prisma.$transaction(async (tx) => {
-      // Verificar si el paciente ya existe
+      // Verificar si ya existe paciente con este Nro. de Historia
+      const historiaExistente = await tx.paciente.findUnique({
+        where: { nroHistoria },
+      });
+
+      if (historiaExistente) {
+        throw new Error(`Ya existe un paciente registrado con el Nro. de Historia ${nroHistoria}`);
+      }
+
+      // Verificar si el paciente ya existe por cédula
       const pacienteExistente = await tx.paciente.findUnique({
         where: { ci },
       });
 
       if (pacienteExistente) {
-        throw new Error('Paciente con esta cédula ya existe');
+        throw new Error(`Ya existe un paciente registrado con la cédula ${ci}`);
       }
 
       // Crear paciente
@@ -326,7 +335,7 @@ export const crearPaciente = async (
     }
 
     // Manejar errores personalizados de transacción
-    if (error.message === 'Paciente con esta cédula ya existe') {
+    if (error.message && error.message.includes('Ya existe un paciente')) {
       res.status(409).json({
         error: 'Conflict',
         message: error.message,
@@ -457,21 +466,66 @@ export const buscarPaciente = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { ci, historia } = req.query;
+    const { ci, historia, nombre, q } = req.query;
 
-    if (!ci && !historia) {
+    if (!ci && !historia && !nombre && !q) {
       res.status(400).json({
         error: 'Bad Request',
-        message: 'Proporcione al menos un criterio de búsqueda (ci o historia)',
+        message: 'Proporcione al menos un criterio de búsqueda (ci, historia, nombre o q)',
       });
       return;
     }
 
-    let paciente = null;
+    // 1. Búsqueda por Nombre o término general 'q' (retorna lista de coincidencias)
+    if (nombre || q) {
+      const queryStr = ((nombre || q) as string).trim();
+      if (!queryStr) {
+        res.status(400).json({ message: 'Ingrese un término de búsqueda válido' });
+        return;
+      }
 
+      const pacientes = await prisma.paciente.findMany({
+        where: {
+          OR: [
+            { apellidosNombres: { contains: queryStr, mode: 'insensitive' } },
+            { ci: { contains: queryStr, mode: 'insensitive' } },
+            { nroHistoria: { contains: queryStr, mode: 'insensitive' } },
+          ],
+        },
+        include: {
+          personalMilitar: true,
+          afiliado: true,
+          admisiones: true,
+          encuentros: true,
+          citas: {
+            orderBy: {
+              fechaCita: 'desc',
+            },
+          },
+        },
+        take: 20,
+      });
+
+      if (!pacientes || pacientes.length === 0) {
+        res.status(404).json({
+          error: 'Not Found',
+          message: 'No se encontraron pacientes que coincidan con la búsqueda',
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        data: convertBigIntToString(pacientes),
+      });
+      return;
+    }
+
+    // 2. Búsqueda por Cédula
     if (ci) {
-      paciente = await prisma.paciente.findUnique({
-        where: { ci: ci as string },
+      const ciStr = (ci as string).trim();
+      let paciente = await prisma.paciente.findUnique({
+        where: { ci: ciStr },
         include: {
           personalMilitar: true,
           afiliado: true,
@@ -484,35 +538,112 @@ export const buscarPaciente = async (
           },
         },
       });
-    } else if (historia) {
-      paciente = await prisma.paciente.findUnique({
-        where: { nroHistoria: historia as string },
-        include: {
-          personalMilitar: true,
-          afiliado: true,
-          admisiones: true,
-          encuentros: true,
-          citas: {
-            orderBy: {
-              fechaCita: 'desc',
-            },
-          },
-        },
-      });
-    }
 
-    if (!paciente) {
-      res.status(404).json({
-        error: 'Not Found',
-        message: 'Paciente no encontrado',
+      // Fallback a coincidencia parcial de CI si no es idéntico
+      if (!paciente) {
+        const pacientes = await prisma.paciente.findMany({
+          where: { ci: { contains: ciStr, mode: 'insensitive' } },
+          include: {
+            personalMilitar: true,
+            afiliado: true,
+            admisiones: true,
+            encuentros: true,
+            citas: {
+              orderBy: {
+                fechaCita: 'desc',
+              },
+            },
+          },
+          take: 10,
+        });
+
+        if (pacientes.length === 1) {
+          paciente = pacientes[0];
+        } else if (pacientes.length > 1) {
+          res.status(200).json({
+            success: true,
+            data: convertBigIntToString(pacientes),
+          });
+          return;
+        }
+      }
+
+      if (!paciente) {
+        res.status(404).json({
+          error: 'Not Found',
+          message: 'Paciente no encontrado con esa Cédula',
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        data: convertBigIntToString(paciente),
       });
       return;
     }
 
-    res.status(200).json({
-      success: true,
-      data: convertBigIntToString(paciente),
-    });
+    // 3. Búsqueda por Historia Clínica
+    if (historia) {
+      const historiaStr = (historia as string).trim();
+      let paciente = await prisma.paciente.findUnique({
+        where: { nroHistoria: historiaStr },
+        include: {
+          personalMilitar: true,
+          afiliado: true,
+          admisiones: true,
+          encuentros: true,
+          citas: {
+            orderBy: {
+              fechaCita: 'desc',
+            },
+          },
+        },
+      });
+
+      // Fallback a coincidencia parcial de Historia Clínica
+      if (!paciente) {
+        const pacientes = await prisma.paciente.findMany({
+          where: { nroHistoria: { contains: historiaStr, mode: 'insensitive' } },
+          include: {
+            personalMilitar: true,
+            afiliado: true,
+            admisiones: true,
+            encuentros: true,
+            citas: {
+              orderBy: {
+                fechaCita: 'desc',
+              },
+            },
+          },
+          take: 10,
+        });
+
+        if (pacientes.length === 1) {
+          paciente = pacientes[0];
+        } else if (pacientes.length > 1) {
+          res.status(200).json({
+            success: true,
+            data: convertBigIntToString(pacientes),
+          });
+          return;
+        }
+      }
+
+      if (!paciente) {
+        res.status(404).json({
+          error: 'Not Found',
+          message: 'Paciente no encontrado con ese Nro. de Historia',
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        data: convertBigIntToString(paciente),
+      });
+      return;
+    }
   } catch (error: any) {
     logger.error('Error al buscar paciente:', error);
     res.status(500).json({

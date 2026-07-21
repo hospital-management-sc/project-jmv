@@ -3,7 +3,7 @@
  */
 
 import { Router } from 'express';
-import { login, register, getCurrentUser, forgotPassword } from '../controllers/auth';
+import { login, register, getCurrentUser, forgotPassword, changePassword } from '../controllers/auth';
 import { authMiddleware } from '../middleware/auth';
 
 const router = Router();
@@ -15,5 +15,6 @@ router.post('/forgot-password', forgotPassword);
 
 // Protected endpoints
 router.get('/me', authMiddleware, getCurrentUser);
+router.post('/change-password', authMiddleware, changePassword);
 
 export default router;

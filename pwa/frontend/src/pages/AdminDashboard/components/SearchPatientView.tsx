@@ -13,16 +13,17 @@ interface SearchPatientViewProps {
 }
 
 export function SearchPatientView({ onViewHistory, onScheduleAppointment }: SearchPatientViewProps) {
-  const [searchType, setSearchType] = useState<'ci' | 'historia'>('ci')
+  const [searchType, setSearchType] = useState<'ci' | 'nombre' | 'historia'>('ci')
   const [searchCITipo, setSearchCITipo] = useState('V')
   const [searchCINumeros, setSearchCINumeros] = useState('')
+  const [searchNombre, setSearchNombre] = useState('')
   const [searchHistoria, setSearchHistoria] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
   const [patientData, setPatientData] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleSearchCINumerosChange = (value: string) => {
-    // Solo permitir dígitos, extraer solo los números del paste
     const soloNumeros = value.replace(/\D/g, '').slice(0, 8)
     setSearchCINumeros(soloNumeros)
     setError('')
@@ -41,32 +42,59 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
     setError('')
   }
 
+  const seleccionarPaciente = (paciente: any) => {
+    setSearchResults([])
+    setError('')
+    setPatientData({
+      id: paciente.id,
+      nroHistoria: paciente.nroHistoria,
+      apellidosNombres: paciente.apellidosNombres,
+      ci: paciente.ci,
+      fechaNacimiento: paciente.fechaNacimiento,
+      sexo: paciente.sexo,
+      telefono: paciente.telefono,
+      direccion: paciente.direccion,
+      nacionalidad: paciente.nacionalidad,
+      estado: paciente.estado,
+      lugarNacimiento: paciente.lugarNacimiento,
+      religion: paciente.religion,
+      createdAt: paciente.createdAt,
+      admisiones: paciente.admisiones || [],
+      encuentros: paciente.encuentros || [],
+      personalMilitar: paciente.personalMilitar,
+    })
+  }
+
   const handleSearch = async () => {
-    let searchParam = ''
+    let param = ''
     
     if (searchType === 'ci') {
       if (!searchCINumeros.trim()) {
         setError('Por favor ingrese un CI')
         return
       }
-      searchParam = `${searchCITipo}-${searchCINumeros}`
+      param = `ci=${encodeURIComponent(searchCITipo + '-' + searchCINumeros)}`
+    } else if (searchType === 'nombre') {
+      if (!searchNombre.trim()) {
+        setError('Por favor ingrese un nombre o apellido')
+        return
+      }
+      param = `nombre=${encodeURIComponent(searchNombre.trim())}&q=${encodeURIComponent(searchNombre.trim())}`
     } else {
       if (!searchHistoria.trim()) {
         setError('Por favor ingrese un número de historia')
         return
       }
-      searchParam = searchHistoria
+      param = `historia=${encodeURIComponent(searchHistoria)}`
     }
 
     setLoading(true)
     setError('')
     setPatientData(null)
+    setSearchResults([])
 
     try {
-      // Construir URL de búsqueda
-      const param = searchType === 'ci' ? `ci=${encodeURIComponent(searchParam)}` : `historia=${encodeURIComponent(searchParam)}`
       const url = `${API_BASE_URL}/pacientes/search?${param}`
-
       const response = await fetch(url)
       const result = await response.json()
 
@@ -74,29 +102,32 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
         throw new Error(result.message || 'Paciente no encontrado')
       }
 
-      // Formatear datos para mostrar
-      const paciente = result.data
-      setPatientData({
-        id: paciente.id,
-        nroHistoria: paciente.nroHistoria,
-        apellidosNombres: paciente.apellidosNombres,
-        ci: paciente.ci,
-        fechaNacimiento: paciente.fechaNacimiento,
-        sexo: paciente.sexo,
-        telefono: paciente.telefono,
-        direccion: paciente.direccion,
-        nacionalidad: paciente.nacionalidad,
-        estado: paciente.estado,
-        lugarNacimiento: paciente.lugarNacimiento,
-        religion: paciente.religion,
-        createdAt: paciente.createdAt,
-        admisiones: paciente.admisiones || [],
-        encuentros: paciente.encuentros || [],
-        personalMilitar: paciente.personalMilitar,
-      })
+      if (Array.isArray(result.data)) {
+        if (result.data.length === 0) {
+          throw new Error('No se encontraron pacientes con esa búsqueda')
+        }
+        if (searchType === 'nombre') {
+          setSearchResults(result.data)
+        } else {
+          if (result.data.length === 1) {
+            seleccionarPaciente(result.data[0])
+          } else {
+            setSearchResults(result.data)
+          }
+        }
+      } else if (result.data) {
+        if (searchType === 'nombre') {
+          setSearchResults([result.data])
+        } else {
+          seleccionarPaciente(result.data)
+        }
+      } else {
+        throw new Error('Paciente no encontrado')
+      }
     } catch (err: any) {
       setError(err.message || 'Error al buscar paciente')
       setPatientData(null)
+      setSearchResults([])
     } finally {
       setLoading(false)
     }
@@ -105,21 +136,17 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
   const calcularEdad = (fechaNac: any): number => {
     if (!fechaNac) return 0
     try {
-      // Extraer solo la parte de fecha YYYY-MM-DD sin considerar zona horaria
       let fechaStr: string
       if (typeof fechaNac === 'string') {
-        // Si viene como "1970-03-15" o "1970-03-15T00:00:00.000Z"
         fechaStr = fechaNac.split('T')[0]
       } else if (fechaNac instanceof Date) {
-        // Convertir a ISO y extraer solo la fecha
         fechaStr = fechaNac.toISOString().split('T')[0]
       } else {
         return 0
       }
       
-      // Parsear la fecha como YYYY-MM-DD local (sin zona horaria)
       const [year, month, day] = fechaStr.split('-').map(Number)
-      const nac = new Date(year, month - 1, day) // Mes es 0-indexed
+      const nac = new Date(year, month - 1, day)
       
       if (isNaN(nac.getTime())) return 0
       
@@ -138,7 +165,7 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
   return (
     <section className={styles["form-section"]}>
       <h2>Consultar Historia Clínica</h2>
-      <p className={styles["form-description"]}>Busque pacientes por CI o número de historia clínica</p>
+      <p className={styles["form-description"]}>Busque pacientes por CI, nombre o número de historia clínica</p>
 
       <div className={styles["search-patient-box"]}>
         {/* Selector de tipo de búsqueda */}
@@ -151,12 +178,31 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
                 setSearchType('ci')
                 setSearchCITipo('V')
                 setSearchCINumeros('')
+                setSearchNombre('')
                 setSearchHistoria('')
                 setError('')
                 setPatientData(null)
+                setSearchResults([])
               }}
             />
             Buscar por CI
+          </label>
+          <label className={styles["radio-label"]}>
+            <input
+              type="radio"
+              checked={searchType === 'nombre'}
+              onChange={() => {
+                setSearchType('nombre')
+                setSearchCITipo('V')
+                setSearchCINumeros('')
+                setSearchNombre('')
+                setSearchHistoria('')
+                setError('')
+                setPatientData(null)
+                setSearchResults([])
+              }}
+            />
+            Buscar por Nombre / Apellido
           </label>
           <label className={styles["radio-label"]}>
             <input
@@ -166,9 +212,11 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
                 setSearchType('historia')
                 setSearchCITipo('V')
                 setSearchCINumeros('')
+                setSearchNombre('')
                 setSearchHistoria('')
                 setError('')
                 setPatientData(null)
+                setSearchResults([])
               }}
             />
             Buscar por Nro. Historia
@@ -176,8 +224,7 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
         </div>
 
         <div className={styles["search-input-group"]}>
-          {/* Fila de inputs */}
-          {searchType === 'ci' ? (
+          {searchType === 'ci' && (
             <div className={styles["dual-input-group"]}>
               <select
                 value={searchCITipo}
@@ -186,6 +233,8 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
                 <option value="V">V</option>
                 <option value="E">E</option>
                 <option value="P">P</option>
+                <option value="J">J</option>
+                <option value="G">G</option>
               </select>
               <input
                 type="text"
@@ -199,21 +248,38 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
                 inputMode="numeric"
               />
             </div>
-          ) : (
-            <input
-              type="text"
-              value={searchHistoria}
-              onChange={(e) => handleHistoriaChange(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') handleSearch()
-              }}
-              placeholder="00-00-00"
-              maxLength={8}
-              inputMode="numeric"
-            />
           )}
 
-          {/* Fila de botón */}
+          {searchType === 'nombre' && (
+            <div style={{ flex: 1 }}>
+              <input
+                type="text"
+                className={styles["search-input"]}
+                value={searchNombre}
+                onChange={(e) => { setSearchNombre(e.target.value); setError(''); }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') handleSearch()
+                }}
+                placeholder="Ej: Pérez o María García"
+              />
+            </div>
+          )}
+
+          {searchType === 'historia' && (
+            <div style={{ flex: 1 }}>
+              <input
+                type="text"
+                className={styles["search-input"]}
+                value={searchHistoria}
+                onChange={(e) => handleHistoriaChange(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') handleSearch()
+                }}
+                placeholder="00-00-00"
+              />
+            </div>
+          )}
+
           <div className={styles["search-actions"]}>
             <button
               onClick={handleSearch}
@@ -226,8 +292,48 @@ export function SearchPatientView({ onViewHistory, onScheduleAppointment }: Sear
         </div>
 
         {error && (
-          <div className={styles["error-message"]} style={{ marginTop: '0.75rem', padding: '0.75rem' }}>
+          <div className={styles["error-message"]} style={{ padding: '0.75rem', marginTop: '1rem' }}>
             {error}
+          </div>
+        )}
+
+        {/* Lista de coincidencias encontradas por nombre o múltiples */}
+        {searchResults.length > 0 && (
+          <div style={{ marginTop: '1rem', background: 'rgba(15, 23, 42, 0.6)', padding: '1rem', borderRadius: '0.5rem', border: '1px solid var(--dashboard-border)' }}>
+            <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
+              Coincidencias encontradas ({searchResults.length}):
+            </h4>
+            <div style={{ display: 'grid', gap: '0.5rem', maxHeight: '220px', overflowY: 'auto' }}>
+              {searchResults.map((paciente: any) => (
+                <div
+                  key={paciente.id}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.6rem 0.85rem',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    borderRadius: '0.375rem',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                  }}
+                >
+                  <div>
+                    <strong style={{ color: '#fff', fontSize: '0.9rem' }}>{paciente.apellidosNombres}</strong>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                      CI: <strong>{paciente.ci}</strong> | Historia: <strong>{paciente.nroHistoria}</strong>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => seleccionarPaciente(paciente)}
+                    className={styles["btn-primary"]}
+                    style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                  >
+                    Ver Historia
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

@@ -72,32 +72,50 @@ router.get('/especialidad/:especialidad', async (req, res) => {
       })
     }
 
-    // Buscar médicos con horarios activos en esa especialidad
-    const medicos = await prisma.usuario.findMany({
+    const espDecoded = decodeURIComponent(especialidad).trim()
+
+    // 1. Buscar médicos que coincidan por especialidad en Usuario, PersonalAutorizado o HorariosDisponibilidad
+    let medicos = await prisma.usuario.findMany({
       where: {
-        role: 'MEDICO',
-        horariosDisponibilidad: {
-          some: {
-            especialidad: especialidad,
-            activo: true,
-          },
+        OR: [
+          { role: 'MEDICO' },
+          { role: 'DOCTOR' },
+          { role: 'ADMIN' },
+        ],
+        AND: {
+          OR: [
+            { especialidad: { equals: espDecoded, mode: 'insensitive' } },
+            { especialidad: { contains: espDecoded, mode: 'insensitive' } },
+            {
+              horariosDisponibilidad: {
+                some: {
+                  especialidad: { contains: espDecoded, mode: 'insensitive' },
+                },
+              },
+            },
+            {
+              personalAutorizado: {
+                especialidad: { contains: espDecoded, mode: 'insensitive' },
+              },
+            },
+          ],
         },
       },
       select: {
         id: true,
         nombre: true,
         email: true,
+        especialidad: true,
+        cargo: true,
         horariosDisponibilidad: {
-          where: {
-            especialidad: especialidad,
-            activo: true,
-          },
           select: {
             id: true,
+            especialidad: true,
             diaSemana: true,
             horaInicio: true,
             horaFin: true,
             capacidadPorDia: true,
+            activo: true,
           },
         },
       },
@@ -120,7 +138,7 @@ router.get('/especialidad/:especialidad', async (req, res) => {
       data: medicos,
     })
   } catch (error: any) {
-    console.error('❌ Error al obtener médicos:', error)
+    console.error('Error al obtener médicos:', error)
     return res.status(500).json({
       success: false,
       message: 'Error al obtener médicos disponibles',
@@ -219,11 +237,10 @@ router.get('/:medicoId/disponibilidad', async (req, res) => {
     })
 
     if (!horario) {
-      // Obtener próximas fechas disponibles (próximos 21 días)
+      // Buscar si el médico tiene algún otro horario personalizado registrado
       const horariosDisponibles = await prisma.horarioMedico.findMany({
         where: {
           usuarioId: Number(medicoId),
-          especialidad: especialidad as string,
           activo: true,
         },
         select: {
@@ -235,22 +252,49 @@ router.get('/:medicoId/disponibilidad', async (req, res) => {
         orderBy: { diaSemana: 'asc' },
       })
 
+      // Si el médico NO tiene ningún horario personalizado registrado en absoluto,
+      // aplicar el HORARIO GENERAL POR DEFECTO DEL HOSPITAL (Lunes a Viernes 08:00 - 16:00)
+      if (horariosDisponibles.length === 0) {
+        const fechaStrDefault = getDateStringInVenezuela(fechaCitaCorregida)
+        const citasExistentesDefault = await prisma.cita.count({
+          where: {
+            medicoId: Number(medicoId),
+            fechaCita: new Date(fechaStrDefault),
+            estado: { not: 'CANCELADA' },
+          },
+        })
+        const capacidadDefault = 20
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            medicoId: Number(medicoId),
+            fecha: fecha as string,
+            diaSemana: diaAjustado,
+            atiendeSeDia: true,
+            horaInicio: '08:00',
+            horaFin: '16:00',
+            capacidadTotal: capacidadDefault,
+            citasYaProgramadas: citasExistentesDefault,
+            espaciosDisponibles: Math.max(0, capacidadDefault - citasExistentesDefault),
+          },
+        })
+      }
+
+      // Si el médico SÍ tiene horarios personalizados en otros días, sugerir esas fechas
       const diasProximos = []
-      const diasProcessados = new Set<number>() // 🆕 TRACK which weekdays we've already added
+      const diasProcessados = new Set<number>()
       
-      // Generar próximas 21 fechas (3 semanas para mayor cobertura)
       for (let i = 1; i <= 21; i++) {
         const proximaFecha = new Date(fechaCitaCorregida)
         proximaFecha.setDate(proximaFecha.getDate() + i)
         
         const proximoDia = getDayOfWeekInVenezuela(proximaFecha)
 
-        // Si no es fin de semana Y no hemos agregado este día de semana todavía
         if (proximoDia <= 4 && !diasProcessados.has(proximoDia)) {
           const horarioProximo = horariosDisponibles.find(h => h.diaSemana === proximoDia)
           
           if (horarioProximo) {
-            // Contar citas ya programadas (usar fecha en zona horaria Caracas)
             const proximaFechaStr = getDateStringInVenezuela(proximaFecha)
             const citasCount = await prisma.cita.count({
               where: {
@@ -262,14 +306,12 @@ router.get('/:medicoId/disponibilidad', async (req, res) => {
 
             const espacios = horarioProximo.capacidadPorDia - citasCount
 
-            // Usar fecha en zona horaria Caracas para mostrar
             diasProximos.push({
               fecha: proximaFechaStr,
               dia: getDayNameInSpanish(proximoDia),
               espacios: Math.max(0, espacios),
             })
             
-            // 🆕 Mark this weekday as processed (add only ONE instance per weekday)
             diasProcessados.add(proximoDia)
           }
         }
