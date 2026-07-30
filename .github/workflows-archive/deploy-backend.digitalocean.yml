@@ -1,3 +1,21 @@
+# ARCHIVADO — 2026-07-30
+#
+# Este workflow desplegaba el backend al droplet de DigitalOcean "hospital-jmv"
+# (159.89.191.201) vía SSH + Docker. El droplet fue destruido el 2026-07-30
+# por costos; el backend se migró a Render (https://hospital-jmv-backend.onrender.com).
+#
+# Se conserva aquí como referencia por si en el futuro se necesita volver a
+# desplegar en un VPS propio (DigitalOcean u otro proveedor). Para reactivarlo:
+#   1. Mover este archivo de vuelta a .github/workflows/
+#   2. Levantar un droplet nuevo, instalar Docker
+#   3. Configurar los secrets SSH_HOST, SSH_USERNAME, SSH_KEY en GitHub
+#   4. Clonar el repo en ~/project-jmv dentro del droplet
+#   5. Crear pwa/backend/.env con las mismas variables usadas en Render
+#      (ver sección "Deploy" de CLAUDE.md)
+#
+# La base de datos (Supabase/Postgres) es independiente del droplet y no
+# requiere migración.
+
 name: Deploy Backend to DigitalOcean
 
 on:
@@ -22,25 +40,25 @@ jobs:
           script: |
             echo "Iniciando despliegue automático..."
             cd ~/project-jmv
-            
+
             echo "Trayendo últimos cambios de Git..."
             git reset --hard HEAD
             git pull origin main
-            
+
             cd pwa/backend
-            
+
             echo "Compilando nueva imagen de Docker..."
             docker build -t hospital-backend .
-            
+
             echo "Reiniciando contenedor de Docker..."
             docker stop hospital-backend || true
             docker rm hospital-backend || true
-            
+
             docker run -d \
               --name hospital-backend \
               -p 5000:5000 \
               --env-file .env \
               --restart unless-stopped \
               hospital-backend
-              
+
             echo "¡Despliegue completado con éxito!"
