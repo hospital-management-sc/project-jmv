@@ -30,15 +30,24 @@ PWA de gestión clínica y administrativa para el Hospital Militar Tipo I "Dr. J
 pwa/frontend/     React 19 + TypeScript + Vite (PWA)
 pwa/backend/      Express.js + TypeScript + Prisma + PostgreSQL
 pwa/docker-compose.yml
-.github/workflows/deploy-backend.yml   CI/CD a DigitalOcean
+.github/workflows-archive/deploy-backend.digitalocean.yml   CI/CD antiguo a DigitalOcean (archivado)
 .claude/skills/pre/SKILL.md
 .claude/skills/release/SKILL.md
 ```
 
 ## Deploy
 
-- Backend: GitHub Actions despliega automáticamente a DigitalOcean al hacer push/merge en `main`.
-- Frontend: despliegue manual (pendiente configurar CI para frontend).
+- **Backend**: desplegado en [Render](https://dashboard.render.com) (plan Free), servicio `hospital-jmv-backend`, Dockerfile de `pwa/backend/`. Deploy automático al hacer push/merge en `main` (auto-deploy de Render conectado al repo). URL: `https://hospital-jmv-backend.onrender.com`.
+  - El plan Free "duerme" tras ~15 min de inactividad (cold start de 30-60s en la siguiente petición). Considerar upgrade si esto afecta la operación real del hospital.
+  - Variables de entorno configuradas directamente en el dashboard de Render (no en `.env` del repo): `NODE_ENV`, `DATABASE_URL` (Supabase), `JWT_SECRET`, `JWT_EXPIRY`, `SESSION_SECRET`, `CORS_ORIGIN`, `FRONTEND_URL`.
+- **Frontend**: Vercel, proyecto `project-jmv`. Variable `VITE_API_URL` debe apuntar a la URL del backend en Render (`https://hospital-jmv-backend.onrender.com/api`). Cambios en env vars requieren Redeploy manual para tomar efecto.
+- **Base de datos**: Supabase (Postgres administrado), independiente del hosting del backend — no requiere migración si se cambia de proveedor de backend.
+
+### Historial: droplet de DigitalOcean (destruido 2026-07-30)
+
+El backend corrió antes en un droplet propio de DigitalOcean (`hospital-jmv`, 159.89.191.201, dominio DuckDNS `hospital-jmv.duckdns.org`), desplegado vía Docker + GitHub Actions por SSH. Se destruyó por costos, migrando el backend a Render sin pérdida de datos (la DB ya vivía en Supabase).
+
+El workflow de aquel deploy quedó archivado en [.github/workflows-archive/deploy-backend.digitalocean.yml](.github/workflows-archive/deploy-backend.digitalocean.yml) con instrucciones para reactivarlo si en el futuro se vuelve a necesitar un VPS propio (más control, sin cold starts, pero con costo mensual fijo).
 
 ## Consideraciones de seguridad
 

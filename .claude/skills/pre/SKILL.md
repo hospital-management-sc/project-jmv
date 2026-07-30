@@ -40,7 +40,7 @@ Identifica:
 
 ---
 
-## Paso 3 — Leer versión actual
+## Paso 3 — Leer versión actual y recomendar bump
 
 Lee la versión actual desde `pwa/frontend/package.json`:
 
@@ -48,36 +48,26 @@ Lee la versión actual desde `pwa/frontend/package.json`:
 node -e "console.log(require('./pwa/frontend/package.json').version)" 2>/dev/null
 ```
 
-O si node no está disponible en el path:
+Analiza el tipo de cambios realizados y **recomienda al usuario** el nivel de bump correspondiente (patch, minor o major):
+- **patch** (ej: `0.0.2` → `0.0.3`): Para correcciones de errores (fix), pequeños retoques o refactorizaciones.
+- **minor** (ej: `0.0.2` → `0.1.0`): Para nuevas funcionalidades principales (feat) o mejoras de UI/UX importantes.
+- **major** (ej: `0.0.2` → `1.0.0`): Para cambios de arquitectura, breaking changes o lanzamientos mayores.
 
-```powershell
-(Get-Content "C:\Users\cmoin\Documentos\hospital-management-dev\pwa\frontend\package.json" | ConvertFrom-Json).version
-```
-
-Calcula la siguiente versión **patch** (ej: `0.1.3` → `0.1.4`).
+Muestra la sugerencia al usuario y **solicita su confirmación explícita** sobre qué versión utilizar antes de proceder al Paso 4.
 
 ---
 
-## Paso 4 — Bumpear versión en ambos package.json
+## Paso 4 — Bumpear versión en ambos package.json tras confirmación del usuario
 
-Actualiza el campo `"version"` en **ambos** archivos al mismo valor:
+Una vez confirmada la versión por el usuario, actualiza el campo `"version"` en **ambos** archivos al mismo valor:
 
 - `pwa/frontend/package.json`
 - `pwa/backend/package.json`
 
-Usa PowerShell para hacerlo de forma segura sin romper el JSON:
+Usa Node.js para hacerlo de forma segura sin romper el JSON:
 
-```powershell
-$frontendPath = "C:\Users\cmoin\Documentos\hospital-management-dev\pwa\frontend\package.json"
-$backendPath  = "C:\Users\cmoin\Documentos\hospital-management-dev\pwa\backend\package.json"
-$newVersion   = "<nueva versión calculada>"
-
-$fe = Get-Content $frontendPath -Raw | ConvertFrom-Json
-$be = Get-Content $backendPath  -Raw | ConvertFrom-Json
-$fe.version = $newVersion
-$be.version = $newVersion
-$fe | ConvertTo-Json -Depth 10 | Set-Content $frontendPath -Encoding utf8
-$be | ConvertTo-Json -Depth 10 | Set-Content $backendPath  -Encoding utf8
+```bash
+node -e "const fs = require('fs'); ['pwa/frontend/package.json', 'pwa/backend/package.json'].forEach(p => { const j = JSON.parse(fs.readFileSync(p, 'utf8')); j.version = '<nueva versión confirmada>'; fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n'); });"
 ```
 
 ---
